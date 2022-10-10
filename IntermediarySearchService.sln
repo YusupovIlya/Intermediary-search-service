@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9857EC77-604B-4BE5-A6CF-0D4097A44D39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntermediarySearchService.Infrastructure", "src\IntermediarySearchService.Infrastructure\IntermediarySearchService.Infrastructure.csproj", "{4C31004C-40F1-4191-A84D-48E1B4F501B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntermediarySearchService.Core", "src\IntermediarySearchService.Core\IntermediarySearchService.Core.csproj", "{A02C21D7-4ED2-4BFB-AB4C-978844434985}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C31004C-40F1-4191-A84D-48E1B4F501B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C31004C-40F1-4191-A84D-48E1B4F501B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C31004C-40F1-4191-A84D-48E1B4F501B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C31004C-40F1-4191-A84D-48E1B4F501B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A02C21D7-4ED2-4BFB-AB4C-978844434985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A02C21D7-4ED2-4BFB-AB4C-978844434985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A02C21D7-4ED2-4BFB-AB4C-978844434985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A02C21D7-4ED2-4BFB-AB4C-978844434985}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4C31004C-40F1-4191-A84D-48E1B4F501B9} = {9857EC77-604B-4BE5-A6CF-0D4097A44D39}
+		{A02C21D7-4ED2-4BFB-AB4C-978844434985} = {9857EC77-604B-4BE5-A6CF-0D4097A44D39}
+	EndGlobalSection
+EndGlobal

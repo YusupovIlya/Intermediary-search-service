@@ -10,6 +10,8 @@ public interface IOrderService
 
     Task<Order> GetByIdAsync(int orderId);
 
+    Task<IEnumerable<Order>> GetAllAsync(string userName);
+
     Task AddItemsAsync(int orderId, List<OrderItem> items);
 
     Task DeleteItemsAsync(int orderId, int[] itemsId);

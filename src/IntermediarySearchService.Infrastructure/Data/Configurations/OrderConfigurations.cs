@@ -30,5 +30,13 @@ public class OrderConfigurations : IEntityTypeConfiguration<Order>
         builder.Property(o => o.PerformerFee)
             .IsRequired()
             .HasColumnType("decimal(8,2)");
+
+
+        builder.OwnsMany(a => a.StatesOrder, c =>
+        {
+            c.WithOwner().HasForeignKey("OwnerId");
+            c.Property<int>("Id");
+            c.HasKey("Id");
+        });
     }
 }

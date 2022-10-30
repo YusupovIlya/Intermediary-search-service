@@ -21,7 +21,7 @@ public class OrderService : IOrderService
 
     public async Task<Order> GetByIdAsync(int orderId)
     {
-        var orderSpec = new OrderWithItemSpecification(orderId);
+        var orderSpec = new OrderWithItemsSpecification(orderId);
         var order = await _orderRepository.FirstOrDefaultAsync(orderSpec);
         if (order != null)
             return order;
@@ -29,9 +29,16 @@ public class OrderService : IOrderService
             throw new OrderNotFoundException(orderId);
     }
 
+    public async Task<IEnumerable<Order>> GetAllAsync(string userName)
+    {
+        var orderSpec = new OrdersWithItemsSpecification(userName);
+        var orders = await _orderRepository.ListAsync(orderSpec);
+        return orders;
+    }
+
     public async Task AddItemsAsync(int orderId, List<OrderItem> items)
     {
-        var orderSpec = new OrderWithItemSpecification(orderId);
+        var orderSpec = new OrderWithItemsSpecification(orderId);
         var order = await _orderRepository.FirstOrDefaultAsync(orderSpec);
         if(order != null)
         {
@@ -55,7 +62,7 @@ public class OrderService : IOrderService
 
     public async Task DeleteItemsAsync(int orderId, int[] itemsId)
     {
-        var orderSpec = new OrderWithItemSpecification(orderId);
+        var orderSpec = new OrderWithItemsSpecification(orderId);
         var order = await _orderRepository.FirstOrDefaultAsync(orderSpec);
         if (order != null)
         {

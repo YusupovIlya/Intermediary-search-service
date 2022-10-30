@@ -13,6 +13,8 @@ public class Offer: BaseEntity, IAggregateRoot
     public decimal? Expenses { get; private set; }
     public bool isSelected { get; private set; } = false;
 
+    private Offer() { }
+
     public Offer(int orderId, string userName, decimal itemsTotalCost,
                  decimal deliveryCost, decimal expenses = 0m)
     {

@@ -1,17 +1,9 @@
 ﻿using IntermediarySearchService.Core.Entities.OfferAggregate;
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Core.Exceptions;
+using System.ComponentModel;
 
 namespace IntermediarySearchService.Core.Entities.OrderAggregate;
-
-public enum StateOrder
-{
-    InSearchPerformer,
-    AwaitingShipment,
-    Shipped,
-    Received,
-}
-
 
 public class Order: BaseEntity, IAggregateRoot
 {
@@ -19,13 +11,17 @@ public class Order: BaseEntity, IAggregateRoot
     public string SiteName { get; private set; }
     public string SiteLink { get; private set; }
     public decimal PerformerFee { get; private set; }
-    public StateOrder StateOrder { get; private set; } = StateOrder.InSearchPerformer;
+
+    private readonly List<StateOrder> _statesOrder = new List<StateOrder>();
+    public IReadOnlyCollection<StateOrder> StatesOrder => _statesOrder.AsReadOnly();
 
     private readonly List<OrderItem> _orderItems = new List<OrderItem>();
     public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
     private readonly List<Offer> _offers = new List<Offer>();
     public IReadOnlyCollection<Offer> Offers => _offers.AsReadOnly();
+
+    private Order() { }
 
     public Order(string userName, string siteName, string siteLink, 
         decimal performerFee, List<OrderItem> orderItems)
@@ -35,6 +31,7 @@ public class Order: BaseEntity, IAggregateRoot
         SiteLink = siteLink;
         PerformerFee = performerFee;
         _orderItems = orderItems;
+        AddStateOrder();
     }
 
     public void AddItem(string productName, string options, string productLink,
@@ -69,6 +66,12 @@ public class Order: BaseEntity, IAggregateRoot
         }
         else
             throw new OfferNotFoundException(offerId);
+    }
+
+    public void AddStateOrder(State stateOrder = State.InSearchPerformer, string description = null)
+    {
+        StateOrder newState = new(stateOrder, description, DateTime.Now);
+        _statesOrder.Add(newState);
     }
 
     public decimal TotalOrderPrice() => _orderItems.Sum(i => i.Units * i.UnitPrice);

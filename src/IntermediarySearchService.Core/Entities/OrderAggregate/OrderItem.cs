@@ -8,6 +8,7 @@ public class OrderItem: BaseEntity
     public decimal UnitPrice { get; private set; }
     public int Units { get; private set; }
 
+    private OrderItem() { }
     public OrderItem(string productName, string options, string productLink, decimal unitPrice, int units)
     {
         ProductName = productName;

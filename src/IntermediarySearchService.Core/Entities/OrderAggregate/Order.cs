@@ -23,14 +23,18 @@ public class Order: BaseEntity, IAggregateRoot
 
     private Order() { }
 
+    public Order(List<OrderItem> orderItems)
+    {
+        _orderItems = orderItems;
+    }
+
     public Order(string userName, string siteName, string siteLink, 
-        decimal performerFee, List<OrderItem> orderItems)
+        decimal performerFee, List<OrderItem> orderItems) : this(orderItems)
     {
         UserName = userName;
         SiteName = siteName;
         SiteLink = siteLink;
         PerformerFee = performerFee;
-        _orderItems = orderItems;
         AddStateOrder();
     }
 

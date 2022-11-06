@@ -13,6 +13,11 @@ public class OrderConfigurations : IEntityTypeConfiguration<Order>
         navigation?.SetPropertyAccessMode(PropertyAccessMode.Field);
 
         builder
+            .HasMany(o => o.OrderItems)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+     
+        builder
             .Property(o => o.UserName)
             .IsRequired()
             .HasMaxLength(20);

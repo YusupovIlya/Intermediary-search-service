@@ -60,6 +60,11 @@ public class OrderService : IOrderService
             throw new OrderNotFoundException(orderId);
     }
 
+    public async Task UpdateAsync(Order order)
+    {
+        await _orderRepository.UpdateAsync(order);
+    }
+
     public async Task DeleteItemsAsync(int orderId, int[] itemsId)
     {
         var orderSpec = new OrderWithItemsSpecification(orderId);

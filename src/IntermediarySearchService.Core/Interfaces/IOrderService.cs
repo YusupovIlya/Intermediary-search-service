@@ -17,4 +17,6 @@ public interface IOrderService
     Task DeleteItemsAsync(int orderId, int[] itemsId);
 
     Task DeleteAsync(int orderId);
+
+    Task UpdateAsync(Order order);
 }

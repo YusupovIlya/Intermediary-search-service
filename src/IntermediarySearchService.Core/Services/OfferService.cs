@@ -12,7 +12,7 @@ public class OfferService : IOfferService
         _offerRepository = offerRepository;
     }
     public async Task CreateAsync(int orderId, string userId, decimal itemsTotalCost,
-                            decimal deliveryCost, decimal expenses = 0m)
+                            decimal deliveryCost, decimal? expenses = 0m)
     {
         var offer = new Offer(orderId, userId, itemsTotalCost, deliveryCost, expenses);
         await _offerRepository.AddAsync(offer);

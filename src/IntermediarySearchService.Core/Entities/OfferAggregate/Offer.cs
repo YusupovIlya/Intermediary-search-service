@@ -16,7 +16,7 @@ public class Offer: BaseEntity, IAggregateRoot
     private Offer() { }
 
     public Offer(int orderId, string userName, decimal itemsTotalCost,
-                 decimal deliveryCost, decimal expenses = 0m)
+                 decimal deliveryCost, decimal? expenses = 0m)
     {
         OrderId = orderId;
         UserName = userName;

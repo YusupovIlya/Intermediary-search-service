@@ -1,10 +1,41 @@
 import ReactDOM from "react-dom";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
-import { NewOrder } from "../models";
+import { INewOrder, IOrderItem } from "../models";
 import { MdDeleteForever } from "react-icons/md";
+import { ReactTinyLink } from 'react-tiny-link';
+import { useScrapper } from 'react-tiny-link'
+import { useState } from "react";
+import { useCreateOrderMutation } from "../store/intermediarysearchservice.api";
 
 export default function CreateOrder() {
-  const {register, control, handleSubmit, formState: { errors }} = useForm<NewOrder>({
+  const [createOrder, response] = useCreateOrderMutation();
+  const [imgLinks, setImgLinks] = useState<string[]>([""]);
+  const [itemLinks, setItemLinks] = useState<string[]>([""]);
+  const [source, setSource] = useState(-1);
+  const [btnAdd, setbtnAdd] = useState(true);
+
+  const [result, loading, error] = useScrapper({
+    url: itemLinks[source],
+    onSuccess: 
+              (response:any) => {
+
+                console.log(response); //
+
+                if(response != undefined){
+                  setImgLinks(imgLinks => {
+                    let newAr = [...imgLinks];
+                    newAr[source] = response.image[0];
+                    return newAr;
+                  });
+
+                  //setbtnAdd(false);
+                  
+                  console.log(register(`orderItems.${source}.imgLink`)); //
+                }
+              },
+  });
+
+  const {register, control, handleSubmit, formState: { errors }} = useForm<INewOrder>({
     mode: "onBlur",
     defaultValues: {
       orderItems: [{
@@ -12,17 +43,33 @@ export default function CreateOrder() {
         options: "",
         productLink: "",
         unitPrice: 0,
-        units: 0
+        units: 0,
+        imgLink: ""
       }]
     },
   });
+
   const { fields, append, remove } = useFieldArray({
     name: "orderItems",
     control
   });
-  const onSubmit = (data: NewOrder) => console.log(data);
-   
+
+  const onSubmit = (data: INewOrder) => {
+    imgLinks.map((value, index) => data.orderItems[index].imgLink = value);
+    console.log(data);
+    // createOrder(data)
+    //   .unwrap()
+    //   .then((pl) => console.log('fulfilled', pl))
+    //   .catch((error) => console.error('rejected', error));
+  };
+
+  const checkValidUrl = (url: string) => {
+    const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+    return regex.test(url);
+  }
+  
   return (
+    
 <div className="py-6 flex flex-col justify-center">
   <div className="relative py-3">
     <div className="relative px-4 py-10 bg-white mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
@@ -30,17 +77,16 @@ export default function CreateOrder() {
         <div className="flex items-center space-x-5">
           <div className="h-14 w-14 bg-yellow-200 rounded-full flex flex-shrink-0 justify-center items-center text-yellow-500 text-2xl font-mono">i</div>
           <div className="block pl-2 font-semibold text-xl self-start text-gray-700">
-            <h2 className="leading-relaxed">Create an Event</h2>
-            <p className="text-sm text-gray-500 font-normal leading-relaxed">Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+            <h2 className="leading-relaxed">Форма создания заказа</h2>
+            <p className="text-sm text-gray-500 font-normal leading-relaxed">Пожалуйста заполните основную информацию</p>
           </div>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 pt-6">
-          <div className="divide-y divide-gray-200">
             <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
               <div className="flex flex-col">
                 <label className="leading-loose">Название сайта</label>
                 <input
-                {...register("siteName", { required: "Пожалуйста введите название сайта!", maxLength: 100 })}
+                {...register("siteName", { required: "Введите название сайта!", maxLength: 100 })}
                 type="text" 
                 className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" />
               <p className="text-red-600 inline">
@@ -51,14 +97,14 @@ export default function CreateOrder() {
                 <label className="leading-loose">Ссылка на сайт</label>
                 <input
                 {...register("siteLink", 
-                { required: 'Пожалуйста введите ссылку на сайт!',
+                { required: 'Введите ссылку на сайт!',
                   pattern: {
                     value: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/,
                     message: 'Неверный формат ссылки!',
                   }})
                 }
                 type="text" 
-                className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" />
+                className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" />            
                 <p className="text-red-600 inline">
                   {errors?.siteLink && errors.siteLink.message}
                 </p>
@@ -90,7 +136,7 @@ export default function CreateOrder() {
                       <input
                         className={`px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600 ${errors?.orderItems?.[index]?.productName ? "error" : ""}`}
                         {...register(`orderItems.${index}.productName` as const, {
-                          required: "Пожалуйста введите название товара!"
+                          required: "Введите название товара!"
                         })}
                       />                   
                     </div>
@@ -100,7 +146,7 @@ export default function CreateOrder() {
                         className={`px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600 ${errors?.orderItems?.[index]?.options ? "error" : ""}`}
                         placeholder="Размер, цвет, вес и т.д."
                         {...register(`orderItems.${index}.options` as const, {
-                          required: "Пожалуйста введите характеристики товара!"
+                          required: "Введите характеристики товара!"
                         })}
                       />
                     </div>
@@ -109,12 +155,20 @@ export default function CreateOrder() {
                       <input
                         className={`px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600 ${errors?.orderItems?.[index]?.productLink ? "error" : ""}`}
                         {...register(`orderItems.${index}.productLink` as const, {
-                          required: "Пожалуйста введите ссылку на товар!",
+                          required: "Введите ссылку на товар!",
                           pattern: {
                             value: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/,
                             message: 'Неверный формат ссылки!',
                           }
                         })}
+                        onBlur={(e) => {
+                          setItemLinks(itemLinks => {
+                            itemLinks[index] = e.target.value;
+                            return itemLinks;
+                          });
+                          setSource(index);
+                          //setbtnAdd(true);
+                        }}
                       />
                     </div>
                     <div className="flex flex-col w-2/12">
@@ -126,7 +180,7 @@ export default function CreateOrder() {
                         step="any"
                         {...register(`orderItems.${index}.unitPrice` as const, {
                           valueAsNumber: true,
-                          required: "Пожалуйста укажите стоимость за ед. товара!",
+                          required: "Укажите стоимость за ед. товара!",
                           min: {
                             value: 0.001,
                             message: "Минимальная стоимость ед. товара составляет 0.001 ден. ед.!"
@@ -143,7 +197,7 @@ export default function CreateOrder() {
                         {...register(`orderItems.${index}.units` as const,
                         {
                           valueAsNumber: true,
-                          required: "Пожалуйста укажите количество товара!",
+                          required: "Укажите количество товара!",
                           min: {
                             value: 1,
                             message: "Минимальное количество товара составляет 1 ед."
@@ -152,12 +206,41 @@ export default function CreateOrder() {
                       />
                     </div>
                     <div className="flex items-end justify-center">
-                      <button type="button" onClick={() => remove(index)}>
+                      <button type="button" onClick={() => {
+                        remove(index);
+
+                        setImgLinks(imgLinks => {
+                          imgLinks.splice(index, 1);
+                          return imgLinks;
+                        });
+
+                        setItemLinks(itemLinks => {
+                          itemLinks.splice(index, 1);
+                          return itemLinks;
+                        });
+
+                       console.log(imgLinks); //
+                       console.log(itemLinks); //
+                      }}>
                         <MdDeleteForever size={35} />
                       </button>
                     </div>
                   </div>
+                  <div className="flex flex-row">
+                    {(itemLinks[index] != "" && itemLinks[index] != undefined && checkValidUrl(itemLinks[index])) &&
+                      <ReactTinyLink
+                      cardSize="small"
+                      showGraphic={true}
+                      maxLine={2}
+                      minLine={1}
+                      url={itemLinks[index]}
+                      />                       
+                    }
+                  </div>
                   <div className="flex flex-col">
+                    <p className="text-red-600 inline">
+                      {errors?.orderItems?.[index]?.imgLink && errors?.orderItems?.[index]?.imgLink?.message}
+                    </p>
                     <p className="text-red-600 inline">
                       {errors?.orderItems?.[index]?.productName && errors?.orderItems?.[index]?.productName?.message}
                     </p>
@@ -182,15 +265,29 @@ export default function CreateOrder() {
               <button
                 type="button"
                 className="bg-yellow-300 px-5 py-3 text-sm shadow-sm font-medium tracking-wider  text-yellow-600 rounded-full hover:shadow-2xl hover:bg-yellow-400"
-                onClick={() =>
+                onClick={() => {
                   append({
                     productName: "",
                     options: "",
                     productLink: "",
                     unitPrice: 0,
-                    units: 0
-                  })
-                }>
+                    units: 0,
+                    imgLink: ""
+                  });
+                  setImgLinks(imgLinks => {
+                    let newAr = [...imgLinks];
+                    newAr.push("");
+                    return newAr;
+                  });
+                  setItemLinks(itemLinks => {
+                    let newAr = [...itemLinks];
+                    newAr.push("");
+                    return newAr;
+                  });
+                }
+              }
+              //disabled={btnAdd}
+              >
               Добавить товар
               </button>
             </div>
@@ -205,7 +302,6 @@ export default function CreateOrder() {
                 Вернуться назад
               </button>
             </div>
-          </div>
         </form>
       </div>
     </div>

@@ -2,7 +2,7 @@ import React from "react";
 import { CgMonday } from "react-icons/cg";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
-import { INav } from "../data/navigation";
+import { INav } from "../store/navigation";
 
 
 export interface NavbarProps {
@@ -14,7 +14,7 @@ export interface NavbarProps {
 
 export function Navbar({ navigationData, currentRoute, setCurrentRoute }: NavbarProps) {
   return (
-    <nav className="hidden md:flex flex-row items-center justify-between px-8 h-20 rounded-b-3xl bg-white">
+    <nav className="flex flex-row items-center justify-between px-8 h-20 rounded-b-3xl bg-white">
       <span className="text-5xl text-gray-800 -mb-1">
         <CgMonday />
       </span>

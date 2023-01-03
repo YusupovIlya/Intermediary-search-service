@@ -10,7 +10,7 @@ export interface IOrderItem {
     productName: string
     options: string
     productLink: string
-    imgLink: string
+    imgLinks: string[]
     unitPrice: number
     units: number
   }

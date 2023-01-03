@@ -9,10 +9,9 @@ import { useCreateOrderMutation } from "../store/intermediarysearchservice.api";
 
 export default function CreateOrder() {
   const [createOrder, response] = useCreateOrderMutation();
-  const [imgLinks, setImgLinks] = useState<string[]>([""]);
+  const [imgLinks, setImgLinks] = useState<string[][]>([[]]);
   const [itemLinks, setItemLinks] = useState<string[]>([""]);
   const [source, setSource] = useState(-1);
-  const [btnAdd, setbtnAdd] = useState(true);
 
   const [result, loading, error] = useScrapper({
     url: itemLinks[source],
@@ -22,15 +21,12 @@ export default function CreateOrder() {
                 console.log(response); //
 
                 if(response != undefined){
-                  setImgLinks(imgLinks => {
-                    let newAr = [...imgLinks];
-                    newAr[source] = response.image[0];
-                    return newAr;
-                  });
 
-                  //setbtnAdd(false);
-                  
-                  console.log(register(`orderItems.${source}.imgLink`)); //
+                  setImgLinks([
+                      ...imgLinks.slice(0, source),
+                      response.image,
+                      ...imgLinks.slice(source+1)
+                    ]);                  
                 }
               },
   });
@@ -44,7 +40,7 @@ export default function CreateOrder() {
         productLink: "",
         unitPrice: 0,
         units: 0,
-        imgLink: ""
+        imgLinks: []
       }]
     },
   });
@@ -55,7 +51,7 @@ export default function CreateOrder() {
   });
 
   const onSubmit = (data: INewOrder) => {
-    imgLinks.map((value, index) => data.orderItems[index].imgLink = value);
+    imgLinks.map((value, index) => data.orderItems[index].imgLinks = value);
     console.log(data);
     // createOrder(data)
     //   .unwrap()
@@ -167,7 +163,6 @@ export default function CreateOrder() {
                             return itemLinks;
                           });
                           setSource(index);
-                          //setbtnAdd(true);
                         }}
                       />
                     </div>
@@ -209,15 +204,8 @@ export default function CreateOrder() {
                       <button type="button" onClick={() => {
                         remove(index);
 
-                        setImgLinks(imgLinks => {
-                          imgLinks.splice(index, 1);
-                          return imgLinks;
-                        });
-
-                        setItemLinks(itemLinks => {
-                          itemLinks.splice(index, 1);
-                          return itemLinks;
-                        });
+                        setImgLinks([ ...imgLinks.slice(0, index), ...imgLinks.slice(index+1) ]);
+                        setItemLinks([ ...itemLinks.slice(0, index), ...itemLinks.slice(index+1) ]);
 
                        console.log(imgLinks); //
                        console.log(itemLinks); //
@@ -226,7 +214,7 @@ export default function CreateOrder() {
                       </button>
                     </div>
                   </div>
-                  <div className="flex flex-row">
+                  <div className="flex flex-row mt-4">
                     {(itemLinks[index] != "" && itemLinks[index] != undefined && checkValidUrl(itemLinks[index])) &&
                       <ReactTinyLink
                       cardSize="small"
@@ -238,9 +226,6 @@ export default function CreateOrder() {
                     }
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-red-600 inline">
-                      {errors?.orderItems?.[index]?.imgLink && errors?.orderItems?.[index]?.imgLink?.message}
-                    </p>
                     <p className="text-red-600 inline">
                       {errors?.orderItems?.[index]?.productName && errors?.orderItems?.[index]?.productName?.message}
                     </p>
@@ -264,7 +249,7 @@ export default function CreateOrder() {
             <div className="flex flex-col">
               <button
                 type="button"
-                className="bg-yellow-300 px-5 py-3 text-sm shadow-sm font-medium tracking-wider  text-yellow-600 rounded-full hover:shadow-2xl hover:bg-yellow-400"
+                className="bg-yellow-300 px-5 py-3 text-base shadow-sm font-semibold tracking-wider  text-yellow-600 rounded-full hover:shadow-2xl hover:bg-yellow-400"
                 onClick={() => {
                   append({
                     productName: "",
@@ -272,21 +257,13 @@ export default function CreateOrder() {
                     productLink: "",
                     unitPrice: 0,
                     units: 0,
-                    imgLink: ""
+                    imgLinks: []
                   });
-                  setImgLinks(imgLinks => {
-                    let newAr = [...imgLinks];
-                    newAr.push("");
-                    return newAr;
-                  });
-                  setItemLinks(itemLinks => {
-                    let newAr = [...itemLinks];
-                    newAr.push("");
-                    return newAr;
-                  });
+
+                  setImgLinks([ ...imgLinks, [] ]);
+                  setItemLinks([ ...itemLinks, "" ]);
                 }
               }
-              //disabled={btnAdd}
               >
               Добавить товар
               </button>

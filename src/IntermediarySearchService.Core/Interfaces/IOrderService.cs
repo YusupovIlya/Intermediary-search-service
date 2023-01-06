@@ -5,7 +5,7 @@ namespace IntermediarySearchService.Core.Interfaces;
 
 public interface IOrderService
 {
-    Task CreateAsync(string userName, string siteName, string siteLink,
+    Task<int> CreateAsync(string userName, string siteName, string siteLink,
                      decimal performerFee, List<OrderItem> orderItems);
 
     Task<Order> GetByIdAsync(int orderId);

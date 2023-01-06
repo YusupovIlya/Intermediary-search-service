@@ -43,9 +43,10 @@ public class OrderController : BaseController
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] NewOrderModel order)
     {
-        await _orderService.CreateAsync(GetUserName(), order.SiteName, order.SiteLink,
+        int orderId = await _orderService.CreateAsync("ilya", order.SiteName, order.SiteLink,
                                         order.PerformerFee, order.OrderItems);
-        return Ok();
+        var response = new ResponseModel(orderId, "Order was successfully created");
+        return Ok(response);
     }
 
     // PUT api/v1/order/additems/5

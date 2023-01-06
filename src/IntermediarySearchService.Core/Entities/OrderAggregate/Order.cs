@@ -39,9 +39,9 @@ public class Order: BaseEntity, IAggregateRoot
     }
 
     public void AddItem(string productName, string options, string productLink,
-                        decimal unitPrice, int units = 1)
+                        decimal unitPrice, List<OrderItemImage> images, int units = 1)
     {
-        var orderItem = new OrderItem(productName, options, productLink, unitPrice, units);
+        var orderItem = new OrderItem(productName, options, productLink, unitPrice, units, images);
         _orderItems.Add(orderItem);
     }
 

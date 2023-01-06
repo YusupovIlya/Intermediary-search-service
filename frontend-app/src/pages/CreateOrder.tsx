@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
-import { INewOrder, IOrderItem } from "../models";
+import { INewOrder, IOrderItem, IOrderItemImage } from "../models";
 import { MdDeleteForever } from "react-icons/md";
 import { ReactTinyLink } from 'react-tiny-link';
 import { useScrapper } from 'react-tiny-link'
@@ -9,10 +9,9 @@ import { useCreateOrderMutation } from "../store/intermediarysearchservice.api";
 
 export default function CreateOrder() {
   const [createOrder, response] = useCreateOrderMutation();
-  const [imgLinks, setImgLinks] = useState<string[]>([""]);
+  const [images, setImages] = useState<string[][]>([[]]);
   const [itemLinks, setItemLinks] = useState<string[]>([""]);
   const [source, setSource] = useState(-1);
-  const [btnAdd, setbtnAdd] = useState(true);
 
   const [result, loading, error] = useScrapper({
     url: itemLinks[source],
@@ -22,15 +21,12 @@ export default function CreateOrder() {
                 console.log(response); //
 
                 if(response != undefined){
-                  setImgLinks(imgLinks => {
-                    let newAr = [...imgLinks];
-                    newAr[source] = response.image[0];
-                    return newAr;
-                  });
 
-                  //setbtnAdd(false);
-                  
-                  console.log(register(`orderItems.${source}.imgLink`)); //
+                  setImages([
+                      ...images.slice(0, source),
+                      response.image,
+                      ...images.slice(source+1)
+                    ]);                  
                 }
               },
   });
@@ -44,7 +40,7 @@ export default function CreateOrder() {
         productLink: "",
         unitPrice: 0,
         units: 0,
-        imgLink: ""
+        images: []
       }]
     },
   });
@@ -55,12 +51,13 @@ export default function CreateOrder() {
   });
 
   const onSubmit = (data: INewOrder) => {
-    imgLinks.map((value, index) => data.orderItems[index].imgLink = value);
+    images.map((value, index) => {
+      const imagesObj: IOrderItemImage[] = value.map(i => {return  {imageLink: i}});
+      data.orderItems[index].images = imagesObj;
+    });
     console.log(data);
-    // createOrder(data)
-    //   .unwrap()
-    //   .then((pl) => console.log('fulfilled', pl))
-    //   .catch((error) => console.error('rejected', error));
+    createOrder(data)
+      .unwrap();
   };
 
   const checkValidUrl = (url: string) => {
@@ -69,7 +66,6 @@ export default function CreateOrder() {
   }
   
   return (
-    
 <div className="py-6 flex flex-col justify-center">
   <div className="relative py-3">
     <div className="relative px-4 py-10 bg-white mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
@@ -167,7 +163,6 @@ export default function CreateOrder() {
                             return itemLinks;
                           });
                           setSource(index);
-                          //setbtnAdd(true);
                         }}
                       />
                     </div>
@@ -208,25 +203,14 @@ export default function CreateOrder() {
                     <div className="flex items-end justify-center">
                       <button type="button" onClick={() => {
                         remove(index);
-
-                        setImgLinks(imgLinks => {
-                          imgLinks.splice(index, 1);
-                          return imgLinks;
-                        });
-
-                        setItemLinks(itemLinks => {
-                          itemLinks.splice(index, 1);
-                          return itemLinks;
-                        });
-
-                       console.log(imgLinks); //
-                       console.log(itemLinks); //
+                        setImages([ ...images.slice(0, index), ...images.slice(index+1) ]);
+                        setItemLinks([ ...itemLinks.slice(0, index), ...itemLinks.slice(index+1) ]);
                       }}>
                         <MdDeleteForever size={35} />
                       </button>
                     </div>
                   </div>
-                  <div className="flex flex-row">
+                  <div className="flex flex-row mt-4">
                     {(itemLinks[index] != "" && itemLinks[index] != undefined && checkValidUrl(itemLinks[index])) &&
                       <ReactTinyLink
                       cardSize="small"
@@ -238,9 +222,6 @@ export default function CreateOrder() {
                     }
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-red-600 inline">
-                      {errors?.orderItems?.[index]?.imgLink && errors?.orderItems?.[index]?.imgLink?.message}
-                    </p>
                     <p className="text-red-600 inline">
                       {errors?.orderItems?.[index]?.productName && errors?.orderItems?.[index]?.productName?.message}
                     </p>
@@ -264,7 +245,7 @@ export default function CreateOrder() {
             <div className="flex flex-col">
               <button
                 type="button"
-                className="bg-yellow-300 px-5 py-3 text-sm shadow-sm font-medium tracking-wider  text-yellow-600 rounded-full hover:shadow-2xl hover:bg-yellow-400"
+                className="bg-yellow-300 px-5 py-3 text-base shadow-sm font-semibold tracking-wider  text-yellow-600 rounded-full hover:shadow-2xl hover:bg-yellow-400"
                 onClick={() => {
                   append({
                     productName: "",
@@ -272,21 +253,13 @@ export default function CreateOrder() {
                     productLink: "",
                     unitPrice: 0,
                     units: 0,
-                    imgLink: ""
+                    images: []
                   });
-                  setImgLinks(imgLinks => {
-                    let newAr = [...imgLinks];
-                    newAr.push("");
-                    return newAr;
-                  });
-                  setItemLinks(itemLinks => {
-                    let newAr = [...itemLinks];
-                    newAr.push("");
-                    return newAr;
-                  });
+
+                  setImages([ ...images, [] ]);
+                  setItemLinks([ ...itemLinks, "" ]);
                 }
               }
-              //disabled={btnAdd}
               >
               Добавить товар
               </button>

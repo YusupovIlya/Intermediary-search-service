@@ -10,13 +10,17 @@ export interface IOrderItem {
     productName: string
     options: string
     productLink: string
-    imgLinks: string[]
+    images: IOrderItemImage[]
     unitPrice: number
     units: number
   }
 
-  export interface ICreateOrderResponse{
+export interface ICreateOrderResponse{
     orderId: number
     message: string
     creatorName: string
+  }
+
+export interface IOrderItemImage {
+    imageLink: string
   }

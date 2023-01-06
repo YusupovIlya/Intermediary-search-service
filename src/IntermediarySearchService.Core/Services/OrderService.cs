@@ -13,10 +13,11 @@ public class OrderService : IOrderService
         _orderRepository = orderRepository;
     }
 
-    public async Task CreateAsync(string userName, string siteName, string siteLink, decimal performerFee, List<OrderItem> orderItems)
+    public async Task<int> CreateAsync(string userName, string siteName, string siteLink, decimal performerFee, List<OrderItem> orderItems)
     {
         var order = new Order(userName, siteName, siteLink, performerFee, orderItems);
         await _orderRepository.AddAsync(order);
+        return order.Id;
     }
 
     public async Task<Order> GetByIdAsync(int orderId)

@@ -24,8 +24,14 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
             .HasMaxLength(100);
 
 
-        builder.Property(oi => oi.UnitPrice)
+        builder
+            .Property(oi => oi.UnitPrice)
             .IsRequired()
             .HasColumnType("decimal(8,2)");
+
+        builder
+            .HasMany(oi => oi.Images)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

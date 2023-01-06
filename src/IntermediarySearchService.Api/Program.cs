@@ -8,6 +8,16 @@ using IntermediarySearchService.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
+    builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    }));
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext")));
 
@@ -28,7 +38,6 @@ builder.Services.AddSwaggerGen(opt =>
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,6 +48,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//app.UseMiddleware<AuthMiddleware>();
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 

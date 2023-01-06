@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
-import { INewOrder, IOrderItem } from "../models";
+import { INewOrder, IOrderItem, IOrderItemImage } from "../models";
 import { MdDeleteForever } from "react-icons/md";
 import { ReactTinyLink } from 'react-tiny-link';
 import { useScrapper } from 'react-tiny-link'
@@ -9,7 +9,7 @@ import { useCreateOrderMutation } from "../store/intermediarysearchservice.api";
 
 export default function CreateOrder() {
   const [createOrder, response] = useCreateOrderMutation();
-  const [imgLinks, setImgLinks] = useState<string[][]>([[]]);
+  const [images, setImages] = useState<string[][]>([[]]);
   const [itemLinks, setItemLinks] = useState<string[]>([""]);
   const [source, setSource] = useState(-1);
 
@@ -22,10 +22,10 @@ export default function CreateOrder() {
 
                 if(response != undefined){
 
-                  setImgLinks([
-                      ...imgLinks.slice(0, source),
+                  setImages([
+                      ...images.slice(0, source),
                       response.image,
-                      ...imgLinks.slice(source+1)
+                      ...images.slice(source+1)
                     ]);                  
                 }
               },
@@ -40,7 +40,7 @@ export default function CreateOrder() {
         productLink: "",
         unitPrice: 0,
         units: 0,
-        imgLinks: []
+        images: []
       }]
     },
   });
@@ -51,12 +51,13 @@ export default function CreateOrder() {
   });
 
   const onSubmit = (data: INewOrder) => {
-    imgLinks.map((value, index) => data.orderItems[index].imgLinks = value);
+    images.map((value, index) => {
+      const imagesObj: IOrderItemImage[] = value.map(i => {return  {imageLink: i}});
+      data.orderItems[index].images = imagesObj;
+    });
     console.log(data);
-    // createOrder(data)
-    //   .unwrap()
-    //   .then((pl) => console.log('fulfilled', pl))
-    //   .catch((error) => console.error('rejected', error));
+    createOrder(data)
+      .unwrap();
   };
 
   const checkValidUrl = (url: string) => {
@@ -65,7 +66,6 @@ export default function CreateOrder() {
   }
   
   return (
-    
 <div className="py-6 flex flex-col justify-center">
   <div className="relative py-3">
     <div className="relative px-4 py-10 bg-white mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
@@ -203,12 +203,8 @@ export default function CreateOrder() {
                     <div className="flex items-end justify-center">
                       <button type="button" onClick={() => {
                         remove(index);
-
-                        setImgLinks([ ...imgLinks.slice(0, index), ...imgLinks.slice(index+1) ]);
+                        setImages([ ...images.slice(0, index), ...images.slice(index+1) ]);
                         setItemLinks([ ...itemLinks.slice(0, index), ...itemLinks.slice(index+1) ]);
-
-                       console.log(imgLinks); //
-                       console.log(itemLinks); //
                       }}>
                         <MdDeleteForever size={35} />
                       </button>
@@ -257,10 +253,10 @@ export default function CreateOrder() {
                     productLink: "",
                     unitPrice: 0,
                     units: 0,
-                    imgLinks: []
+                    images: []
                   });
 
-                  setImgLinks([ ...imgLinks, [] ]);
+                  setImages([ ...images, [] ]);
                   setItemLinks([ ...itemLinks, "" ]);
                 }
               }

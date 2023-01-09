@@ -2,9 +2,13 @@
 
 public class ResponseModel
 {
-    public int Id { get; set; }
+    public string Id { get; set; }
     public string Message { get; set; }
-    public ResponseModel(int id, string message)
+    public ResponseModel(string id)
+    {
+        Id = id;
+    }
+    public ResponseModel(string id, string message)
     {
         Id = id;
         Message = message;

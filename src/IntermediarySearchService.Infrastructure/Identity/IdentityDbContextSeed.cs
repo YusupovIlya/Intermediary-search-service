@@ -6,13 +6,8 @@ namespace IntermediarySearchService.Infrastructure.Identity;
 
 public class IdentityDbContextSeed
 {
-    public static async Task SeedAsync(IdentityDbContext identityDbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+    public static async Task SeedAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
     {
-
-        if (identityDbContext.Database.IsSqlServer())
-        {
-            identityDbContext.Database.Migrate();
-        }
 
         await roleManager.CreateAsync(new IdentityRole("User"));
 

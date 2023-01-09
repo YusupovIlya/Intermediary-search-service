@@ -2,6 +2,8 @@
 using IntermediarySearchService.Api.DtoModels;
 using IntermediarySearchService.Core.Entities.OrderAggregate;
 using IntermediarySearchService.Core.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntermediarySearchService.Api.Controllers;
@@ -41,11 +43,12 @@ public class OrderController : BaseController
     // POST api/v1/order/create
     [Route("create")]
     [HttpPost]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateOrder([FromBody] NewOrderModel order)
     {
         int orderId = await _orderService.CreateAsync("ilya", order.SiteName, order.SiteLink,
                                         order.PerformerFee, order.OrderItems);
-        var response = new ResponseModel(orderId, "Order was successfully created");
+        var response = new ResponseModel(orderId.ToString(), "Order was successfully created");
         return Ok(response);
     }
 

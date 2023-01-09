@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { User } from '../models'
+import { IUser } from '../models'
 import type { RootState } from '.'
 import { intermediarySearchServiceApi } from './intermediarysearchservice.api'
 
 type AuthState = {
-  user: User | null
+  user: IUser | null
   token: string | null
 }
 

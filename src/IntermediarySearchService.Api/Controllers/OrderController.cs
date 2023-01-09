@@ -26,7 +26,7 @@ public class OrderController : BaseController
     public async Task<IActionResult> Get()
     {
         //var orders = await _orderService.GetAllAsync(GetUserName());
-        var orders = await _orderService.GetAllAsync("usr1");
+        var orders = await _orderService.GetAllAsync("ilya");
         var mappedOrders = _mapper.Map<IEnumerable<OrderModel>>(orders);
         return Ok(mappedOrders);
     }

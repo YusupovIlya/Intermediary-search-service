@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { IOrder } from "../models";
 
 interface OrderCardProps {
@@ -15,7 +16,7 @@ export default function OrderCard({order}: OrderCardProps) {
     }
     return(
       <div className="rounded-lg p-3 bg-white shadow-lg hover:bg-slate-100">
-          <a key={order.id} href="#">
+        <Link to={`/order/${order.id}`}>
             <div className="w-full overflow-hidden rounded-lg h-3/5">
               <img
                 src={getImgLink()}
@@ -26,7 +27,7 @@ export default function OrderCard({order}: OrderCardProps) {
             <p className="mt-3 text-lg text-slate-600 not-italic font-medium font-sans">{order.orderItems.length > 1 && `и еще ${order.orderItems.length-1} ед. в этом заказе`}</p>
             <p className="mt-2 text-lg text-gray-700">Магазин: {order.siteName}</p>
             <p className="mt-1 text-xl font-semibold text-gray-900">Вознограждение: {order.performerFee}$</p>
-        </a>
+        </Link>
       </div>
     );
 }

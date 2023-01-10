@@ -7,6 +7,7 @@ import CreateOrder from "./pages/CreateOrder";
 import { Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import AllOrders from "./pages/AllOrders";
+import OrderSummary from "./components/OrderSummary";
 
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/order/create" element={ <CreateOrder /> } />
           <Route path="/auth/login" element={ <Login /> } />
           <Route path="/order/all" element={ <AllOrders /> } />
+          <Route path="/order/:id" element={ <OrderSummary /> } />
         </Routes>
       </div>
     </div>

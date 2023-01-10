@@ -34,8 +34,14 @@ export const intermediarySearchServiceApi = createApi({
                 url: "/order/all",
                 method: 'GET',
             }),
+        }),
+        getOrderById: builder.query<IOrder, string>({
+            query: (id) => ({
+                url: `/order/${id}`,
+                method: 'GET',
+            }),
         })
     })
 })
 
-export const { useLoginMutation, useCreateOrderMutation, useAllOrdersQuery} = intermediarySearchServiceApi
+export const { useLoginMutation, useCreateOrderMutation, useAllOrdersQuery, useGetOrderByIdQuery} = intermediarySearchServiceApi

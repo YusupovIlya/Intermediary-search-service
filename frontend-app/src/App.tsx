@@ -5,6 +5,9 @@ import {Navbar} from "./components/navbar";
 import {Tabbar} from "./components/tabbar";
 import CreateOrder from "./pages/CreateOrder";
 import { Route, Routes } from "react-router-dom";
+import Login from "./pages/Login";
+import AllOrders from "./pages/AllOrders";
+import OrderSummary from "./components/OrderSummary";
 
 
 const App = () => {
@@ -19,6 +22,9 @@ const App = () => {
       <div className="flex items-center justify-center text-5xl text-gray-300">
         <Routes>
           <Route path="/order/create" element={ <CreateOrder /> } />
+          <Route path="/auth/login" element={ <Login /> } />
+          <Route path="/order/all" element={ <AllOrders /> } />
+          <Route path="/order/:id" element={ <OrderSummary /> } />
         </Routes>
       </div>
     </div>

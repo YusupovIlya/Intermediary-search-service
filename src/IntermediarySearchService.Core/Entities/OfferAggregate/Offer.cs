@@ -12,17 +12,19 @@ public class Offer: BaseEntity, IAggregateRoot
     public decimal DeliveryCost { get; private set; }
     public decimal? Expenses { get; private set; }
     public bool isSelected { get; private set; } = false;
+    public string? Comment { get; set; }
 
     private Offer() { }
 
     public Offer(int orderId, string userName, decimal itemsTotalCost,
-                 decimal deliveryCost, decimal? expenses = 0m)
+                 decimal deliveryCost, decimal? expenses = 0m, string? comment = null)
     {
         OrderId = orderId;
         UserName = userName;
         ItemsTotalCost = itemsTotalCost;
         DeliveryCost = deliveryCost;
         Expenses = expenses;
+        Comment = comment;
     }
 
     public void ChangeSelectStatus(bool state) => isSelected = state;

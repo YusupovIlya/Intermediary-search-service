@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using IntermediarySearchService.Api.DtoModels;
 using IntermediarySearchService.Core.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,11 +22,13 @@ public class OfferController : BaseController
 
     [Route("create")]
     [HttpPost]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateOffer([FromBody] NewOfferModel offer)
     {
-        await _offerService.CreateAsync(offer.OrderId, GetUserName(), offer.ItemsTotalCost,
-                                        offer.DeliveryCost, offer.Expenses);
-        return Ok();
+        var offerId = await _offerService.CreateAsync(offer.OrderId, GetUserName(), offer.ItemsTotalCost,
+                                                      offer.DeliveryCost, offer.Expenses);
+        var response = new ResponseModel(offerId.ToString(), ResponseModel.Success);
+        return Ok(response);
     }
 
     [HttpDelete("{id:int}")]

@@ -4,7 +4,7 @@ namespace IntermediarySearchService.Core.Interfaces;
 
 public interface IOfferService
 {
-    Task CreateAsync(int orderId, string userId, decimal itemsTotalCost,
-                     decimal deliveryCost, decimal? expenses = 0m);
+    Task<int> CreateAsync(int orderId, string userName, decimal itemsTotalCost,
+                     decimal deliveryCost, decimal? expenses = 0m, string? comment = null);
     Task DeleteAsync(int offerId);
 }

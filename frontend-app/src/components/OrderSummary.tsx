@@ -1,19 +1,36 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { useGetOrderByIdQuery } from "../store/intermediarysearchservice.api";
+import { INewOffer } from "../models";
+import { useCreateOfferMutation, useGetOrderByIdQuery } from "../store/intermediarysearchservice.api";
 import OrderItemSummary from "./OrderItemSummary";
 
 
 export default function OrderSummary() {
     const { id } = useParams();
+    const [showForm, setShowForm] = useState(false);
+    const [btnText, setbtnText] = useState("Открыть");
+    const [createOffer, response] = useCreateOfferMutation();
+    const {register, control, handleSubmit, formState: { errors }} = useForm<INewOffer>({
+      mode: "onBlur"
+    });
+    
     var orderId = "-1";
     if(id != undefined) orderId = id;
     const {
         data: order,
-        isFetching,
-        isLoading,
       } = useGetOrderByIdQuery(orderId);
-    
-    if(!isLoading) console.log(order);
+
+    const onSubmit = async (data: INewOffer) => {
+      try {
+          data.orderId = order?.id!;
+          console.log(data);
+          await createOffer(data).unwrap().then(response => console.log(response));
+          console.log()
+        } catch (err) {
+          console.log(err);
+        }
+    }
 
     return(
         <div className="py-14 px-4 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
@@ -47,18 +64,112 @@ export default function OrderSummary() {
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-center px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 dark:bg-gray-800 space-y-6">
+
+
+        <div className="flex flex-col justify-center px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 dark:bg-gray-800 space-y-1">
           <div className="flex justify-between items-start w-full">
             <div className="flex justify-center items-center space-x-4">
-              <div className="flex flex-col justify-start items-center">
-                <p className="text-lg leading-6 dark:text-white font-semibold text-gray-800">Нажмите на кнопку, чтобы предложить себя в качестве исполнителя<br /></p>
+              <div className="flex flex-col justify-start items-start space-y-2">
+                <p className="text-lg leading-6 dark:text-white font-semibold text-gray-800">Чтобы предложить себя в качестве исполнителя, заполните форму:<br /></p>
+                <button 
+                  type="button" 
+                  className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+                  onClick={() => {
+                    setShowForm(!showForm);
+                    setbtnText((btnText) => {
+                      if(btnText == "Открыть")
+                        return "Закрыть";
+                      else
+                        return "Открыть";
+                    })
+                  }}
+                >{btnText}</button>
               </div>
             </div>
           </div>
-          <div className="w-full flex justify-center items-center">
-            <button className="hover:bg-black dark:bg-white dark:text-gray-800 dark:hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-base font-medium leading-4 text-white">Отправить предложение заказчику</button>
-          </div>
+
+          {showForm &&
+          <div className="w-3/4">
+            <form className="text-sm" onSubmit={handleSubmit(onSubmit)}>
+                <div className="flex flex-col mb-4">
+                    <label className="text-gray-700">Общая стоимость заказа, в $</label>
+                    <input
+                      {...register("itemsTotalCost",
+                      { 
+                        required: "Обязательное поле!",
+                        valueAsNumber: true,
+                        min: {
+                          value: 1,
+                          message: "Значение должно быть не менее 1 ден.ед.!"
+                      }, max: 99999999.99 })}
+                      type="number"
+                      step="any"
+                      className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                    />
+                    <p className="text-red-600 inline">
+                      {errors?.itemsTotalCost && errors.itemsTotalCost.message}
+                    </p>           
+                </div>
+
+                <div className="flex flex-col my-4">
+                    <label className="text-gray-700">Общая стоимость доставки, в $</label>
+                    <input
+                      {...register("deliveryCost",
+                      { 
+                        required: "Обязательное поле!",
+                        valueAsNumber: true,
+                        min: {
+                          value: 1,
+                          message: "Значение должно быть не менее 1 ден.ед.!"
+                      }, max: 99999999.99 })}
+                      type="number"
+                      step="any"
+                      className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                    />
+                    <p className="text-red-600 inline">
+                      {errors?.deliveryCost && errors.deliveryCost.message}
+                    </p> 
+                </div>
+
+                <div className="flex flex-col my-4">
+                    <label className="text-gray-700">Дополнительные расходы, в $</label>
+                    <input
+                      {...register("expenses",
+                      {
+                        valueAsNumber: true,
+                        min: {
+                          value: 1,
+                          message: "Значение должно быть не менее 1 ден.ед.!"
+                      }, max: 99999999.99 })}
+                      type="number"
+                      step="any"
+                      className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                    />
+                    <p className="text-red-600 inline">
+                      {errors?.expenses && errors.expenses.message}
+                    </p> 
+                </div>
+
+                <div className="flex flex-col my-4">
+                    <label className="text-gray-700">Комментарий</label>
+                    <textarea
+                      {...register("comment",
+                      { 
+                        required: false,
+                      })}
+                      className="mt-2 block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                      placeholder="Your message..."
+                      />               
+                </div>
+                <div className="w-full flex justify-center items-center">
+                  <button type="submit" className="hover:bg-black dark:bg-white dark:text-gray-800 dark:hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-base font-medium leading-4 text-white">Отправить</button>
+                </div>
+            </form>           
+          </div>          
+          }
         </div>
+
+
       </div>
     </div>
     <div className="bg-gray-50 dark:bg-gray-800 w-full xl:w-96 flex justify-between items-center md:items-start px-4 py-6 md:p-6 xl:p-8 flex-col">
@@ -93,5 +204,4 @@ export default function OrderSummary() {
   </div>
 </div>
     )
-
 }

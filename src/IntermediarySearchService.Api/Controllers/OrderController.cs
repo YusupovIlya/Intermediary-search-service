@@ -48,7 +48,7 @@ public class OrderController : BaseController
     {
         int orderId = await _orderService.CreateAsync("ilya", order.SiteName, order.SiteLink,
                                         order.PerformerFee, order.OrderItems);
-        var response = new ResponseModel(orderId.ToString(), "Order was successfully created");
+        var response = new ResponseModel(orderId.ToString(), ResponseModel.Success);
         return Ok(response);
     }
 

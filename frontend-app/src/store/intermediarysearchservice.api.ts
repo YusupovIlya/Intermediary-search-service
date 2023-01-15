@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ICreateOrderResponse, ILoginResponse, ILoginRequest, IOrder } from '../models'
+import { INewOrder, ICreateOrderResponse, ILoginResponse, ILoginRequest, IOrder, INewOffer } from '../models'
 import { RootState } from '.'
 
 export const intermediarySearchServiceApi = createApi({
@@ -40,8 +40,19 @@ export const intermediarySearchServiceApi = createApi({
                 url: `/order/${id}`,
                 method: 'GET',
             }),
+        }),
+        createOffer: builder.mutation<ICreateOrderResponse, INewOffer>({
+            query: (payload) => ({
+                url: "/offer/create",
+                method: 'POST',
+                body: payload,
+            }),
         })
     })
 })
 
-export const { useLoginMutation, useCreateOrderMutation, useAllOrdersQuery, useGetOrderByIdQuery} = intermediarySearchServiceApi
+export const { useLoginMutation, useCreateOrderMutation, 
+               useAllOrdersQuery, useGetOrderByIdQuery,
+               useCreateOfferMutation} 
+               
+               = intermediarySearchServiceApi

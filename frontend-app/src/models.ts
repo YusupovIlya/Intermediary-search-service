@@ -30,6 +30,14 @@ export interface IOffer {
   isSelected: boolean
 } 
 
+export interface INewOffer {
+  orderId: number
+  itemsTotalCost: number
+  deliveryCost: number
+  expenses: number
+  comment: string
+} 
+
 export interface IOrderItem {
     productName: string
     options: string

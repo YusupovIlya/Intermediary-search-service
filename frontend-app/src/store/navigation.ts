@@ -19,5 +19,9 @@ export const navigationData: INav[] = [
     {
         text: "All orders",
         route: "/order/all"
+    },
+    {
+        text: "Profile",
+        route: "/user/profile"
     }
 ]

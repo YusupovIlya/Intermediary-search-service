@@ -2,7 +2,7 @@ import { ToastContainer, toast, ToastContentProps } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 import { useForm, useFieldArray } from "react-hook-form";
-import { ICreateOrderResponse, INewOrder, IOrderItemImage } from "../models";
+import { IResponse, INewOrder, IOrderItemImage } from "../models";
 import { MdDeleteForever } from "react-icons/md";
 import { ReactTinyLink } from 'react-tiny-link';
 import { useScrapper } from 'react-tiny-link'
@@ -63,7 +63,7 @@ export default function CreateOrder() {
       {
         pending: 'Создание заказа...',
         success: {
-          render(response: ToastContentProps<ICreateOrderResponse>){
+          render(response: ToastContentProps<IResponse>){
             return `Заказ №${response.data?.id} успешно создан!`
           }
         },

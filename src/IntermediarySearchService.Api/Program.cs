@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using IntermediarySearchService.Core.Constants;
 using System.Text;
+using IntermediarySearchService.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>));
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOfferService, OfferService>();
 builder.Services.AddScoped<ITokenService, IdentityTokenClaimService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var key = Encoding.ASCII.GetBytes(AuthConstants.JWT_SECRET_KEY);
 builder.Services

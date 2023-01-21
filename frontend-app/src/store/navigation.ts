@@ -23,5 +23,9 @@ export const navigationData: INav[] = [
     {
         text: "Profile",
         route: "/user/profile"
-    }
+    },
+    {
+        text: "User addresses",
+        route: "/user/addresses"
+    },
 ]

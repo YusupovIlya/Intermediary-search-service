@@ -12,8 +12,7 @@ export default function Login() {
 
   const onSubmit = async (data: ILoginRequest) => {
     try {
-        console.log(data);
-        await loginRequest(data).unwrap().then(response => console.log(response));
+        await loginRequest(data).unwrap();
       } catch (err) {
         console.log(err);
       }

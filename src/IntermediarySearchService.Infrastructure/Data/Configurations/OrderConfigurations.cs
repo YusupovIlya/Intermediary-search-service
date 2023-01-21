@@ -32,16 +32,21 @@ public class OrderConfigurations : IEntityTypeConfiguration<Order>
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.Property(o => o.PerformerFee)
+        builder
+            .Property(o => o.PerformerFee)
             .IsRequired()
             .HasColumnType("decimal(8,2)");
 
 
-        builder.OwnsMany(a => a.StatesOrder, c =>
+        builder
+            .OwnsMany(a => a.StatesOrder, c =>
         {
             c.WithOwner().HasForeignKey("OwnerId");
             c.Property<int>("Id");
             c.HasKey("Id");
         });
+
+        builder
+            .OwnsOne(o => o.Address);
     }
 }

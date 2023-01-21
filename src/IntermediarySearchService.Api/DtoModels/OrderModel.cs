@@ -8,4 +8,5 @@ public class OrderModel : NewOrderModel
     public int Id { get; set; }
     public IEnumerable<StateModel> StatesOrder { get; set; }
     public IEnumerable<Offer> Offers { get; set; }
+    public decimal TotalPrice { get; set; }
 }

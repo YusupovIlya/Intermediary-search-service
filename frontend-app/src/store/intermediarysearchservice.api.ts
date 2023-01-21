@@ -1,6 +1,7 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ICreateOrderResponse, ILoginResponse, ILoginRequest, IOrder, INewOffer } from '../models'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse } from '../models'
 import { RootState } from '.'
+import { IAddress } from '../pages/MyAddresses'
 
 export const intermediarySearchServiceApi = createApi({
     reducerPath: 'intermediarySearchServiceApi',
@@ -22,7 +23,7 @@ export const intermediarySearchServiceApi = createApi({
               body: credentials,
             }),
         }),
-        createOrder: builder.mutation<ICreateOrderResponse, INewOrder>({
+        createOrder: builder.mutation<IResponse, INewOrder>({
             query: (payload) => ({
                 url: "/order/create",
                 method: 'POST',
@@ -41,11 +42,24 @@ export const intermediarySearchServiceApi = createApi({
                 method: 'GET',
             }),
         }),
-        createOffer: builder.mutation<ICreateOrderResponse, INewOffer>({
+        createOffer: builder.mutation<IResponse, INewOffer>({
             query: (payload) => ({
                 url: "/offer/create",
                 method: 'POST',
                 body: payload,
+            }),
+        }),
+        addAddress: builder.mutation<IResponse, IAddress>({
+            query: (payload) => ({
+                url: "/user/addresses/add",
+                method: 'POST',
+                body: payload,
+            }),
+        }),
+        getUserAddresses: builder.query<IAddress[], null>({
+            query: () => ({
+                url: "/user/addresses",
+                method: 'GET',
             }),
         })
     })
@@ -53,6 +67,7 @@ export const intermediarySearchServiceApi = createApi({
 
 export const { useLoginMutation, useCreateOrderMutation, 
                useAllOrdersQuery, useGetOrderByIdQuery,
-               useCreateOfferMutation} 
+               useCreateOfferMutation, useAddAddressMutation,
+               useGetUserAddressesQuery} 
                
                = intermediarySearchServiceApi

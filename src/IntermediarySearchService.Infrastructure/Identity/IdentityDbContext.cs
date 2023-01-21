@@ -26,5 +26,13 @@ public class IdentityDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<IdentityUserToken<string>>(entity => entity.ToTable("UserTokens"));
 
         builder.Entity<IdentityRoleClaim<string>>(entity => entity.ToTable("RoleClaims"));
+
+        builder.Entity<ApplicationUser>().
+                OwnsMany(user => user.Addresses, c =>
+                {
+                    c.WithOwner().HasForeignKey("OwnerId");
+                    c.Property<int>("Id");
+                    c.HasKey("Id");
+                });
     }
 }

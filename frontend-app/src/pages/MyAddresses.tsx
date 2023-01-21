@@ -1,12 +1,16 @@
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
+
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import Address from "../components/Address"
 import { Modal } from "../components/Modal"
 import { useDebounce } from "../hooks/useDebounce"
 import { IPlace, useGeoCoder } from "../hooks/useGeoCoder"
+import { useAddAddressMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api"
 
 export interface IAddress {
-    postal_code: string
+    postalCode: string
     country: string
     region: string
     label: string
@@ -14,13 +18,13 @@ export interface IAddress {
 
 export const placesData: IAddress[] = [
     {
-        postal_code: "000000",
+        postalCode: "000000",
         country: "USA",
         region: "New York",
         label: "././/././"
     },
     {
-        postal_code: "000000",
+        postalCode: "000000",
         country: "USA",
         region: "New York",
         label: "/././.."
@@ -28,6 +32,13 @@ export const placesData: IAddress[] = [
 ]
 
 export default function MyAddresses() {
+    const {
+        data: addresses,
+        isFetching,
+        isLoading,
+        refetch
+      } = useGetUserAddressesQuery(null);
+    const [addAddress, response] = useAddAddressMutation();
     const [modalActive, setModalActive] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [dropdown, setDropdown] = useState(false);
@@ -37,21 +48,13 @@ export default function MyAddresses() {
     const [selectedPlace, setSelectedPlace] = useState("");
     const [addressInModal, setAddressInModal] = useState<IAddress>(
         {
-            postal_code: "",
+            postalCode: "",
             country: "",
             region: "",
             label: ""
         }
     );
-    const [newAddress, setNewAddress] = useState<IAddress>(
-        {
-            postal_code: "",
-            country: "",
-            region: "",
-            label: ""
-        }
-    );
-    const {handleSubmit} = useForm<IAddress>({
+    const { handleSubmit, setValue} = useForm<IAddress>({
         mode: "onBlur"
       });
     
@@ -64,20 +67,28 @@ export default function MyAddresses() {
   const clickOnPlaceHandler = (place: IPlace) => {
         setSelectedPlace(place.label);
         setDropdown(false);
-        setNewAddress(() => {
-            return {
-                postal_code: place.postal_code,
-                country: place.country,
-                region: place.region,
-                label: place.label
-            }
-        });
+        setValue("country", place.country);
+        setValue("postalCode", place.postal_code);
+        setValue("region", place.region);
+        setValue("label", place.label);
   }
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: IAddress) => {
     try {
-        console.log(newAddress);
-        //await loginRequest(data).unwrap();
+        console.log(data);
+        if(data.label == null) data.label = selectedPlace;
+        const promise = addAddress(data).unwrap();
+        setSelectedPlace("");
+        setShowAddForm(false);
+        await toast.promise(
+          promise,
+          {
+            pending: 'Добавление адреса...',
+            success: 'Адрес успешно добавлен!',
+            error: 'Не удалось добавить адрес'
+          }
+        );
+        refetch();
       } catch (err) {
         console.log(err);
       }
@@ -89,18 +100,19 @@ export default function MyAddresses() {
                 <div className="p-4">
                     <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">Город: {addressInModal.region}</p>
                     <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">Страна: {addressInModal.country}</p>
-                    <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">Индекс: {addressInModal.postal_code}</p>
+                    <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">Индекс: {addressInModal.postalCode}</p>
                     <p className="mt-2 mb-2 text-lg text-slate-600 not-italic font-semibold font-sans">{addressInModal.label}</p>
                     <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Удалить</button>
                 </div>
             }/>
+            <ToastContainer />
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-                {placesData.map((item, index) => (
+                {addresses?.map((item, index) => (
                 <Address 
-                address={item} 
-                key={index}
-                setAddressInModal={setAddressInModal}
-                setModalActive={setModalActive}
+                    address={item} 
+                    key={index}
+                    setAddressInModal={setAddressInModal}
+                    setModalActive={setModalActive}
                 />
                 ))}
             </div>
@@ -111,9 +123,9 @@ export default function MyAddresses() {
                 Добавить
             </button>}
             {showAddForm && 
-            <form className="mt-6 flex flex-col space-y-2 sm:w-1/3" onSubmit={handleSubmit(onSubmit)}>   
+            <form className="mt-6 flex flex-col space-y-2 sm:w-3/4" onSubmit={handleSubmit(onSubmit)}>   
                 <div>
-                    <input
+                    <input                   
                         className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                         placeholder="Страна, город или почтовый индекс..."
                         onClick={(e) => {

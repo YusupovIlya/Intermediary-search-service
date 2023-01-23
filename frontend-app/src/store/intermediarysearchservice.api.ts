@@ -1,7 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse } from '../models'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress } from '../models'
 import { RootState } from '.'
-import { IAddress } from '../pages/MyAddresses'
 
 export const intermediarySearchServiceApi = createApi({
     reducerPath: 'intermediarySearchServiceApi',
@@ -22,6 +21,9 @@ export const intermediarySearchServiceApi = createApi({
               method: 'POST',
               body: credentials,
             }),
+            transformErrorResponse: (
+                response: { status: number, data: ILoginResponse }
+              ) => response.data,
         }),
         createOrder: builder.mutation<IResponse, INewOrder>({
             query: (payload) => ({
@@ -61,6 +63,13 @@ export const intermediarySearchServiceApi = createApi({
                 url: "/user/addresses",
                 method: 'GET',
             }),
+        }),
+        deleteAddress: builder.mutation<IResponse, IAddress>({
+            query: (payload) => ({
+                url: "/user/addresses/delete",
+                method: 'DELETE',
+                body: payload,
+            }),
         })
     })
 })
@@ -68,6 +77,6 @@ export const intermediarySearchServiceApi = createApi({
 export const { useLoginMutation, useCreateOrderMutation, 
                useAllOrdersQuery, useGetOrderByIdQuery,
                useCreateOfferMutation, useAddAddressMutation,
-               useGetUserAddressesQuery} 
+               useGetUserAddressesQuery, useDeleteAddressMutation} 
                
                = intermediarySearchServiceApi

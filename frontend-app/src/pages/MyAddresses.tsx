@@ -7,38 +7,15 @@ import Address from "../components/Address"
 import { Modal } from "../components/Modal"
 import { useDebounce } from "../hooks/useDebounce"
 import { IPlace, useGeoCoder } from "../hooks/useGeoCoder"
-import { useAddAddressMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api"
-
-export interface IAddress {
-    postalCode: string
-    country: string
-    region: string
-    label: string
-  }
-
-export const placesData: IAddress[] = [
-    {
-        postalCode: "000000",
-        country: "USA",
-        region: "New York",
-        label: "././/././"
-    },
-    {
-        postalCode: "000000",
-        country: "USA",
-        region: "New York",
-        label: "/././.."
-    },
-]
+import { useAddAddressMutation, useDeleteAddressMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api"
+import { IAddress } from '../models';
 
 export default function MyAddresses() {
-    const {
-        data: addresses,
-        isFetching,
-        isLoading,
-        refetch
-      } = useGetUserAddressesQuery(null);
-    const [addAddress, response] = useAddAddressMutation();
+
+    const {data: addresses,isLoading,refetch} = useGetUserAddressesQuery(null);
+    const [deleteAddress] = useDeleteAddressMutation();
+    const [addAddress] = useAddAddressMutation();
+
     const [modalActive, setModalActive] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [dropdown, setDropdown] = useState(false);
@@ -54,6 +31,7 @@ export default function MyAddresses() {
             label: ""
         }
     );
+
     const { handleSubmit, setValue} = useForm<IAddress>({
         mode: "onBlur"
       });
@@ -75,7 +53,6 @@ export default function MyAddresses() {
 
   const onSubmit = async (data: IAddress) => {
     try {
-        console.log(data);
         if(data.label == null) data.label = selectedPlace;
         const promise = addAddress(data).unwrap();
         setSelectedPlace("");
@@ -94,6 +71,25 @@ export default function MyAddresses() {
       }
   }
 
+  const deleteAddressHandler = async () => {
+    try {
+        console.log(addressInModal);
+        setModalActive(false);
+        const promise = deleteAddress(addressInModal).unwrap();
+        await toast.promise(
+          promise,
+          {
+            pending: 'Удаление адреса...',
+            success: 'Адрес удален!',
+            error: 'Не удалось удалить адрес'
+          }
+        );
+        refetch();
+      } catch (err) {
+        console.log(err);
+      }
+}
+
     return(
         <div className="mx-auto max-w-2xl px-4 sm:py-15 sm:px-6 lg:max-w-7xl lg:px-8" onClick={() => setDropdown(false)}>
             <Modal active={modalActive} setActive={setModalActive} content={
@@ -102,11 +98,15 @@ export default function MyAddresses() {
                     <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">Страна: {addressInModal.country}</p>
                     <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">Индекс: {addressInModal.postalCode}</p>
                     <p className="mt-2 mb-2 text-lg text-slate-600 not-italic font-semibold font-sans">{addressInModal.label}</p>
-                    <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Удалить</button>
+                    <button 
+                    className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                    onClick={() => deleteAddressHandler()}
+                    >Удалить</button>
                 </div>
             }/>
             <ToastContainer />
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+                {isLoading && <p>Loading...</p>}
                 {addresses?.map((item, index) => (
                 <Address 
                     address={item} 

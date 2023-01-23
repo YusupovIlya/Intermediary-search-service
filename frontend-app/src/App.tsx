@@ -1,6 +1,5 @@
-import { FaDev } from "react-icons/fa";
 import {useNavigation} from "./hooks/useNavigation";
-import {navigationData} from "./store/navigation";
+import {unAuthRoutes, authRoutes, INav} from "./store/navigation";
 
 import CreateOrder from "./pages/CreateOrder";
 import { Route, Routes } from "react-router-dom";
@@ -11,14 +10,24 @@ import UserProfile from "./pages/UserProfile";
 import OrderHistory from "./pages/OrderHistory";
 import Navbar from "./components/Navbar";
 import MyAddresses from "./pages/MyAddresses";
+import { useAuth } from "./hooks/useAuth";
+import { useEffect, useState } from "react";
 
 
 const App = () => {
   const { currentRoute, setCurrentRoute } = useNavigation();
+  const [userRoutes, setUserRoutes] = useState<INav[]>([]);
+  const auth = useAuth();
+
+  useEffect(() => {
+    auth.user ? setUserRoutes(authRoutes) : setUserRoutes([]);
+  }, [auth.user]);
+
   return (
-    <div className="bg-gray-200 p-2">
+    <div className="bg-gray-200 p-2">     
       <Navbar
-        navigationData={navigationData}
+        unAuthRoutes={unAuthRoutes}
+        authRoutes={userRoutes}
         currentRoute={currentRoute}
         setCurrentRoute={setCurrentRoute}
       />

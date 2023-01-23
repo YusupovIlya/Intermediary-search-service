@@ -4,6 +4,7 @@ namespace IntermediarySearchService.Api.DtoModels;
 
 public class NewOrderModel
 {
+    public Address Address { get; set; }
     public string SiteName { get; set; }
     public string SiteLink { get; set; }
     public decimal PerformerFee { get; set; }

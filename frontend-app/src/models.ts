@@ -1,9 +1,17 @@
+
+
 export interface INewOrder {
     siteName: string
     siteLink: string
     performerFee: number
-    postCode: string
+    address?: IAddress
     orderItems: IOrderItem[]
+  }
+  export interface IAddress {
+    postalCode: string
+    country: string
+    region: string
+    label: string
   }
 
 export interface IOrder {
@@ -13,6 +21,7 @@ export interface IOrder {
   siteLink: string
   performerFee: number
   orderItems: IOrderItem[]
+  address: IAddress
 }
 
 export interface IStateOrder {

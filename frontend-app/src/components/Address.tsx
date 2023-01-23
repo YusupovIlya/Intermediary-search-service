@@ -1,4 +1,4 @@
-import { IAddress } from "../pages/MyAddresses";
+import { IAddress } from "../models";
 
 interface AddressProps {
     address: IAddress,

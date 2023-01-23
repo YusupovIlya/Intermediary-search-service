@@ -25,7 +25,7 @@ public class ApplicationUser : IdentityUser
     }
     public void DeleteAddress(Address address)
     {
-        var item = _addresses.FirstOrDefault(address);
+        var item = _addresses.FirstOrDefault(a => a.Label == address.Label);
         _addresses.Remove(item);
     }
 }

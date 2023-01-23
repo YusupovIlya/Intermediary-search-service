@@ -26,13 +26,13 @@ public class UserController : BaseController
     {
         try
         {
-            var addresses = await _userService.GetUserAddresses("user@email.com");
+            var addresses = await _userService.GetUserAddresses(UserName);
             return Ok(addresses);
         }
         catch (UserNotFoundException exc)
         {
             _logger.LogError(exc.Message);
-            var response = new ResponseModel(GetUserName(), ResponseModel.Error);
+            var response = new ResponseModel(UserName, ResponseModel.Error);
             return NotFound(response);
         }
     }
@@ -44,32 +44,33 @@ public class UserController : BaseController
     {
         try
         {
-            await _userService.AddNewAddressToUser("user@email.com", newAddress);
-            var response = new ResponseModel(GetUserName(), ResponseModel.Success);
+            await _userService.AddNewAddressToUser(UserName, newAddress);
+            var response = new ResponseModel(UserName, ResponseModel.Success);
             return Ok(response);
         }
         catch (UserNotFoundException exc)
         {
             _logger.LogError(exc.Message);
-            var response = new ResponseModel(GetUserName(), ResponseModel.Error);
+            var response = new ResponseModel(UserName, ResponseModel.Error);
             return NotFound(response);
         }
     }
+
     [Route("addresses/delete")]
     [HttpDelete]
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> DeleteAddress([FromBody] Address address)
     {
         try
         {
-            await _userService.DeleteAddress("user@email.com", address);
-            var response = new ResponseModel(GetUserName(), ResponseModel.Success);
+            await _userService.DeleteAddress(UserName, address);
+            var response = new ResponseModel(UserName, ResponseModel.Success);
             return Ok(response);
         }
         catch (UserNotFoundException exc)
         {
             _logger.LogError(exc.Message);
-            var response = new ResponseModel(GetUserName(), ResponseModel.Error);
+            var response = new ResponseModel(UserName, ResponseModel.Error);
             return NotFound(response);
         }
     }

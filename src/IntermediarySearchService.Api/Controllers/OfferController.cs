@@ -25,7 +25,7 @@ public class OfferController : BaseController
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateOffer([FromBody] NewOfferModel offer)
     {
-        var offerId = await _offerService.CreateAsync(offer.OrderId, GetUserName(), offer.ItemsTotalCost,
+        var offerId = await _offerService.CreateAsync(offer.OrderId, UserName, offer.ItemsTotalCost,
                                                       offer.DeliveryCost, offer.Expenses);
         var response = new ResponseModel(offerId.ToString(), ResponseModel.Success);
         return Ok(response);

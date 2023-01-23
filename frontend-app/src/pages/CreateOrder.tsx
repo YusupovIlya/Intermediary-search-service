@@ -7,10 +7,12 @@ import { MdDeleteForever } from "react-icons/md";
 import { ReactTinyLink } from 'react-tiny-link';
 import { useScrapper } from 'react-tiny-link'
 import { useState } from "react";
-import { useCreateOrderMutation } from "../store/intermediarysearchservice.api";
+import { useCreateOrderMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api";
 
 export default function CreateOrder() {
-  const [createOrder, response] = useCreateOrderMutation();
+  const [createOrder] = useCreateOrderMutation();
+  const {data: addresses} = useGetUserAddressesQuery(null);
+  const [selectedAddress, setSelectedAddress] = useState<string>(addresses ? addresses[0].label : "");
   const [images, setImages] = useState<string[][]>([[]]);
   const [itemLinks, setItemLinks] = useState<string[]>([""]);
   const [source, setSource] = useState(-1);
@@ -55,6 +57,7 @@ export default function CreateOrder() {
       const imagesObj: IOrderItemImage[] = value.map(i => {return  {imageLink: i}});
       data.orderItems[index].images = imagesObj;
     });
+    data.address = addresses?.find(a => a.label == selectedAddress);
     const promise = createOrder(data).unwrap();
     reset();
     setItemLinks([]);
@@ -140,17 +143,12 @@ export default function CreateOrder() {
 
               <div className="flex flex-col md:w-1/3">
                 <label className="leading-loose">Куда доставить?</label>
-                <input
-                {...register("postCode",
-                { 
-                  required: 'Введите почтовый индекс!',                  
-                })}
-                className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" 
-                placeholder="Укажите почтовый индекс"
-                />
-                <p className="text-red-600 inline">
-                  {errors?.postCode && errors.postCode.message}
-                </p>                
+                <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                  {addresses?.map(addr => 
+                  <option onClick={() => 
+                    setSelectedAddress(addr.label)} value={addr.label}>{addr.label}
+                  </option>)}
+                </select>              
               </div>
 
                 {fields.map((field, index) => {

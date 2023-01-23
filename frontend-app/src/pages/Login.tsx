@@ -1,19 +1,37 @@
+import { ToastContainer, toast, ToastContentProps } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
+
 import { useForm} from "react-hook-form";
-import { ILoginRequest } from "../models";
+import { ILoginRequest, ILoginResponse } from "../models";
 import { useLoginMutation } from "../store/intermediarysearchservice.api";
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Login() {
 
-  const [loginRequest, loginResponse] = useLoginMutation();
-  const {register, control, handleSubmit, formState: { errors }} = useForm<ILoginRequest>({
+  const [loginRequest] = useLoginMutation();
+  const navigate = useNavigate();
+  const {register, handleSubmit, formState: { errors }, reset} = useForm<ILoginRequest>({
     mode: "onBlur"
   });
 
   const onSubmit = async (data: ILoginRequest) => {
     try {
-        console.log(data);
-        await loginRequest(data).unwrap().then(response => console.log(response));
+        reset();
+        const promise =  loginRequest(data).unwrap();
+        await toast.promise(
+          promise,
+          {
+            pending: 'Вход...',
+            success: 'Вы были успешно авторизованы!',
+            error: {
+              render(response: ToastContentProps<ILoginResponse>){
+                return `Не удалось выполнить вход !\n${response.data?.message}`
+              }
+            },
+          }
+        );
+        (await promise).token && navigate("/user/profile");
       } catch (err) {
         console.log(err);
       }
@@ -22,6 +40,7 @@ export default function Login() {
 
   return (
   <div className="min-h-screen flex flex-col items-center justify-start w-full">
+    <ToastContainer />
     <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-full max-w-md">
       <div className="font-medium self-center text-xl sm:text-2xl uppercase text-gray-800">Login To Your Account</div>
       <button className="relative mt-6 border rounded-md py-2 text-sm text-gray-800 bg-gray-100 hover:bg-gray-200">
@@ -38,7 +57,7 @@ export default function Login() {
           <div className="flex flex-col mb-6">
             <label className="mb-1 text-base text-gray-600">E-Mail Address:</label>
             <div className="relative">
-              <div className="inline-flex items-center justify-center absolute left-0 top-2.5 h-full w-10 text-gray-400">
+              <div className="inline-flex items-center justify-center absolute left-0 top-0 h-full w-10 text-gray-400">
                 <svg className="h-6 w-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
                   <path d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                 </svg>
@@ -62,7 +81,7 @@ export default function Login() {
           <div className="flex flex-col mb-6">
             <label className="mb-1 text-base text-gray-600">Password:</label>
             <div className="relative">
-              <div className="inline-flex items-center justify-center absolute left-0 top-2.5 h-full w-10 text-gray-400">
+              <div className="inline-flex items-center justify-center absolute left-0 top-0 h-full w-10 text-gray-400">
                 <span>
                   <svg className="h-6 w-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />

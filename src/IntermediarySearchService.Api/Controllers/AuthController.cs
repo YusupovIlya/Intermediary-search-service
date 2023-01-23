@@ -27,9 +27,9 @@ public class AuthController : BaseController
     [Route("login")]
     public async Task<IActionResult> Login(LoginRequestModel request)
     {
-        var response = new LoginResponseModel(Guid.NewGuid().ToString());
         var user = await _userManager.FindByEmailAsync(request.Email);
-        if(user != null)
+        var response = new LoginResponseModel(Guid.NewGuid().ToString());
+        if (user != null)
         {
             response.User = new UserModel(user.FirstName, user.LastName);
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
@@ -41,11 +41,13 @@ public class AuthController : BaseController
             else
             {
                 response.Message = "Wrong password!";
+                return BadRequest(response);
             }
         }
         else
         {
             response.Message = "Wrong login!";
+            return BadRequest(response);
         }
         return Ok(response);
     }

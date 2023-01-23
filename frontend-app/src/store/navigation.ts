@@ -3,25 +3,24 @@ export interface INav {
     route: string
   }
 
-export const navigationData: INav[] = [
+export const unAuthRoutes: INav[] = [
     {
         text: "Заказать",
         route: "/order/create"
     },
     {
-        text: "Выполнить",
-        route: "/offer/search"
-    },
-    {
-        text: "Логин",
-        route: "/auth/login"
-    },
-    {
-        text: "All orders",
+        text: "Выполнить заказ",
         route: "/order/all"
     },
+]
+
+export const authRoutes: INav[] = [
     {
-        text: "Profile",
+        text: "Мой профиль",
         route: "/user/profile"
-    }
+    },
+    {
+        text: "Мои адреса",
+        route: "/user/addresses"
+    },
 ]

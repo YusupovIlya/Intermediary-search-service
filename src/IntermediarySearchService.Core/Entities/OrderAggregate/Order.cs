@@ -11,6 +11,7 @@ public class Order: BaseEntity, IAggregateRoot
     public string SiteName { get; private set; }
     public string SiteLink { get; private set; }
     public decimal PerformerFee { get; private set; }
+    public Address Address { get; private set; }
 
     private readonly List<StateOrder> _statesOrder = new List<StateOrder>();
     public IReadOnlyCollection<StateOrder> StatesOrder => _statesOrder.AsReadOnly();
@@ -29,12 +30,13 @@ public class Order: BaseEntity, IAggregateRoot
     }
 
     public Order(string userName, string siteName, string siteLink, 
-        decimal performerFee, List<OrderItem> orderItems) : this(orderItems)
+        decimal performerFee, List<OrderItem> orderItems, Address address) : this(orderItems)
     {
         UserName = userName;
         SiteName = siteName;
         SiteLink = siteLink;
         PerformerFee = performerFee;
+        Address = address;
         AddStateOrder();
     }
 

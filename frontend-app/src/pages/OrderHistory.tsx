@@ -15,7 +15,13 @@ export default function OrderHistory() {
             siteLink: "",
             orderItems: [],
             statesOrder: [],
-            performerFee: 0
+            performerFee: 0,
+            address: {
+                postalCode: "",
+                label: "",
+                country: "",
+                region: "",
+            }
         }
     );
     const {

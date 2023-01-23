@@ -1,8 +1,17 @@
+
+
 export interface INewOrder {
     siteName: string
     siteLink: string
     performerFee: number
+    address?: IAddress
     orderItems: IOrderItem[]
+  }
+  export interface IAddress {
+    postalCode: string
+    country: string
+    region: string
+    label: string
   }
 
 export interface IOrder {
@@ -12,6 +21,7 @@ export interface IOrder {
   siteLink: string
   performerFee: number
   orderItems: IOrderItem[]
+  address: IAddress
 }
 
 export interface IStateOrder {
@@ -47,10 +57,9 @@ export interface IOrderItem {
     units: number
   }
 
-export interface ICreateOrderResponse{
-    orderId: number
+export interface IResponse{
+    id: string
     message: string
-    creatorName: string
   }
 
 export interface IOrderItemImage {

@@ -46,8 +46,8 @@ public class OrderController : BaseController
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateOrder([FromBody] NewOrderModel order)
     {
-        int orderId = await _orderService.CreateAsync("ilya", order.SiteName, order.SiteLink,
-                                        order.PerformerFee, order.OrderItems);
+        int orderId = await _orderService.CreateAsync(UserName, order.SiteName, order.SiteLink,
+                                        order.PerformerFee, order.OrderItems, order.Address);
         var response = new ResponseModel(orderId.ToString(), ResponseModel.Success);
         return Ok(response);
     }

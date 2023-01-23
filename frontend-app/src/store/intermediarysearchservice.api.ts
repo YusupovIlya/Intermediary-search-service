@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ICreateOrderResponse, ILoginResponse, ILoginRequest, IOrder, INewOffer } from '../models'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress } from '../models'
 import { RootState } from '.'
 
 export const intermediarySearchServiceApi = createApi({
@@ -21,8 +21,11 @@ export const intermediarySearchServiceApi = createApi({
               method: 'POST',
               body: credentials,
             }),
+            transformErrorResponse: (
+                response: { status: number, data: ILoginResponse }
+              ) => response.data,
         }),
-        createOrder: builder.mutation<ICreateOrderResponse, INewOrder>({
+        createOrder: builder.mutation<IResponse, INewOrder>({
             query: (payload) => ({
                 url: "/order/create",
                 method: 'POST',
@@ -41,10 +44,30 @@ export const intermediarySearchServiceApi = createApi({
                 method: 'GET',
             }),
         }),
-        createOffer: builder.mutation<ICreateOrderResponse, INewOffer>({
+        createOffer: builder.mutation<IResponse, INewOffer>({
             query: (payload) => ({
                 url: "/offer/create",
                 method: 'POST',
+                body: payload,
+            }),
+        }),
+        addAddress: builder.mutation<IResponse, IAddress>({
+            query: (payload) => ({
+                url: "/user/addresses/add",
+                method: 'POST',
+                body: payload,
+            }),
+        }),
+        getUserAddresses: builder.query<IAddress[], null>({
+            query: () => ({
+                url: "/user/addresses",
+                method: 'GET',
+            }),
+        }),
+        deleteAddress: builder.mutation<IResponse, IAddress>({
+            query: (payload) => ({
+                url: "/user/addresses/delete",
+                method: 'DELETE',
                 body: payload,
             }),
         })
@@ -53,6 +76,7 @@ export const intermediarySearchServiceApi = createApi({
 
 export const { useLoginMutation, useCreateOrderMutation, 
                useAllOrdersQuery, useGetOrderByIdQuery,
-               useCreateOfferMutation} 
+               useCreateOfferMutation, useAddAddressMutation,
+               useGetUserAddressesQuery, useDeleteAddressMutation} 
                
                = intermediarySearchServiceApi

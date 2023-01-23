@@ -11,12 +11,11 @@ public class IdentityDbContextSeed
 
         await roleManager.CreateAsync(new IdentityRole("User"));
 
-        var defaultUser = new ApplicationUser(AuthConstants.USER_NAME, AuthConstants.FIRST_NAME,
-                                              AuthConstants.LAST_NAME, AuthConstants.EMAIL);
+        var defaultUser = new ApplicationUser(AuthConstants.FIRST_NAME, AuthConstants.LAST_NAME, AuthConstants.EMAIL);
 
         await userManager.CreateAsync(defaultUser, AuthConstants.DEFAULT_PASSWORD);
 
-        defaultUser = await userManager.FindByNameAsync(AuthConstants.USER_NAME);
+        defaultUser = await userManager.FindByEmailAsync(AuthConstants.EMAIL);
         await userManager.AddToRoleAsync(defaultUser, "User");
     }
 }

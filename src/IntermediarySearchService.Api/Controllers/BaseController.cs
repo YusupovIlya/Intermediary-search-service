@@ -6,6 +6,6 @@ namespace IntermediarySearchService.Api.Controllers
     [Route("api/v1/[controller]")]
     public class BaseController : ControllerBase
     {
-        protected string GetUserName() => User.Identity.Name;
+        protected string UserName => HttpContext.User.Identity.Name;
     }
 }

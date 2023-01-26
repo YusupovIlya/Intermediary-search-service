@@ -14,6 +14,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
+import Filters from "./pages/Filters";
 
 
 const App = () => {
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="/user/profile" element={ <UserProfile /> } />
           <Route path="/user/addresses" element={ <MyAddresses /> } />
           <Route path="/order/history" element={ <OrderHistory /> } />
+          <Route path="/orders/all" element={ <Filters /> } />
         </Routes>
       </div>
     </div>

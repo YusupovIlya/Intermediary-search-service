@@ -1,19 +1,40 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
+import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError} from '@reduxjs/toolkit/query/react'
 import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress } from '../models'
 import { RootState } from '.'
+import history from '../hooks/history';
+import { resetStateAction } from '../hooks/resetState';
+import { toast } from 'react-toastify';
+
+
+const baseQuery = fetchBaseQuery({
+    baseUrl: 'https://localhost:44349/api/v1',
+    prepareHeaders: (headers, { getState }) => {
+        const token = (getState() as RootState).auth.token
+        if (token) {
+          headers.set('authorization', `Bearer ${token}`)
+        }
+        return headers
+      },
+});
+
+const baseQueryWithRedir: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+  let result = await baseQuery(args, api, extraOptions)
+  if (result.error && result.error.status === 401) {
+    api.dispatch(resetStateAction());
+    history.push('/auth/login');
+    toast.error("Вам необходимо авторизоваться!");
+  }
+  return result
+}
+
 
 export const intermediarySearchServiceApi = createApi({
     reducerPath: 'intermediarySearchServiceApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'https://localhost:44349/api/v1',
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as RootState).auth.token
-            if (token) {
-              headers.set('authorization', `Bearer ${token}`)
-            }
-            return headers
-          },
-    }),
+    baseQuery: baseQueryWithRedir,
     endpoints: builder => ({
         login: builder.mutation<ILoginResponse, ILoginRequest>({
             query: (credentials) => ({

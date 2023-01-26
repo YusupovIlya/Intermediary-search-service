@@ -1,5 +1,4 @@
-import { ToastContainer, toast, ToastContentProps } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
+import { toast, ToastContentProps } from 'react-toastify';
 
 import { useForm} from "react-hook-form";
 import { ILoginRequest, ILoginResponse } from "../models";
@@ -40,7 +39,7 @@ export default function Login() {
 
   return (
   <div className="min-h-screen flex flex-col items-center justify-start w-full">
-    <ToastContainer />
+
     <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-full max-w-md">
       <div className="font-medium self-center text-xl sm:text-2xl uppercase text-gray-800">Login To Your Account</div>
       <button className="relative mt-6 border rounded-md py-2 text-sm text-gray-800 bg-gray-100 hover:bg-gray-200">

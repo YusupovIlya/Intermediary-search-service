@@ -1,5 +1,4 @@
-import { ToastContainer, toast, ToastContentProps } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
+import { toast, ToastContentProps } from 'react-toastify';
 
 import { useForm, useFieldArray } from "react-hook-form";
 import { IResponse, INewOrder, IOrderItemImage } from "../models";
@@ -52,7 +51,7 @@ export default function CreateOrder() {
     control
   });
 
-  const onSubmit = (data: INewOrder) => {
+  const onSubmit = async (data: INewOrder) => {
     images.map((value, index) => {
       const imagesObj: IOrderItemImage[] = value.map(i => {return  {imageLink: i}});
       data.orderItems[index].images = imagesObj;
@@ -61,7 +60,7 @@ export default function CreateOrder() {
     const promise = createOrder(data).unwrap();
     reset();
     setItemLinks([]);
-    toast.promise(
+    await toast.promise(
       promise,
       {
         pending: 'Создание заказа...',
@@ -95,7 +94,6 @@ export default function CreateOrder() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 pt-6">
             <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
               <div className="flex flex-col">
-                <ToastContainer />
                 <label className="leading-loose">Название сайта</label>
                 <input
                 {...register("siteName", { required: "Введите название сайта!", maxLength: 100 })}

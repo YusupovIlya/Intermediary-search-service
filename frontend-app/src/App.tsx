@@ -12,6 +12,8 @@ import Navbar from "./components/Navbar";
 import MyAddresses from "./pages/MyAddresses";
 import { useAuth } from "./hooks/useAuth";
 import { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.min.css';
 
 
 const App = () => {
@@ -32,6 +34,7 @@ const App = () => {
         setCurrentRoute={setCurrentRoute}
       />
       <div className="flex items-center justify-center text-gray-300 m-2 sm:m-8">
+      <ToastContainer />
         <Routes>
           <Route path="/order/create" element={ <CreateOrder /> } />
           <Route path="/auth/login" element={ <Login /> } />

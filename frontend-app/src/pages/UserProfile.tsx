@@ -1,12 +1,10 @@
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
+
 
 
 export default function UserProfile() {
 
     return(
         <div className="p-2">
-            <ToastContainer />
             <div className="p-8 bg-white shadow mt-20">
             <div className="grid grid-cols-1 md:grid-cols-3">
                 <div className="grid grid-cols-3 text-center order-last md:order-first mt-20 md:mt-0">

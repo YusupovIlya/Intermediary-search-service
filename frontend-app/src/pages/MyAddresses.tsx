@@ -1,5 +1,4 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
+import { toast } from 'react-toastify';
 
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -104,7 +103,6 @@ export default function MyAddresses() {
                     >Удалить</button>
                 </div>
             }/>
-            <ToastContainer />
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
                 {isLoading && <p>Loading...</p>}
                 {addresses?.map((item, index) => (

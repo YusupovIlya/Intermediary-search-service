@@ -32,6 +32,8 @@ public class IdentityTokenClaimService : ITokenService
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
+            Issuer = "IntermediarySearchService",
+            Audience = "FrontApp",
             Subject = new ClaimsIdentity(claims.ToArray()),
             Expires = DateTime.UtcNow.AddDays(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

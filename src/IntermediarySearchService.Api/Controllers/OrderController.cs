@@ -21,15 +21,15 @@ public class OrderController : BaseController
     }
 
     // GET: api/v1/order/all
-    [Route("all")]
-    [HttpGet]
-    public async Task<IActionResult> Get()
-    {
-        //var orders = await _orderService.GetAllAsync(GetUserName());
-        var orders = await _orderService.GetAllAsync("ilya");
-        var mappedOrders = _mapper.Map<IEnumerable<OrderModel>>(orders);
-        return Ok(mappedOrders);
-    }
+    //[Route("all")]
+    //[HttpGet]
+    //public async Task<IActionResult> Get()
+    //{
+    //    //var orders = await _orderService.GetAllAsync(GetUserName());
+    //    var orders = await _orderService.GetUserOrdersAsync("ilya");
+    //    var mappedOrders = _mapper.Map<IEnumerable<OrderModel>>(orders);
+    //    return Ok(mappedOrders);
+    //}
 
     // GET api/v1/order/5
     [HttpGet("{id:int}")]
@@ -38,6 +38,52 @@ public class OrderController : BaseController
         var order = await _orderService.GetByIdAsync(id);
         var orderDto = _mapper.Map<OrderModel>(order);
         return Ok(orderDto);
+    }
+
+    // GET api/v1/order/all
+    [Route("all")]
+    [HttpGet]
+    public async Task<IActionResult> GetPaginatedOrders([FromQuery]int page, [FromQuery] int pageSize)
+    {
+        var orders = await _orderService.GetOrdersByPageNumberAsync(page, pageSize);
+        var paginationMeta = new PaginationMetaModel(orders.CurrentPage, orders.TotalPages, orders.PageSize, 
+                                                     orders.TotalCount, orders.HasPrevious, orders.HasNext);
+        var mappedOrders = _mapper.Map<IEnumerable<OrderModel>>(orders);
+        var result = new PaginatedOrdersModel(paginationMeta, mappedOrders);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get filtered and paginated order list
+    /// </summary>
+    /// <param name="page">page number</param>
+    /// <param name="pageSize">number of items per page</param>
+    /// <param name="model">
+    /// filter parameters: 
+    /// shop name, country, number of items in the order, 
+    /// order total price range
+    /// </param>
+    /// <response code="200">Returns items</response>
+    /// <response code="401">Unauthorized</response>
+    // GET api/v1/order/all/filter
+    [Route("all/filter")]
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetPaginatedOrders([FromQuery] int page,
+                                                        [FromQuery] int pageSize,
+                                                        [FromQuery] OrdersFilterModel model)
+    {
+        if (model.Shops == null) model.Shops = new string[0];
+        if (model.Countries == null) model.Countries = new string[0];
+        var orders = await _orderService.GetOrdersByPageNumberAsync(page, pageSize, model.Shops,
+                                                                    model.Countries, model.NumOrderItems,
+                                                                    model.MinOrderPrice, model.MaxOrderPrice);
+        var paginationMeta = new PaginationMetaModel(orders.CurrentPage, orders.TotalPages, orders.PageSize,
+                                                     orders.TotalCount, orders.HasPrevious, orders.HasNext);
+        var mappedOrders = _mapper.Map<IEnumerable<OrderModel>>(orders);
+        var result = new PaginatedOrdersModel(paginationMeta, mappedOrders);
+        return Ok(result);
     }
 
     // POST api/v1/order/create
@@ -76,5 +122,25 @@ public class OrderController : BaseController
     {
         await _orderService.DeleteAsync(id);
         return Ok();
+    }
+
+    // GET: api/v1/order/shopslist
+    [Route("shopslist")]
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetShopsList()
+    {
+        var shopsList = await _orderService.GetShopsForFilter();
+        return Ok(shopsList);
+    }
+
+    // GET: api/v1/order/countrieslist
+    [Route("countrieslist")]
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCountriesList()
+    {
+        var countrieslist = await _orderService.GetCountriesForFilter();
+        return Ok(countrieslist);
     }
 }

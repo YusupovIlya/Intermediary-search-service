@@ -1,4 +1,5 @@
 ﻿using IntermediarySearchService.Core.Entities.OrderAggregate;
+using IntermediarySearchService.Core.Services;
 using System.Threading.Tasks;
 
 namespace IntermediarySearchService.Core.Interfaces;
@@ -10,7 +11,7 @@ public interface IOrderService
 
     Task<Order> GetByIdAsync(int orderId);
 
-    Task<IEnumerable<Order>> GetAllAsync(string userName);
+    Task<IEnumerable<Order>> GetUserOrdersAsync(string userName);
 
     Task AddItemsAsync(int orderId, List<OrderItem> items);
 
@@ -19,4 +20,15 @@ public interface IOrderService
     Task DeleteAsync(int orderId);
 
     Task UpdateAsync(Order order);
+
+    Task<string[]> GetShopsForFilter();
+
+    Task<string?[]> GetCountriesForFilter();
+
+    Task<PagedList<Order>> GetOrdersByPageNumberAsync(int pageNumber, int pageSize, 
+                                                      string[] shops, string[] countries, 
+                                                      int numOrderItems, int minOrderPrice, 
+                                                      int maxOrderPrice);
+
+    Task<PagedList<Order>> GetOrdersByPageNumberAsync(int pageNumber, int pageSize);
 }

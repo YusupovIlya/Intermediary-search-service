@@ -28,7 +28,7 @@ export default function OrderHistory() {
         data: orders,
         isFetching,
         isLoading,
-      } = useAllOrdersQuery(null)
+      } = useAllOrdersQuery({page: 1, pageSize: 10})
 
     return(
     <div>
@@ -55,13 +55,13 @@ export default function OrderHistory() {
                     </tr>
                 </thead>
                 <tbody className="text-center">
-                {orders?.map((item, index) => (
+                {/* {orders?.map((item, index) => (
                 <OrderInHistory 
                     order={item} 
                     key={index} 
                     setOrderInModal={setOrderInModal}
                     setModalActive={setModalActive}
-                />))}
+                />))} */}
                 </tbody>
             </table>
         </div>        

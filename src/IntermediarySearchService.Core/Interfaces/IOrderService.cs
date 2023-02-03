@@ -27,8 +27,6 @@ public interface IOrderService
 
     Task<PagedList<Order>> GetOrdersByPageNumberAsync(int pageNumber, int pageSize, 
                                                       string[] shops, string[] countries, 
-                                                      int numOrderItems, int minOrderPrice, 
-                                                      int maxOrderPrice);
-
-    Task<PagedList<Order>> GetOrdersByPageNumberAsync(int pageNumber, int pageSize);
+                                                      int? numOrderItems, int? minOrderPrice, 
+                                                      int? maxOrderPrice, string? sortBy);
 }

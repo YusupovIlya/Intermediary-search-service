@@ -40,45 +40,34 @@ public class OrderController : BaseController
         return Ok(orderDto);
     }
 
-    // GET api/v1/order/all
-    [Route("all")]
-    [HttpGet]
-    public async Task<IActionResult> GetPaginatedOrders([FromQuery]int page, [FromQuery] int pageSize)
-    {
-        var orders = await _orderService.GetOrdersByPageNumberAsync(page, pageSize);
-        var paginationMeta = new PaginationMetaModel(orders.CurrentPage, orders.TotalPages, orders.PageSize, 
-                                                     orders.TotalCount, orders.HasPrevious, orders.HasNext);
-        var mappedOrders = _mapper.Map<IEnumerable<OrderModel>>(orders);
-        var result = new PaginatedOrdersModel(paginationMeta, mappedOrders);
-        return Ok(result);
-    }
-
     /// <summary>
-    /// Get filtered and paginated order list
+    /// Get paginated order list by params
     /// </summary>
     /// <param name="page">page number</param>
     /// <param name="pageSize">number of items per page</param>
-    /// <param name="model">
-    /// filter parameters: 
-    /// shop name, country, number of items in the order, 
-    /// order total price range
-    /// </param>
+    /// <param name="shops"></param>
+    /// <param name="countries"></param>
+    /// <param name="numOrderItems">max number of items in order</param>
+    /// <param name="minOrderPrice">min order's price</param>
+    /// <param name="maxOrderPrice">max order's price</param>
     /// <response code="200">Returns items</response>
-    /// <response code="401">Unauthorized</response>
-    // GET api/v1/order/all/filter
-    [Route("all/filter")]
+    /// <response code="400">Model state invalid</response>
+    // GET api/v1/order/all/
+    [Route("all")]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPaginatedOrders([FromQuery] int page,
                                                         [FromQuery] int pageSize,
-                                                        [FromQuery] OrdersFilterModel model)
+                                                        [FromQuery] string[] shops,
+                                                        [FromQuery] string[] countries,
+                                                        [FromQuery] int? numOrderItems,
+                                                        [FromQuery] int? minOrderPrice,
+                                                        [FromQuery] int? maxOrderPrice,
+                                                        [FromQuery] string? sortBy)
     {
-        if (model.Shops == null) model.Shops = new string[0];
-        if (model.Countries == null) model.Countries = new string[0];
-        var orders = await _orderService.GetOrdersByPageNumberAsync(page, pageSize, model.Shops,
-                                                                    model.Countries, model.NumOrderItems,
-                                                                    model.MinOrderPrice, model.MaxOrderPrice);
+        var orders = await _orderService.GetOrdersByPageNumberAsync(page, pageSize, shops, countries,
+                                                                    numOrderItems, minOrderPrice, maxOrderPrice, sortBy);
         var paginationMeta = new PaginationMetaModel(orders.CurrentPage, orders.TotalPages, orders.PageSize,
                                                      orders.TotalCount, orders.HasPrevious, orders.HasNext);
         var mappedOrders = _mapper.Map<IEnumerable<OrderModel>>(orders);

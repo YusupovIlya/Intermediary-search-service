@@ -27,7 +27,7 @@ export interface IOrder {
 export interface IStateOrder {
   state: string
   description: string
-  date: Date
+  date: string
 } 
 
 export interface IOffer {
@@ -80,4 +80,34 @@ export interface ILoginResponse {
 export interface ILoginRequest {
   email: string
   password: string
+}
+
+export interface IPaginationOptions {
+  page: number,
+  pageSize: number
+}
+
+export interface IPaginationMetaData {
+  totalCount: number,
+  pageSize: number,
+  currentPage: number,
+  totalPages: number,
+  hasNext: boolean,
+  hasPrevious: boolean
+}
+
+export interface IPaginatedOrders {
+  paginationMeta: IPaginationMetaData,
+  orders: IOrder[]
+}
+
+export interface IOrdersFilter {
+  page: number,
+  pageSize: number
+  shops: string[],
+  countries: string[],
+  numOrderItems: number,
+  minOrderPrice: number,
+  maxOrderPrice: number,
+  sortBy: string
 }

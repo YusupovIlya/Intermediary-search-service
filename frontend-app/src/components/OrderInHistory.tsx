@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useImgLinkForOrder } from "../hooks/useImgLinkForOrder";
+
+import { getOrderImg } from "../hooks/getImage";
 import { IOrder } from "../models";
 
 interface OrderInHistoryProps {
@@ -10,7 +10,6 @@ interface OrderInHistoryProps {
 
 
 export default function OrderInHistory({order, setOrderInModal, setModalActive}: OrderInHistoryProps) {
-    const orderPreview = useImgLinkForOrder(order);
     
     return(
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -19,7 +18,7 @@ export default function OrderInHistory({order, setOrderInModal, setModalActive}:
                 setModalActive(true);
             }}>
         <td className="w-48 p-4">
-            <img src={orderPreview} alt="Не удалось загрузить изображение товара"/>
+            <img src={getOrderImg(order)} alt="Не удалось загрузить изображение товара"/>
         </td>
         <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
         <a href={order?.siteLink} className="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{order?.siteName}</a>

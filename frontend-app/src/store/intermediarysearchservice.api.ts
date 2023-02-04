@@ -56,16 +56,6 @@ export const intermediarySearchServiceApi = createApi({
                 body: payload,
             }),
         }),
-        allOrders: builder.query<IPaginatedOrders, IPaginationOptions>({
-            query: (payload) => ({
-                url: "/order/all/fdfd",
-                method: 'GET',
-                params: {
-                    page: payload.page,
-                    pageSize: payload.pageSize
-                },
-            })
-        }),
         filteredOrders: builder.query<IPaginatedOrders, IOrdersFilter>({
             query: (payload) => ({
                 url: "/order/all",
@@ -131,10 +121,9 @@ export const intermediarySearchServiceApi = createApi({
 })
 
 export const { useLoginMutation, useCreateOrderMutation, 
-               useAllOrdersQuery, useGetOrderByIdQuery,
-               useCreateOfferMutation, useAddAddressMutation,
+               useGetOrderByIdQuery, useCreateOfferMutation, 
+               useAddAddressMutation, useFilteredOrdersQuery,
                useGetUserAddressesQuery, useDeleteAddressMutation,
-               useGetCountriesForFilterQuery, useGetShopsForFilterQuery,
-               useFilteredOrdersQuery} 
+               useGetCountriesForFilterQuery, useGetShopsForFilterQuery} 
                
                = intermediarySearchServiceApi

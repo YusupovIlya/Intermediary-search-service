@@ -6,11 +6,11 @@ export interface INav {
 export const unAuthRoutes: INav[] = [
     {
         text: "Заказать",
-        route: "/order/create"
+        route: "/orders/create"
     },
     {
         text: "Выполнить заказ",
-        route: "/order/all"
+        route: "/orders/all"
     },
 ]
 
@@ -22,5 +22,9 @@ export const authRoutes: INav[] = [
     {
         text: "Мои адреса",
         route: "/user/addresses"
+    },
+    {
+        text: "Мои заказы",
+        route: "/user/orders"
     },
 ]

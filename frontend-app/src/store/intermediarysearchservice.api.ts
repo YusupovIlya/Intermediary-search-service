@@ -1,5 +1,5 @@
-import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginationOptions, IPaginatedOrders, IOrdersFilter } from '../models'
+import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError} from '@reduxjs/toolkit/query/react'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter } from '../models'
 import { RootState } from '.'
 import history from '../hooks/history';
 import { resetStateAction } from '../hooks/resetState';
@@ -49,11 +49,18 @@ export const intermediarySearchServiceApi = createApi({
             }),
             transformErrorResponse: (response: { status: number, data: ILoginResponse }) => response.data,
         }),
+
         createOrder: builder.mutation<IResponse, INewOrder>({
             query: (payload) => ({
                 url: "/order/create",
                 method: 'POST',
                 body: payload,
+            }),
+        }),
+        removeOrder: builder.mutation<IResponse, {orderId: number}>({
+            query: (payload) => ({
+                url: `/orders/${payload.orderId}`,
+                method: 'DELETE',
             }),
         }),
         filteredOrders: builder.query<IPaginatedOrders, IOrdersFilter>({
@@ -74,15 +81,34 @@ export const intermediarySearchServiceApi = createApi({
         }),
         getOrderById: builder.query<IOrder, string>({
             query: (id) => ({
-                url: `/order/${id}`,
+                url: `/orders/${id}`,
                 method: 'GET',
             }),
         }),
+
         createOffer: builder.mutation<IResponse, INewOffer>({
             query: (payload) => ({
                 url: "/offer/create",
                 method: 'POST',
                 body: payload,
+            }),
+        }),
+        selectOffer: builder.mutation<IResponse, {orderId: number, offerId: number}>({
+            query: (payload) => ({
+                url: `/orders/${payload.orderId}/offers/${payload.offerId}`,
+                method: 'PUT',
+            }),
+        }),
+
+        getUserOrders: builder.query<IOrder[], IUserOrdersFilter>({
+            query: (payload) => ({
+                url:"/user/orders",
+                method: 'GET',
+                params: {
+                    orderStates: payload.orderStates.length == 0 ? undefined : payload.orderStates,
+                    shops: payload.shops.length == 0 ? undefined : payload.shops,
+                    sortBy: payload.sortBy
+                },
             }),
         }),
         addAddress: builder.mutation<IResponse, IAddress>({
@@ -124,6 +150,8 @@ export const { useLoginMutation, useCreateOrderMutation,
                useGetOrderByIdQuery, useCreateOfferMutation, 
                useAddAddressMutation, useFilteredOrdersQuery,
                useGetUserAddressesQuery, useDeleteAddressMutation,
-               useGetCountriesForFilterQuery, useGetShopsForFilterQuery} 
+               useGetCountriesForFilterQuery, useGetShopsForFilterQuery,
+               useGetUserOrdersQuery, useSelectOfferMutation,
+               useRemoveOrderMutation}
                
                = intermediarySearchServiceApi

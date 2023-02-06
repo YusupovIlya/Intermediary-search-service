@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useGetShopsForFilterQuery, useGetUserOrdersQuery } from "../store/intermediarysearchservice.api";
+import { useGetParamsForFilterQuery, useGetUserOrdersQuery } from "../store/intermediarysearchservice.api";
 import { IOffer, IUserOrdersFilter } from "../models";
 import classNames from "classnames";
 import {statesOrder} from "../hooks/getStateOrder";
@@ -15,7 +15,7 @@ export default function UserOrders() {
         shops: [],
         sortBy: "newest"
       });
-      const { data: shops, isLoading: isLoadingShops } = useGetShopsForFilterQuery(null);
+      const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(2);
       const { data: orders, isLoading, refetch } = useGetUserOrdersQuery(filter, {refetchOnMountOrArgChange: true});
       const [mobileFilter, setMobileFilter] = useState(false);
       const [sortActive, setSortActive] = useState(false);
@@ -192,7 +192,7 @@ export default function UserOrders() {
   
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900">Заказы пользователей</h1>
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900">Мои заказы</h1>
         
                 <div className="flex items-center">
                   <div className="inline-block text-left">

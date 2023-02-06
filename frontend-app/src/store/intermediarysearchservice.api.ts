@@ -52,7 +52,7 @@ export const intermediarySearchServiceApi = createApi({
 
         createOrder: builder.mutation<IResponse, INewOrder>({
             query: (payload) => ({
-                url: "/order/create",
+                url: "/orders",
                 method: 'POST',
                 body: payload,
             }),
@@ -63,9 +63,16 @@ export const intermediarySearchServiceApi = createApi({
                 method: 'DELETE',
             }),
         }),
+        editOrder: builder.mutation<IResponse, {orderId: number, data: INewOrder}>({
+            query: (payload) => ({
+                url: `/orders/${payload.orderId}`,
+                method: 'PUT',
+                body: payload.data,
+            }),
+        }),
         filteredOrders: builder.query<IPaginatedOrders, IOrdersFilter>({
             query: (payload) => ({
-                url: "/order/all",
+                url: "/orders",
                 method: 'GET',
                 params: {
                     page: payload.page,
@@ -131,15 +138,9 @@ export const intermediarySearchServiceApi = createApi({
                 body: payload,
             }),
         }),
-        getShopsForFilter: builder.query<string[], null>({
-            query: () => ({
-                url: "/order/shopslist",
-                method: 'GET',
-            }),
-        }),
-        getCountriesForFilter: builder.query<string[], null>({
-            query: () => ({
-                url: "/order/countrieslist",
+        getParamsForFilter: builder.query<string[], number>({
+            query: (type) => ({
+                url: `/orders/params/${type}`,
                 method: 'GET',
             }),
         }),
@@ -150,8 +151,8 @@ export const { useLoginMutation, useCreateOrderMutation,
                useGetOrderByIdQuery, useCreateOfferMutation, 
                useAddAddressMutation, useFilteredOrdersQuery,
                useGetUserAddressesQuery, useDeleteAddressMutation,
-               useGetCountriesForFilterQuery, useGetShopsForFilterQuery,
                useGetUserOrdersQuery, useSelectOfferMutation,
-               useRemoveOrderMutation}
+               useRemoveOrderMutation, useEditOrderMutation,
+               useGetParamsForFilterQuery}
                
                = intermediarySearchServiceApi

@@ -1,32 +1,32 @@
 import { useEffect, useState } from "react";
 import MultiRangeSlider from "multi-range-slider-react";
-import { useFilteredOrdersQuery, useGetCountriesForFilterQuery, useGetShopsForFilterQuery } from "../store/intermediarysearchservice.api";
+import { useFilteredOrdersQuery, useGetParamsForFilterQuery } from "../store/intermediarysearchservice.api";
 import OrderCard from "../components/OrderCard";
 import { IOrdersFilter } from "../models";
 import classNames from "classnames";
 import { useDebounce } from "../hooks/useDebounce";
 
-interface TypesSortList{
-  type: string,
+export interface TypesSort{
+  value: any,
   text: string,
 }
 
 
-const sortList: TypesSortList[] = [
+export const sortList: TypesSort[] = [
   {
-    type: "newest",
+    value: "newest",
     text: "Новые",  
   },
   {
-    type: "oldest",
+    value: "oldest",
     text: "Старые",  
   },
   {
-    type: "maxmin",
+    value: "maxmin",
     text: "Стоимость заказа Max --> Min",  
   },
   {
-    type: "minmax",
+    value: "minmax",
     text: "Стоимость заказа Min --> Max",  
   }
 ]
@@ -42,8 +42,8 @@ export default function AllOrders() {
       minOrderPrice: -1,
       sortBy: "newest"
     });
-    const { data: countries, isLoading: isLoadingCountries } = useGetCountriesForFilterQuery(null);
-    const { data: shops, isLoading: isLoadingShops } = useGetShopsForFilterQuery(null);
+    const { data: countries, isLoading: isLoadingCountries } = useGetParamsForFilterQuery(1);
+    const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(0);
     const { data: allOrdersResponse, isLoading } = useFilteredOrdersQuery(filter);
     const [mobileFilter, setMobileFilter] = useState(false);
     const [sortActive, setSortActive] = useState(false);
@@ -57,7 +57,7 @@ export default function AllOrders() {
     const [minPrice, setMinPrice] = useState(1);
     const [maxPrice, setMaxPrice] = useState(500);
     const [numOrderItems, setNumOrderItems] = useState(1);
-    const [typeSort, setTypeSort] = useState("newest");
+    const [valueSort, setTypeSort] = useState("newest");
     const debouncedItems = useDebounce(numOrderItems, 500);
     const debouncedMin = useDebounce(minPrice, 500);
     const debouncedMax = useDebounce(maxPrice, 500);
@@ -88,9 +88,9 @@ export default function AllOrders() {
       setFilter(filter => {
         return {
           ...filter,
-          sortBy: typeSort,
+          sortBy: valueSort,
         }});
-    }, [typeSort]);
+    }, [valueSort]);
 
 
     useEffect(() => {
@@ -383,9 +383,9 @@ export default function AllOrders() {
                                 <button
                                   className={classNames([
                                     "text-gray-500 block px-4 py-2 text-sm",
-                                    typeSort == item.type && "font-medium text-gray-900",
+                                    valueSort == item.value && "font-medium text-gray-900",
                                   ])} 
-                                  onClick={() => setTypeSort(item.type)}
+                                  onClick={() => setTypeSort(item.value)}
                                   key={index}
                                   >{item.text}
                                 </button>
@@ -663,7 +663,7 @@ export default function AllOrders() {
                         })}}                     
                       >
                         <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                          <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                          <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
                         </svg>
                       </button>                      
                       {Array.from({length: allOrdersResponse?.paginationMeta.totalPages!}, (_, i) => i + 1).map(index => {
@@ -700,7 +700,7 @@ export default function AllOrders() {
                         })}}  
                         >
                         <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                          <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                          <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
                         </svg>
                       </button>                                         
                     </nav>

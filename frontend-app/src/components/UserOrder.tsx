@@ -35,7 +35,7 @@ export default function UserOrder({order, setOfferInModal, setOfferModalActive}
 
                         <div className="w-full flex flex-col justify-start items-start space-y-8">
                             <p className="text-sm dark:text-white xl:text-base leading-6 text-gray-800">{order.orderItems.length} ед. в этом заказе</p>
-                            <p className="text-sm dark:text-white xl:text-base font-semibold leading-6 text-gray-800">Стоимость заказа: ${order.performerFee}</p>
+                            <p className="text-sm dark:text-white xl:text-base font-semibold leading-6 text-gray-800">Стоимость заказа: ${order.totalPrice}</p>
                         </div>
 
 

@@ -13,6 +13,9 @@ import { useAuth } from "./hooks/useAuth";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
+import UserOrders from "./pages/UserOrders";
+import OrderSummaryForOwner from "./pages/OrderSummaryForOwner";
+import EditOrder from "./pages/EditOrder";
 
 
 const App = () => {
@@ -25,7 +28,7 @@ const App = () => {
   }, [auth.user]);
 
   return (
-    <div className="bg-gray-200 p-2">     
+    <div className="p-2">     
       <Navbar
         unAuthRoutes={unAuthRoutes}
         authRoutes={userRoutes}
@@ -36,15 +39,18 @@ const App = () => {
       <ToastContainer />
         <Routes>
 
-          <Route path="/order/create" element={ <CreateOrder /> } />
-          <Route path="/order/all" element={ <AllOrders /> } />
-          <Route path="/order/:id" element={ <OrderSummary /> } />
+          <Route path="/orders/create" element={ <CreateOrder /> } />
+          <Route path="/orders/all" element={ <AllOrders /> } />
+          <Route path="/orders/:id" element={ <OrderSummary /> } />
 
           <Route path="/auth/login" element={ <Login /> } />
 
+          <Route path="/user/:username" element={ <UserProfile /> } />
           <Route path="/user/profile" element={ <UserProfile /> } />
           <Route path="/user/addresses" element={ <MyAddresses /> } />
-
+          <Route path="/user/orders" element={ <UserOrders /> } />
+          <Route path="/user/orders/:id" element={ <OrderSummaryForOwner /> } />
+          <Route path="/user/orders/:id/edit" element={ <EditOrder /> } />
         </Routes>
       </div>
     </div>

@@ -10,4 +10,6 @@ public class OrderModel : NewOrderModel
     public IEnumerable<StateModel> StatesOrder { get; set; }
     public IEnumerable<Offer> Offers { get; set; }
     public decimal TotalPrice { get; set; }
+    public bool isEditable { get; set; }
+    public bool isDeletable { get; set; }
 }

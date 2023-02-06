@@ -10,3 +10,5 @@ public class NewOrderModel
     public decimal PerformerFee { get; set; }
     public List<OrderItem> OrderItems { get; set; }
 }
+
+public class EditedOrderModel: NewOrderModel { }

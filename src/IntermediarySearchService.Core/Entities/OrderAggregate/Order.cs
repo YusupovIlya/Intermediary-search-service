@@ -22,6 +22,9 @@ public class Order: BaseEntity, IAggregateRoot
     private readonly List<Offer> _offers = new List<Offer>();
     public IReadOnlyCollection<Offer> Offers => _offers.AsReadOnly();
 
+    public bool isEditable => _statesOrder.Last().State == State.InSearchPerformer;
+    public bool isDeletable => _statesOrder.Last().State == State.Received || _statesOrder.Last().State == State.InSearchPerformer;
+
     private Order() { }
 
     public Order(List<OrderItem> orderItems)
@@ -40,35 +43,24 @@ public class Order: BaseEntity, IAggregateRoot
         AddStateOrder();
     }
 
-    public void AddItem(string productName, string options, string productLink,
-                        decimal unitPrice, List<OrderItemImage> images, int units = 1)
+    public void Update(string siteName, string siteLink, Address address,
+                       decimal performerFee, List<OrderItem> orderItems)
     {
-        var orderItem = new OrderItem(productName, options, productLink, unitPrice, units, images);
-        _orderItems.Add(orderItem);
+        SiteName = siteName;
+        SiteLink = siteLink;
+        PerformerFee = performerFee;
+        Address = address;
+        _orderItems.Clear();
+        _orderItems.AddRange(orderItems);
     }
 
-    public void AddItem(OrderItem item)
-    {
-        _orderItems.Add(item);
-    }
-
-    public void DeleteItem(int itemId)
-    {
-        var orderItem = _orderItems.FirstOrDefault(o => o.Id == itemId);
-        if (orderItem != null)
-        {
-            _orderItems.Remove(orderItem);
-        }
-        else
-            throw new OrderItemNotFoundException(itemId);
-    }
-
-    public void ChangeStatusOffer(int offerId, bool selectStatus)
+    public void SelectOffer(int offerId)
     {
         var offer = _offers.FirstOrDefault(o => o.Id == offerId);
         if (offer != null)
         {
-            offer.ChangeSelectStatus(selectStatus);
+            _offers.ForEach(of => of.ChangeSelectStatus(false));
+            offer.ChangeSelectStatus(true);
         }
         else
             throw new OfferNotFoundException(offerId);

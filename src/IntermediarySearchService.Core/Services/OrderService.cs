@@ -2,6 +2,7 @@
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Core.Specifications;
 using IntermediarySearchService.Core.Exceptions;
+using System.Linq;
 
 namespace IntermediarySearchService.Core.Services;
 
@@ -35,63 +36,63 @@ public class OrderService : IOrderService
             throw new OrderNotFoundException(orderId);
     }
 
-    public async Task<IEnumerable<Order>> GetUserOrdersAsync(string userName)
+    public async Task<IEnumerable<Order>> GetUserOrdersAsync(string userName, State[] orderStates,
+                                                             string[] shops, string? sortBy)
     {
         var orderSpec = new OrdersWithItemsSpecification(userName);
         var orders = await _orderRepository.ListAsync(orderSpec);
-        return orders;
+        if (shops.Length > 0) orders = orders.Where(o => shops.Contains(o.SiteName)).ToList();
+        if(orderStates.Length > 0) orders = orders.Where(o => orderStates.Contains((State)o.StatesOrder.Last()?.State)).ToList();
+        return SortByParam(sortBy, orders);
     }
 
-    public async Task AddItemsAsync(int orderId, List<OrderItem> items)
-    {
-        var orderSpec = new OrderWithItemsSpecification(orderId);
-        var order = await _orderRepository.FirstOrDefaultAsync(orderSpec);
-        if(order != null)
-        {
-            items.ForEach(i => order.AddItem(i));
-            await _orderRepository.SaveChangesAsync();
-        }
-        else
-            throw new OrderNotFoundException(orderId);
-    }
-
-    public async Task DeleteAsync(int orderId)
+    public async Task DeleteAsync(int orderId, string initatorUserName)
     {
         var order = await _orderRepository.GetByIdAsync(orderId);
         if (order != null)
         {
-            await _orderRepository.DeleteAsync(order);
+            if (order.UserName == initatorUserName)
+                await _orderRepository.DeleteAsync(order);
+            else
+                throw new ForbiddenActionException(initatorUserName);
         }
         else
             throw new OrderNotFoundException(orderId);
     }
 
-    public async Task UpdateAsync(Order order)
+    public async Task UpdateAsync(string initatorUserName, int orderId, string siteName, string siteLink, 
+                                  Address address, decimal performerFee, List<OrderItem> orderItems)
     {
-        await _orderRepository.UpdateAsync(order);
-    }
-
-    public async Task DeleteItemsAsync(int orderId, int[] itemsId)
-    {
-        var orderSpec = new OrderWithItemsSpecification(orderId);
-        var order = await _orderRepository.FirstOrDefaultAsync(orderSpec);
+        var order = await GetByIdAsync(orderId);
         if (order != null)
         {
-            Array.ForEach(itemsId, i => order.DeleteItem(i));
-            await _orderRepository.SaveChangesAsync();
+            if (order.UserName == initatorUserName)
+            {
+                order.Update(siteName, siteLink, address, performerFee, orderItems);
+                await _orderRepository.UpdateAsync(order);
+            }
+            else
+                throw new ForbiddenActionException(initatorUserName);
         }
         else
             throw new OrderNotFoundException(orderId);
     }
 
-    public async Task<string[]> GetShopsForFilter()
+
+
+    public async Task<string[]> GetShopsForFilter(string userName = null)
     {
-        return await _orderRepository
-                                    .ListAsync()
-                                    .ContinueWith(o => o.Result
-                                                            .DistinctBy(order => order.SiteName)
-                                                            .Select(i => i.SiteName)
-                                                            .ToArray());
+        List<Order> orders;
+        if(userName == null)
+            orders = await _orderRepository.ListAsync();
+        else
+        {
+            var orderSpec = new OrdersWithItemsSpecification(userName);
+            orders = await _orderRepository.ListAsync(orderSpec);
+        }
+        return orders.DistinctBy(order => order.SiteName)
+                     .Select(i => i.SiteName)
+                     .ToArray();
     }
 
     public async Task<string?[]> GetCountriesForFilter()
@@ -134,26 +135,43 @@ public class OrderService : IOrderService
                 (true, true) => orders.Where(o => checkIntParams(o)),
             };
 
-        if(sortBy != null)
-        {
-            switch (sortBy)
-            {
-                case newest:
-                    filtered = filtered.OrderBy(o => o.StatesOrder.FirstOrDefault(s => s.State == State.InSearchPerformer)?.Date);
-                    break;
-                case oldest:
-                    filtered = filtered.OrderByDescending(o => o.StatesOrder.FirstOrDefault(s => s.State == State.InSearchPerformer)?.Date);
-                    break;
-                case maxMin:
-                    filtered = filtered.OrderBy(o => o.TotalOrderPrice());
-                    break;
-                case minMax:
-                    filtered = filtered.OrderByDescending(o => o.TotalOrderPrice());
-                    break;
-            }
-        }
-
+        filtered = SortByParam(sortBy, filtered);
         var paginatedOrders = PagedList<Order>.ToPagedList(filtered, pageNumber, pageSize);
         return paginatedOrders;
     }
+
+
+    public IEnumerable<Order> SortByParam(string? param, IEnumerable<Order> orders) =>
+        param switch
+        {
+            newest => orders.OrderByDescending(o => o.StatesOrder.First().Date),
+            oldest => orders.OrderBy(o => o.StatesOrder.First().Date),
+            minMax => orders.OrderBy(o => o.TotalOrderPrice()),
+            maxMin => orders.OrderByDescending(o => o.TotalOrderPrice()),
+            _ => orders,
+        };
+
+    public async Task<string?[]> GetParam(FilterParam type, string userName) =>
+        type switch
+        {
+            FilterParam.AllShops => await GetShopsForFilter(),
+            FilterParam.UserShops => await GetShopsForFilter(userName),
+            FilterParam.AllCountries => await GetCountriesForFilter(),
+            _ => new string[0],
+        };
+
+    public async Task<int> SelectOfferForOrderByIdAsync(int orderId, int offerId)
+    {
+        var order = await GetByIdAsync(orderId);
+        order.SelectOffer(offerId);
+        await _orderRepository.UpdateAsync(order);
+        return offerId;
+    }
+}
+
+public enum FilterParam
+{
+    AllShops,
+    AllCountries,
+    UserShops,
 }

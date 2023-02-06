@@ -17,6 +17,7 @@ public sealed class OrdersWithItemsSpecification : Specification<Order>
     {
         Query
             .Where(o => o.UserName == userName)
+            .Include(o => o.Offers)
             .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Images);
     }

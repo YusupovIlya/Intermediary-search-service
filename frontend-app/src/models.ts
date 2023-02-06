@@ -22,9 +22,14 @@ export interface IOrder {
   performerFee: number
   orderItems: IOrderItem[]
   address: IAddress
+  totalPrice: number
+  offers: IOffer[],
+  isEditable: boolean,
+  isDeletable: boolean,
 }
 
 export interface IStateOrder {
+  id: number,
   state: string
   description: string
   date: string
@@ -37,7 +42,8 @@ export interface IOffer {
   itemsTotalCost: number
   deliveryCost: number
   expenses: number
-  isSelected: boolean
+  isSelected: boolean,
+  comment: string
 } 
 
 export interface INewOffer {
@@ -82,11 +88,6 @@ export interface ILoginRequest {
   password: string
 }
 
-export interface IPaginationOptions {
-  page: number,
-  pageSize: number
-}
-
 export interface IPaginationMetaData {
   totalCount: number,
   pageSize: number,
@@ -109,5 +110,11 @@ export interface IOrdersFilter {
   numOrderItems: number,
   minOrderPrice: number,
   maxOrderPrice: number,
+  sortBy: string
+}
+
+export interface IUserOrdersFilter {
+  orderStates: string[],
+  shops: string[],
   sortBy: string
 }

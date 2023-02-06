@@ -11,19 +11,17 @@ public interface IOrderService
 
     Task<Order> GetByIdAsync(int orderId);
 
-    Task<IEnumerable<Order>> GetUserOrdersAsync(string userName);
+    Task<IEnumerable<Order>> GetUserOrdersAsync(string userName, State[] orderStates, 
+                                                string[] shops, string? sortBy);
 
-    Task AddItemsAsync(int orderId, List<OrderItem> items);
+    Task DeleteAsync(int orderId, string initatorUserName);
 
-    Task DeleteItemsAsync(int orderId, int[] itemsId);
+    Task UpdateAsync(string initatorUserName, int orderId, string siteName, string siteLink, 
+                     Address address, decimal performerFee, List<OrderItem> orderItems);
 
-    Task DeleteAsync(int orderId);
+    Task<string?[]> GetParam(FilterParam type, string userName);
 
-    Task UpdateAsync(Order order);
-
-    Task<string[]> GetShopsForFilter();
-
-    Task<string?[]> GetCountriesForFilter();
+    Task<int> SelectOfferForOrderByIdAsync(int orderId, int offerId);
 
     Task<PagedList<Order>> GetOrdersByPageNumberAsync(int pageNumber, int pageSize, 
                                                       string[] shops, string[] countries, 

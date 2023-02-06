@@ -1,5 +1,5 @@
-import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginationOptions, IPaginatedOrders, IOrdersFilter } from '../models'
+import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError} from '@reduxjs/toolkit/query/react'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter } from '../models'
 import { RootState } from '.'
 import history from '../hooks/history';
 import { resetStateAction } from '../hooks/resetState';
@@ -49,16 +49,30 @@ export const intermediarySearchServiceApi = createApi({
             }),
             transformErrorResponse: (response: { status: number, data: ILoginResponse }) => response.data,
         }),
+
         createOrder: builder.mutation<IResponse, INewOrder>({
             query: (payload) => ({
-                url: "/order/create",
+                url: "/orders",
                 method: 'POST',
                 body: payload,
             }),
         }),
+        removeOrder: builder.mutation<IResponse, {orderId: number}>({
+            query: (payload) => ({
+                url: `/orders/${payload.orderId}`,
+                method: 'DELETE',
+            }),
+        }),
+        editOrder: builder.mutation<IResponse, {orderId: number, data: INewOrder}>({
+            query: (payload) => ({
+                url: `/orders/${payload.orderId}`,
+                method: 'PUT',
+                body: payload.data,
+            }),
+        }),
         filteredOrders: builder.query<IPaginatedOrders, IOrdersFilter>({
             query: (payload) => ({
-                url: "/order/all",
+                url: "/orders",
                 method: 'GET',
                 params: {
                     page: payload.page,
@@ -74,15 +88,34 @@ export const intermediarySearchServiceApi = createApi({
         }),
         getOrderById: builder.query<IOrder, string>({
             query: (id) => ({
-                url: `/order/${id}`,
+                url: `/orders/${id}`,
                 method: 'GET',
             }),
         }),
+
         createOffer: builder.mutation<IResponse, INewOffer>({
             query: (payload) => ({
                 url: "/offer/create",
                 method: 'POST',
                 body: payload,
+            }),
+        }),
+        selectOffer: builder.mutation<IResponse, {orderId: number, offerId: number}>({
+            query: (payload) => ({
+                url: `/orders/${payload.orderId}/offers/${payload.offerId}`,
+                method: 'PUT',
+            }),
+        }),
+
+        getUserOrders: builder.query<IOrder[], IUserOrdersFilter>({
+            query: (payload) => ({
+                url:"/user/orders",
+                method: 'GET',
+                params: {
+                    orderStates: payload.orderStates.length == 0 ? undefined : payload.orderStates,
+                    shops: payload.shops.length == 0 ? undefined : payload.shops,
+                    sortBy: payload.sortBy
+                },
             }),
         }),
         addAddress: builder.mutation<IResponse, IAddress>({
@@ -105,15 +138,9 @@ export const intermediarySearchServiceApi = createApi({
                 body: payload,
             }),
         }),
-        getShopsForFilter: builder.query<string[], null>({
-            query: () => ({
-                url: "/order/shopslist",
-                method: 'GET',
-            }),
-        }),
-        getCountriesForFilter: builder.query<string[], null>({
-            query: () => ({
-                url: "/order/countrieslist",
+        getParamsForFilter: builder.query<string[], number>({
+            query: (type) => ({
+                url: `/orders/params/${type}`,
                 method: 'GET',
             }),
         }),
@@ -124,6 +151,8 @@ export const { useLoginMutation, useCreateOrderMutation,
                useGetOrderByIdQuery, useCreateOfferMutation, 
                useAddAddressMutation, useFilteredOrdersQuery,
                useGetUserAddressesQuery, useDeleteAddressMutation,
-               useGetCountriesForFilterQuery, useGetShopsForFilterQuery} 
+               useGetUserOrdersQuery, useSelectOfferMutation,
+               useRemoveOrderMutation, useEditOrderMutation,
+               useGetParamsForFilterQuery}
                
                = intermediarySearchServiceApi

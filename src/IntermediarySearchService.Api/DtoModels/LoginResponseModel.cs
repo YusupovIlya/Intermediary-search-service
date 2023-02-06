@@ -4,7 +4,7 @@ public class LoginResponseModel: ResponseModel
 {
     public UserModel User { get; set; }
     public string Token { get; set; }
-    public LoginResponseModel(string id): base(id)
+    public LoginResponseModel(string? id): base(id)
     {}
 }
 

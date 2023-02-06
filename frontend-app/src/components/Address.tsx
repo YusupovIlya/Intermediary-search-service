@@ -4,7 +4,7 @@ interface AddressProps {
     address: IAddress,
     setAddressInModal: (option: IAddress) => void,
     setModalActive: (option: boolean) => void
-  }
+}
 
 export default function Address({address, setAddressInModal, setModalActive}: AddressProps) {
 

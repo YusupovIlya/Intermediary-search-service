@@ -6,7 +6,6 @@ namespace IntermediarySearchService.Core.Entities.OfferAggregate;
 public class Offer: BaseEntity, IAggregateRoot
 {
     public int OrderId { get; private set; }
-    public Order? Order { get; private set; }
     public string UserName { get; private set; }
     public decimal ItemsTotalCost { get; private set; }
     public decimal DeliveryCost { get; private set; }

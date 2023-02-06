@@ -1,15 +1,19 @@
-import { toast, ToastContentProps } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import { useForm, useFieldArray } from "react-hook-form";
-import { IResponse, INewOrder, IOrderItemImage } from "../models";
+import { INewOrder, IOrderItemImage } from "../models";
 import { MdDeleteForever } from "react-icons/md";
 import { ReactTinyLink } from 'react-tiny-link';
 import { useScrapper } from 'react-tiny-link'
 import { useEffect, useState } from "react";
-import { useCreateOrderMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api";
+import { useEditOrderMutation, useGetOrderByIdQuery, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api";
+import { useParams } from 'react-router-dom';
+import history from '../hooks/history';
 
-export default function CreateOrder() {
-  const [createOrder] = useCreateOrderMutation();
+export default function EditOrder() {
+  const { id } = useParams();    
+  const {data: order} = useGetOrderByIdQuery(id!);
+  const [editOrder] = useEditOrderMutation();
   const {data: addresses} = useGetUserAddressesQuery(null);
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [images, setImages] = useState<string[][]>([[]]);
@@ -32,23 +36,27 @@ export default function CreateOrder() {
               },
   });
 
+  useEffect(() => {
+    order && setItemLinks(order.orderItems.map(item => {
+                return item.productLink
+            }));
+    order && setImages(order.orderItems.map(item => {
+        return item.images.map(im => im.imageLink);
+    }));
+  }, [order]);
 
   useEffect(() => {
-    addresses && setSelectedAddress(addresses[0].label);
+    addresses && setSelectedAddress(order?.address.label!);
   }, [addresses]);
 
-
-  const {register, control, handleSubmit, formState: { errors }, reset} = useForm<INewOrder>({
+  const {register, control, handleSubmit, formState: { errors }} = useForm<INewOrder>({
     mode: "onBlur",
     defaultValues: {
-      orderItems: [{
-        productName: "",
-        options: "",
-        productLink: "",
-        unitPrice: 0,
-        units: 0,
-        images: []
-      }]
+      siteName: order?.siteName,
+      siteLink: order?.siteLink,
+      performerFee: order?.performerFee,
+      address: order?.address,
+      orderItems: order?.orderItems
     },
   });
 
@@ -63,21 +71,16 @@ export default function CreateOrder() {
       data.orderItems[index].images = imagesObj;
     });
     data.address = addresses?.find(a => a.label == selectedAddress);
-    const promise = createOrder(data).unwrap();
-    reset();
-    setItemLinks([]);
+    const promise = editOrder({orderId: order?.id!, data: data}).unwrap();
     await toast.promise(
       promise,
       {
-        pending: 'Создание заказа...',
-        success: {
-          render(response: ToastContentProps<IResponse>){
-            return `Заказ №${response.data?.id} успешно создан!`
-          }
-        },
-        error: 'Не удалось создать заказ'
+        pending: 'Редактирование заказа...',
+        success: `Заказ №${id} успешно отредактирован!`,
+        error: 'Не удалось отредактировать заказ'
       }
     );
+    history.push("/user/orders");
   };
 
   const checkValidUrl = (url: string) => {
@@ -91,14 +94,13 @@ export default function CreateOrder() {
     <div className="relative px-4 py-10 bg-white shadow rounded-3xl sm:p-10">
       <div className="mx-auto">
         <div className="flex items-center space-x-5">
-          <div className="h-14 w-14 bg-yellow-200 rounded-full flex flex-shrink-0 justify-center items-center text-yellow-500 text-2xl font-mono">i</div>
           <div className="block pl-2 font-semibold text-xl self-start text-gray-700">
-            <h2 className="leading-relaxed">Форма создания заказа</h2>
-            <p className="text-sm text-gray-500 font-normal leading-relaxed">Пожалуйста заполните основную информацию</p>
+            <h2 className="leading-relaxed">Заказ №{order?.id} от {order?.statesOrder.length! > 0 && order?.statesOrder[0].date}</h2>
+            <p className="text-sm text-gray-500 font-normal leading-relaxed">Редактирование</p>
           </div>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 pt-6">
-            <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 pt-4">
+            <div className="py-4 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
               <div className="flex flex-col">
                 <label className="leading-loose">Название сайта</label>
                 <input
@@ -149,10 +151,13 @@ export default function CreateOrder() {
                 <label className="leading-loose">Куда доставить?</label>
                 <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                   {addresses?.map(addr => 
-                  <option onClick={() => 
-                    setSelectedAddress(addr.label)} value={addr.label}>{addr.label}
+                  <option 
+                    onClick={() => setSelectedAddress(addr.label)} 
+                    value={addr.label}
+                    selected={addr.label == selectedAddress}
+                    >{addr.label}
                   </option>)}
-                </select>              
+                </select>
               </div>
 
                 {fields.map((field, index) => {
@@ -233,7 +238,7 @@ export default function CreateOrder() {
                       />
                     </div>
                     <div className="flex items-end justify-center">
-                      {index != 0 &&
+                      {fields.length > 1 &&
                       <button type="button" onClick={() => {
                         remove(index);
                         setImages([ ...images.slice(0, index), ...images.slice(index+1) ]);
@@ -302,10 +307,15 @@ export default function CreateOrder() {
               <button
                 type="submit"
                 className="border border-indigo-500 bg-indigo-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-indigo-600 focus:outline-none focus:shadow-outline text-base">
-                Создать
+                Сохранить
               </button>            
               <button
-                className="border border-gray-200 bg-gray-200 text-gray-700 rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-gray-300 focus:outline-none focus:shadow-outline text-base">
+                className="border border-gray-200 bg-gray-200 text-gray-700 rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-gray-300 focus:outline-none focus:shadow-outline text-base"
+                onClick={(e) => {
+                  e.preventDefault();
+                  history.back();
+                }}
+                >     
                 Вернуться назад
               </button>
             </div>

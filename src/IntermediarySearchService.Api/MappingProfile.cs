@@ -13,7 +13,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.StatesOrder,
                        opt => opt.MapFrom(src =>
                        src.StatesOrder.Select(s =>
-                       new StateModel(StateOrder.GetDescription(s.State), s.Description,
+                       new StateModel(s.State, StateOrder.GetDescription(s.State), s.Description,
                                       $"{s.Date.Value.ToShortDateString()} {s.Date.Value.ToShortTimeString()}"))))
             .ForMember(dest => dest.TotalPrice,
                        opt => opt.MapFrom(src => src.TotalOrderPrice()));

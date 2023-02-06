@@ -37,7 +37,7 @@ export default function OrderSummary() {
 
   <div className="flex justify-start item-start space-y-2 flex-col">
     <h1 className="text-3xl dark:text-white lg:text-4xl font-semibold leading-7 lg:leading-9 text-gray-800">Заказ #{order?.id}</h1>
-    <p className="text-base dark:text-gray-300 font-medium leading-6 text-gray-600">21st Mart 2021 at 10:34 PM</p>
+    <p className="text-base dark:text-gray-300 font-medium leading-6 text-gray-600">{order?.statesOrder[0].date}</p>
   </div>
   <div className="mt-10 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
     <div className="flex flex-col justify-start items-start w-full space-y-4 md:space-y-6 xl:space-y-8">
@@ -54,8 +54,7 @@ export default function OrderSummary() {
             <div className="flex justify-between w-full">
               <p className="text-base dark:text-white leading-4 text-gray-800">Общая стоимость заказа</p>
               <p className="text-base dark:text-gray-300 leading-4 text-gray-600">
-                ${order?.orderItems.reduce((totalOrderPrice, item) => 
-                totalOrderPrice + (item.unitPrice * item.units), 0)}
+                ${order?.totalPrice}
               </p>
             </div>
             <div className="flex justify-between items-center w-full">

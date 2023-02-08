@@ -6,7 +6,7 @@ import {statesOrder} from "../hooks/getStateOrder";
 import UserOrder from "../components/UserOrder";
 import { Modal } from "../components/Modal";
 import OfferModal from "../components/OfferModal";
-import { sortList } from "./AllOrders";
+import { useTranslation } from "react-i18next";
 
 export default function UserOrders() {
 
@@ -15,6 +15,7 @@ export default function UserOrders() {
         shops: [],
         sortBy: "newest"
       });
+      const { t, i18n } = useTranslation('order');
       const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(2);
       const { data: orders, isLoading, refetch } = useGetUserOrdersQuery(filter, {refetchOnMountOrArgChange: true});
       const [mobileFilter, setMobileFilter] = useState(false);
@@ -22,7 +23,7 @@ export default function UserOrders() {
       const [shopActive, setShopActive] = useState(false);
       const [stateOrderActive, setStateOrderActive] = useState(false);
       const [offerModalActive, setOfferModalActive] = useState(false);
-      const [typeSort, setTypeSort] = useState("newest");
+      const [valueSort, setTypeSort] = useState("newest");
       const [offerInModal, setOfferInModal] = useState<IOffer>({
           id: 0,
           orderId: 0,
@@ -38,9 +39,9 @@ export default function UserOrders() {
         setFilter(filter => {
           return {
             ...filter,
-            sortBy: typeSort,
+            sortBy: valueSort,
           }});
-      }, [typeSort]);
+      }, [valueSort]);
   
         return(
         <div className="bg-white w-10/12" onClick={() => setSortActive(false)}>        
@@ -60,7 +61,7 @@ export default function UserOrders() {
               <div className="fixed inset-0 z-40 flex">
               <div className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl">
                 <div className="flex items-center justify-between px-4">
-                  <h2 className="text-lg font-medium text-gray-900">Фильтры</h2>
+                  <h2 className="text-lg font-medium text-gray-900">{t("allOrders.filters")}</h2>
                   <button 
                   className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
                   onClick={() => setMobileFilter(false)}
@@ -81,7 +82,7 @@ export default function UserOrders() {
                       className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" 
                       onClick={() => setStateOrderActive(!stateOrderActive)}
                       >
-                        <span className="font-medium text-gray-900">Статус заказа</span>
+                        <span className="font-medium text-gray-900">{t("allOrders.status")}</span>
                         <span className="ml-6 flex items-center">
                           {stateOrderActive ?
                               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -121,7 +122,9 @@ export default function UserOrders() {
                                           }
                                       })}                                                                
                                     />
-                                    <label className="ml-3 min-w-0 flex-1 text-gray-500">{item.text}</label>
+                                    <label className="ml-3 min-w-0 flex-1 text-gray-500">
+                                      {i18n.language == "en" ? item.textEn : item.textRu}
+                                    </label>
                                   </div> 
                               )                              
                           })}
@@ -136,7 +139,7 @@ export default function UserOrders() {
                       className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" 
                       onClick={() => (setShopActive(!shopActive))}
                       >
-                        <span className="font-medium text-gray-900">Магазин</span>
+                        <span className="font-medium text-gray-900">{t("allOrders.shop")}</span>
                         <span className="ml-6 flex items-center">
                           {shopActive ?
                               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -192,7 +195,7 @@ export default function UserOrders() {
   
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900">Мои заказы</h1>
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900">{t("allOrders.titleUser")}</h1>
         
                 <div className="flex items-center">
                   <div className="inline-block text-left">
@@ -203,7 +206,7 @@ export default function UserOrders() {
                             e.stopPropagation();
                             setSortActive(!sortActive);
                           }}>
-                        Сортировка
+                        {t("buttons.sort")}
                         <svg className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                         </svg>
@@ -212,21 +215,40 @@ export default function UserOrders() {
         
                     {sortActive && 
                       <div className="absolute right-125 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <div className="py-1">
-                              {sortList.map((item, index) => {
-                                return(
-                                  <button
-                                    className={classNames([
-                                      "text-gray-500 block px-4 py-2 text-sm",
-                                      typeSort == item.value && "font-medium text-gray-900",
-                                    ])} 
-                                    onClick={() => setTypeSort(item.value)}
-                                    key={index}
-                                    >{item.text}
-                                  </button>
-                                )
-                              })}   
-                          </div>
+                        <div className="py-1">
+                          <button
+                            className={classNames([
+                              "text-gray-500 block px-4 py-2 text-sm",
+                              valueSort == "newest" && "font-medium text-gray-900",
+                            ])} 
+                            onClick={() => setTypeSort("newest")}
+                            >{t("sortTypes.new")}
+                          </button>
+                          <button
+                            className={classNames([
+                              "text-gray-500 block px-4 py-2 text-sm",
+                              valueSort == "oldest" && "font-medium text-gray-900",
+                            ])} 
+                            onClick={() => setTypeSort("oldest")}
+                            >{t("sortTypes.old")}
+                          </button>
+                          <button
+                            className={classNames([
+                              "text-gray-500 block px-4 py-2 text-sm",
+                              valueSort == "maxmin" && "font-medium text-gray-900",
+                            ])} 
+                            onClick={() => setTypeSort("maxmin")}
+                            >{t("sortTypes.maxmin")}
+                          </button>
+                          <button
+                            className={classNames([
+                              "text-gray-500 block px-4 py-2 text-sm",
+                              valueSort == "minmax" && "font-medium text-gray-900",
+                            ])} 
+                            onClick={() => setTypeSort("minmax")}
+                            >{t("sortTypes.minmax")}
+                          </button>                          
+                        </div>
                       </div>                  
                     }
                   </div>
@@ -251,7 +273,7 @@ export default function UserOrders() {
                             className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
                             onClick={() => setStateOrderActive(!stateOrderActive)}
                             >
-                            <span className="font-medium text-gray-900">Статус заказа</span>
+                            <span className="font-medium text-gray-900">{t("allOrders.status")}</span>
                             <span className="ml-6 flex items-center">
                                 {stateOrderActive ?                           
                                     <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -291,7 +313,9 @@ export default function UserOrders() {
                                                 }
                                             })}
                                           />
-                                          <label className="ml-3 text-sm text-gray-600">{item.text}</label>
+                                          <label className="ml-3 text-sm text-gray-600">
+                                            {i18n.language == "en" ? item.textEn : item.textRu}
+                                          </label>
                                         </div> 
                                     )                              
                                   })}
@@ -306,7 +330,7 @@ export default function UserOrders() {
                             className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
                             onClick={() => setShopActive(!shopActive)}
                             >
-                            <span className="font-medium text-gray-900">Магазин</span>
+                            <span className="font-medium text-gray-900">{t("allOrders.shop")}</span>
                             <span className="ml-6 flex items-center">
                                 {shopActive ?                           
                                     <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

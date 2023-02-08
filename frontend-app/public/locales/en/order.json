@@ -1,22 +1,65 @@
 {
     "orderForm": {
-        "siteName": "Website name",
-        "siteLink": "Website link",
-        "performerFee": "Performer fee",
+        "createTitle": "Order Creation Form",
+        "createInfo": "Please fill in basic information",
+        "editTitle": "Order #{{id}} from {{from}}",
+        "editInfo": "Editing",
+        "siteName": "Site name",
+        "siteLink": "Website Link",
+        "performerFee": "Reward",
         "place": "Where to deliver?",
         "productName": "Product name",
-        "options": "Options",
-        "productLink": "Product link",
-        "unitPrice": "Unit price",
-        "units": "Units"
+        "options": "Product options",
+        "productLink": "Product Link",
+        "unitPrice": "Unit Price",
+        "units": "Number"
+    },
+    "orderCard": {
+        "shop": "Shop {{shop}}",
+        "performerFee": "Reward {{performerFee}}$",
+        "from": "From {{from}}",
+        "numItems": "and {{numItems}} more items in this order",
+        "totalPrice": "Order value: ${{totalPrice}}",
+        "numItemsAll": "{{numItemsAll}} items in this order"
+    },
+    "orderSummary": {
+        "title": "Order #{{id}}",
+        "details": "Order details",
+        "totalTitle": "Total order value",
+        "resultTitle": "Result",
+        "offerYourself": "To offer yourself as an artist, fill out the form:",
+        "total": "Total order value, in $",
+        "delivery": "Delivery cost, in $",
+        "expenses": "Additional expenses, in $",
+        "comment": "Comment",
+        "contacts": "Customer contacts",
+        "place": "Where to deliver",
+        "confirmRemove": "Confirm order removal #{{id}}",
+        "removeWarn": "This action cannot be undone"
+    },
+    "userOrder": {
+        "offers": "Offer",
+        "offer": "Offer #{{id}}",
+        "noneOffers": "No Offers"
+    },
+    "orderItem": {
+        "options": "Options: ",
+        "units": "{{units}} units"
     },
     "buttons": {
-        "addItem": "Add item",
+        "addItem": "Add Item",
         "create": "Create",
-        "back": "Go back"
+        "back": "Go back",
+        "send": "Send",
+        "open": "Open",
+        "close": "Close",
+        "sort": "Sort",
+        "edit": "Edit",
+        "remove": "Remove",
+        "confirm": "Confirm"
     },
     "messages": {
-        "nameRequired": "Enter site name!",
+        "nameRequired": "Enter a site name!",
         "linkRequired": "Enter a link to the site!",
         "linkRegex": "Invalid link format!",
         "feeRequired": "Enter the amount of the reward!",
@@ -24,11 +67,50 @@
         "feePlaceholder": "Enter the reward amount in $",
         "producNameRequired": "Please enter a product name!",
         "optionsRequired": "Enter product features!",
+        "optionPlaceholder": "Size, color, weight, etc.",
         "productLinkRequired": "Enter a product link!",
         "productLinkRegex": "Invalid link format!",
         "unitPriceRequired": "Enter unit price!",
         "unitPriceRule": "Minimum unit price is $0.1!",
         "unitsRequired": "Enter quantity of item!",
-        "unitsRule": "Minimum item quantity is 1 unit"
+        "unitsRule": "Minimum item quantity is 1 unit",
+        "requredField": "Required field!",
+        "offerRule": "Value must be at least 1 dollar!"
+    },
+    "allOrders": {
+        "title": "User Orders",
+        "titleUser": "My orders",
+        "shop": "Shop",
+        "place": "Delivery country",
+        "numItems": "Number of items in order",
+        "price": "Order price",
+        "status": "Order status",
+        "filters": "Filters",
+        "numMsg": "Up to {{num}} pieces",
+        "priceRange": "From {{min}}$ to {{max}}$",
+        "numPages": "On page {{txt}} of orders from {{total}}"
+    },
+    "sortTypes": {
+        "new": "New",
+        "old": "Old",
+        "maxmin": "Order value Max --> Min",
+        "minmax": "Order value Min --> Max"
+    },
+    "toastDeleteOrder":{
+        "success": "Order #{{id}} was deleted successfully!",
+        "pending": "Deleting order...",
+        "error": "An error occurred while deleting...",
+        "info": "The order cannot be deleted because it is already in progress!",
+        "editInfo": "The order cannot be edited because it is already in progress!"
+    },
+    "toastCreateOrder":{
+        "success": "Order #{{id}} created successfully!",
+        "pending": "Creating an order...",
+        "error": "Failed to create order"
+    },
+    "toastEditOrder":{
+        "success": "Order #{{id}} edited successfully!",
+        "pending": "Editing order...",
+        "error": "Failed to edit order"
     }
 }

@@ -71,13 +71,13 @@ export default function CreateOrder() {
     await toast.promise(
       promise,
       {
-        pending: 'Создание заказа...',
+        pending: t("toastCreateOrder.pending"),
         success: {
           render(response: ToastContentProps<IResponse>){
-            return `Заказ №${response.data?.id} успешно создан!`
+            return t("toastCreateOrder.success", {id: response.data?.id})!
           }
         },
-        error: 'Не удалось создать заказ'
+        error: t("toastCreateOrder.error")
       }
     );
   };
@@ -97,8 +97,8 @@ export default function CreateOrder() {
         <div className="flex items-center space-x-5">
           <div className="h-14 w-14 bg-yellow-200 rounded-full flex flex-shrink-0 justify-center items-center text-yellow-500 text-2xl font-mono">i</div>
           <div className="block pl-2 font-semibold text-xl self-start text-gray-700">
-            <h2 className="leading-relaxed">Форма создания заказа</h2>
-            <p className="text-sm text-gray-500 font-normal leading-relaxed">Пожалуйста заполните основную информацию</p>
+            <h2 className="leading-relaxed">{t("orderForm.createTitle")}</h2>
+            <p className="text-sm text-gray-500 font-normal leading-relaxed">{t("orderForm.createInfo")}</p>
           </div>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 pt-6">

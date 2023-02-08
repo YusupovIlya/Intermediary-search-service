@@ -38,5 +38,18 @@
         "add": "Add",
         "cancel": "Cancel",
         "save": "Save"   
+    },
+    "offer": {
+        "total": "Total order value: {{total}}$",
+        "delivery": "Delivery cost: {{delivery}}$",
+        "expenses": "Additional expenses: {{expenses}}$",
+        "comment": "Comment: {{comment}}",
+        "toUserProfile": "Open User Profile",
+        "selectOffer": "Select this offer"
+    },
+    "offerTotas": {
+        "success": "Offer #{{id}} selected!",
+        "pending": "Selecting an application...",
+        "error": "Failed to select request"
     }  
 }

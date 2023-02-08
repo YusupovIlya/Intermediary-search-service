@@ -1,4 +1,3 @@
-import { TypesSort } from "../pages/AllOrders";
 
 export function getStateOrder(state: number): string {
     switch(state){
@@ -10,21 +9,31 @@ export function getStateOrder(state: number): string {
     }
 }
 
-export const statesOrder: TypesSort[] =[
+interface TypeState{
+    value: any,
+    textRu: string,
+    textEn: string
+  }
+
+export const statesOrder: TypeState[] =[
     {
         value: 0,
-        text: "В поиске исполнителя",  
+        textRu: "В поиске исполнителя",
+        textEn: "In search performer",
     },
     {
         value: 1,
-        text: "Ожидает отправки",  
+        textRu: "Ожидает отправки",
+        textEn: "Awaiting shipment",
     },
     {
         value: 2,
-        text: "В пути",  
+        textRu: "В пути",
+        textEn: "Shipped",
     },
     {
         value: 3,
-        text: "Получено",  
+        textRu: "Получено",
+        textEn: "Received",
     },
 ]

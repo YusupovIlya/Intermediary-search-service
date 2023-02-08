@@ -20,13 +20,7 @@ import { useTranslation } from "react-i18next";
 
 
 const App = () => {
-
-  const { t, i18n } = useTranslation('translation', { keyPrefix: 'description' });
-
-  const ch = (loca: string) => i18n.changeLanguage(loca);
-
   const { currentRoute, setCurrentRoute } = useNavigation();
-  const auth = useAuth();
 
   return (
     <div className="p-2">     
@@ -34,8 +28,6 @@ const App = () => {
         currentRoute={currentRoute}
         setCurrentRoute={setCurrentRoute}
       />
-      <button onClick={()=>ch("ru")}>ru </button>
-      <button onClick={()=>ch("en")}>en </button>
       <div className="flex items-center justify-center text-gray-300 m-2 sm:m-8">
       <ToastContainer />
         <Routes>

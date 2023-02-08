@@ -4,6 +4,7 @@ import { useState } from "react";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import {getStateOrder} from "../hooks/getStateOrder";
+import { useTranslation } from "react-i18next";
 
 interface UserOrderProps {
     order: IOrder,
@@ -15,7 +16,7 @@ export default function UserOrder({order, setOfferInModal, setOfferModalActive}
                                    : UserOrderProps) {
 
     const [showOffers, setShowOffers] = useState(false);
-
+    const { t, i18n } = useTranslation('order');
     return(
         <div>
             <Link to={`/user/orders/${order.id}`}>
@@ -26,16 +27,20 @@ export default function UserOrder({order, setOfferInModal, setOfferModalActive}
                     </div>
                     <div className="flex justify-between items-start w-full flex-col md:flex-row space-y-4 md:space-y-0">
                         <div className="w-full flex flex-col justify-start items-start space-y-8">
-                            <a href={order?.siteLink} target="_blank" className="font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">Магазин: {order?.siteName}</a>
+                            <a href={order?.siteLink} target="_blank" className="font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("orderCard.shop", {shop: order.siteName})}</a>
                             <div className="flex justify-start items-start flex-col space-y-2">
-                                <p className="text-sm dark:text-white leading-none text-gray-800"><span className="dark:text-gray-400 text-zinc-600">От </span>{order.statesOrder.length > 0 && order.statesOrder[0].date}</p>
-                                <p className="text-sm dark:text-white leading-none text-gray-800"><span className="dark:text-gray-400 text-zinc-600"></span>{order.statesOrder.length > 0 && getStateOrder(order.statesOrder.slice(-1)[0].id)}</p>
+                                <p className="text-sm dark:text-white leading-none text-gray-800">{t("orderCard.from", {from: order.statesOrder[0].date})}</p>
+                                <p className="text-sm dark:text-white leading-none text-gray-800"><span className="dark:text-gray-400 text-zinc-600"></span>
+                                    {order.statesOrder.length > 0 && 
+                                    i18n.language == "en" ? order.statesOrder.slice(-1)[0].state
+                                    : getStateOrder(order.statesOrder.slice(-1)[0].id)}
+                                </p>
                             </div>
                         </div>
 
                         <div className="w-full flex flex-col justify-start items-start space-y-8">
-                            <p className="text-sm dark:text-white xl:text-base leading-6 text-gray-800">{order.orderItems.length} ед. в этом заказе</p>
-                            <p className="text-sm dark:text-white xl:text-base font-semibold leading-6 text-gray-800">Стоимость заказа: ${order.totalPrice}</p>
+                            <p className="text-sm dark:text-white xl:text-base leading-6 text-gray-800">{t("orderCard.numItemsAll", {numItemsAll: order.orderItems.length})}</p>
+                            <p className="text-sm dark:text-white xl:text-base font-semibold leading-6 text-gray-800">{t("orderCard.totalPrice", {totalPrice: order.totalPrice})}</p>
                         </div>
 
 
@@ -46,7 +51,7 @@ export default function UserOrder({order, setOfferInModal, setOfferModalActive}
                                     e.preventDefault();
                                     setShowOffers(!showOffers);
                                 }}
-                                >Заявки</button>
+                                >{t("userOrder.offers")}</button>
                         </div>
                     </div> 
                 </div>               
@@ -67,12 +72,12 @@ export default function UserOrder({order, setOfferInModal, setOfferModalActive}
                                         setOfferModalActive(true);
                                     }}  
                                     >
-                                    Заявка #{item.id}
+                                    {t("userOrder.offer", {id: item.id})}
                                 </li>
                             )
                         })
                         :
-                        <p className="py-2 px-4 bg-gray-500 text-white">Нет заявок</p>              
+                        <p className="py-2 px-4 bg-gray-500 text-white">{t("userOrder.noneOffers")}</p>              
                     }
                 </ul>
             }            

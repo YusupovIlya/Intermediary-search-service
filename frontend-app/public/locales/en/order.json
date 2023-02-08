@@ -1,0 +1,34 @@
+{
+    "orderForm": {
+        "siteName": "Website name",
+        "siteLink": "Website link",
+        "performerFee": "Performer fee",
+        "place": "Where to deliver?",
+        "productName": "Product name",
+        "options": "Options",
+        "productLink": "Product link",
+        "unitPrice": "Unit price",
+        "units": "Units"
+    },
+    "buttons": {
+        "addItem": "Add item",
+        "create": "Create",
+        "back": "Go back"
+    },
+    "messages": {
+        "nameRequired": "Enter site name!",
+        "linkRequired": "Enter a link to the site!",
+        "linkRegex": "Invalid link format!",
+        "feeRequired": "Enter the amount of the reward!",
+        "feeRule": "Reward must be at least 1 cash!",
+        "feePlaceholder": "Enter the reward amount in $",
+        "producNameRequired": "Please enter a product name!",
+        "optionsRequired": "Enter product features!",
+        "productLinkRequired": "Enter a product link!",
+        "productLinkRegex": "Invalid link format!",
+        "unitPriceRequired": "Enter unit price!",
+        "unitPriceRule": "Minimum unit price is $0.1!",
+        "unitsRequired": "Enter quantity of item!",
+        "unitsRule": "Minimum item quantity is 1 unit"
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "unAuthRoutes": {
+        "createOrder": "Создать заказ",
+        "findOrder": "Стать посредником",
+        "login": "Войти"
+    },
+    "authRoutes": {
+        "myProfile": "Мой профиль",
+        "myAddresses": "Мои адреса",
+        "myOrders": "Мои заказы"
+    }
+}

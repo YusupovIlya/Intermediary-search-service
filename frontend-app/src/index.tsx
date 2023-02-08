@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import { CustomRouter } from './hooks/CustomRouter';
 import history from './hooks/history';
+import './i18n';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -13,7 +14,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <Provider store={store}>
     <CustomRouter history={history}>
-      <App />
+      <Suspense fallback={<div>Loading language...</div>}>
+        <App />  
+      </Suspense>
     </CustomRouter>
   </Provider>
 );

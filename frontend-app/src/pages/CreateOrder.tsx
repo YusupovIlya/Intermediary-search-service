@@ -7,8 +7,10 @@ import { ReactTinyLink } from 'react-tiny-link';
 import { useScrapper } from 'react-tiny-link'
 import { useEffect, useState } from "react";
 import { useCreateOrderMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api";
+import { useTranslation } from 'react-i18next';
 
 export default function CreateOrder() {
+  const { t } = useTranslation('order');
   const [createOrder] = useCreateOrderMutation();
   const {data: addresses} = useGetUserAddressesQuery(null);
   const [selectedAddress, setSelectedAddress] = useState<string>("");
@@ -85,6 +87,8 @@ export default function CreateOrder() {
     return regex.test(url);
   }
 
+  const d = () => t("orderForm.nameRequired");
+
   return (
 <div className="xl:w-4/5 xl:py-6 flex flex-col justify-center w-full">
   <div className="relative py-3">
@@ -100,9 +104,9 @@ export default function CreateOrder() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 pt-6">
             <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
               <div className="flex flex-col">
-                <label className="leading-loose">Название сайта</label>
+                <label className="leading-loose">{t("orderForm.siteName")}</label>
                 <input
-                {...register("siteName", { required: "Введите название сайта!", maxLength: 100 })}
+                {...register("siteName", { required: t("messages.nameRequired")!, maxLength: 100 })}
                 type="text" 
                 className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" />
               <p className="text-red-600 inline">
@@ -110,13 +114,13 @@ export default function CreateOrder() {
               </p>              
               </div>
               <div className="flex flex-col">
-                <label className="leading-loose">Ссылка на сайт</label>
+                <label className="leading-loose">{t("orderForm.siteLink")}</label>
                 <input
                 {...register("siteLink", 
-                { required: 'Введите ссылку на сайт!',
+                { required: t("messages.linkRequired")!,
                   pattern: {
                     value: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/,
-                    message: 'Неверный формат ссылки!',
+                    message: t("messages.linkRegex"),
                   }})
                 }
                 type="text" 
@@ -126,27 +130,27 @@ export default function CreateOrder() {
                 </p>
               </div>
               <div className="flex flex-col md:w-1/2">
-                <label className="leading-loose">Вознограждение</label>
+                <label className="leading-loose">{t("orderForm.performerFee")}</label>
                 <input
                 {...register("performerFee",
                 { 
-                  required: 'Введите размер вознограждения!',
+                  required: t("messages.feeRequired")!,
                   valueAsNumber: true,
                   min: {
                     value: 1,
-                    message: "Вознограждение должно быть не менее 1 ден.ед.!"
+                    message: t("messages.feeRule"),
                 }, max: 99999999.99 })}
                 type="number"
                 step="any"
                 className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" 
-                placeholder="Укажите размер вознограждения в $" />
+                placeholder={t("messages.feePlaceholder")!} />
                 <p className="text-red-600 inline">
                   {errors?.performerFee && errors.performerFee.message}
                 </p>                
               </div>
 
               <div className="flex flex-col md:w-1/3">
-                <label className="leading-loose">Куда доставить?</label>
+                <label className="leading-loose">{t("orderForm.place")}</label>
                 <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                   {addresses?.map(addr => 
                   <option onClick={() => 
@@ -160,33 +164,33 @@ export default function CreateOrder() {
                 <div key={field.id}>
                   <div className="flex flex-col space-y-2 shadow-lg p-2 bg-slate-100 lg:flex-row lg:space-x-5">
                     <div className="flex flex-col lg:w-2/12 lg:justify-end">
-                      <label className="leading-loose">Название товара</label>
+                      <label className="leading-loose">{t("orderForm.productName")}</label>
                       <input
                         className={`px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600 ${errors?.orderItems?.[index]?.productName ? "error" : ""}`}
                         {...register(`orderItems.${index}.productName` as const, {
-                          required: "Введите название товара!"
+                          required: t("messages.producNameRequired")!
                         })}
                       />                   
                     </div>
                     <div className="flex flex-col lg:w-3/12 lg:justify-end">
-                      <label className="leading-loose">Опции товара</label>
+                      <label className="leading-loose">{t("orderForm.options")}</label>
                       <input
                         className={`px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600 ${errors?.orderItems?.[index]?.options ? "error" : ""}`}
-                        placeholder="Размер, цвет, вес и т.д."
+                        placeholder={t("messages.optionPlaceholder")!}
                         {...register(`orderItems.${index}.options` as const, {
-                          required: "Введите характеристики товара!"
+                          required: t("messages.optionsRequired")!
                         })}
                       />
                     </div>
                     <div className="flex flex-col lg:w-3/12 lg:justify-end">
-                      <label className="leading-loose">Ссылка на товар</label>
+                      <label className="leading-loose">{t("orderForm.productLink")}</label>
                       <input
                         className={`px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600 ${errors?.orderItems?.[index]?.productLink ? "error" : ""}`}
                         {...register(`orderItems.${index}.productLink` as const, {
-                          required: "Введите ссылку на товар!",
+                          required: t("messages.productLinkRequired")!,
                           pattern: {
                             value: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/,
-                            message: 'Неверный формат ссылки!',
+                            message: t("messages.productLinkRegex"),
                           }
                         })}
                         onBlur={(e) => {
@@ -199,7 +203,7 @@ export default function CreateOrder() {
                       />
                     </div>
                     <div className="flex flex-col lg:w-2/12 lg:justify-end">
-                      <label className="leading-loose">Цена за единицу</label>                        
+                      <label className="leading-loose">{t("orderForm.unitPrice")}</label>                        
                       <input
                         className={`px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600 ${errors?.orderItems?.[index]?.unitPrice ? "error" : ""}`}
                         placeholder="unitPrice"
@@ -207,27 +211,26 @@ export default function CreateOrder() {
                         step="any"
                         {...register(`orderItems.${index}.unitPrice` as const, {
                           valueAsNumber: true,
-                          required: "Укажите стоимость за ед. товара!",
+                          required: t("messages.unitPriceRequired")!,
                           min: {
-                            value: 0.001,
-                            message: "Минимальная стоимость ед. товара составляет 0.001 ден. ед.!"
+                            value: 0.1,
+                            message: t("messages.unitPriceRule"),
                           }
                         })}
                       />
                     </div>
                     <div className="flex flex-col lg:w-2/12 lg:justify-end">
-                      <label className="leading-loose">Количество</label>
+                      <label className="leading-loose">{t("orderForm.units")}</label>
                       <input
                         className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
-                        placeholder="units"
                         type="number"
                         {...register(`orderItems.${index}.units` as const,
                         {
                           valueAsNumber: true,
-                          required: "Укажите количество товара!",
+                          required: t("messages.unitsRequired")!,
                           min: {
                             value: 1,
-                            message: "Минимальное количество товара составляет 1 ед."
+                            message: t("messages.unitsRule"),
                           }
                         })}
                       />
@@ -295,18 +298,14 @@ export default function CreateOrder() {
                 }
               }
               >
-              Добавить товар
+              {t("buttons.addItem")}
               </button>
             </div>
             <div className="pt-4 flex items-start space-x-4">
               <button
                 type="submit"
                 className="border border-indigo-500 bg-indigo-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-indigo-600 focus:outline-none focus:shadow-outline text-base">
-                Создать
-              </button>            
-              <button
-                className="border border-gray-200 bg-gray-200 text-gray-700 rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-gray-300 focus:outline-none focus:shadow-outline text-base">
-                Вернуться назад
+                {t("buttons.create")}
               </button>
             </div>
         </form>

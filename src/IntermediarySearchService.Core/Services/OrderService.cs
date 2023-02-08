@@ -3,6 +3,7 @@ using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Core.Specifications;
 using IntermediarySearchService.Core.Exceptions;
 using System.Linq;
+using IntermediarySearchService.Core.Entities.OfferAggregate;
 
 namespace IntermediarySearchService.Core.Services;
 
@@ -18,10 +19,10 @@ public class OrderService : IOrderService
         _orderRepository = orderRepository;
     }
 
-    public async Task<int> CreateAsync(string userName, string siteName, string siteLink, 
-                                       decimal performerFee, List<OrderItem> orderItems, Address address)
+    public async Task<int> CreateAsync(string userName, string siteName, string siteLink, decimal performerFee,
+                                       List<OrderItem> orderItems, Address address, bool isBuyingByMyself)
     {
-        var order = new Order(userName, siteName, siteLink, performerFee, orderItems, address);
+        var order = new Order(userName, siteName, siteLink, performerFee, orderItems, address, isBuyingByMyself);
         await _orderRepository.AddAsync(order);
         return order.Id;
     }
@@ -36,13 +37,13 @@ public class OrderService : IOrderService
             throw new OrderNotFoundException(orderId);
     }
 
-    public async Task<IEnumerable<Order>> GetUserOrdersAsync(string userName, State[] orderStates,
+    public async Task<IEnumerable<Order>> GetUserOrdersAsync(string userName, OrderState[] orderStates,
                                                              string[] shops, string? sortBy)
     {
         var orderSpec = new OrdersWithItemsSpecification(userName);
         var orders = await _orderRepository.ListAsync(orderSpec);
         if (shops.Length > 0) orders = orders.Where(o => shops.Contains(o.SiteName)).ToList();
-        if(orderStates.Length > 0) orders = orders.Where(o => orderStates.Contains((State)o.StatesOrder.Last()?.State)).ToList();
+        if(orderStates.Length > 0) orders = orders.Where(o => orderStates.Contains((OrderState)o.StatesOrder.Last()?.State)).ToList();
         return SortByParam(sortBy, orders);
     }
 
@@ -141,7 +142,7 @@ public class OrderService : IOrderService
     }
 
 
-    public IEnumerable<Order> SortByParam(string? param, IEnumerable<Order> orders) =>
+    private IEnumerable<Order> SortByParam(string? param, IEnumerable<Order> orders) =>
         param switch
         {
             newest => orders.OrderByDescending(o => o.StatesOrder.First().Date),
@@ -160,12 +161,24 @@ public class OrderService : IOrderService
             _ => new string[0],
         };
 
-    public async Task<int> SelectOfferForOrderByIdAsync(int orderId, int offerId)
+    public async Task SetTrackCode(int orderId, string initatorUserName, string trackCode)
     {
         var order = await GetByIdAsync(orderId);
-        order.SelectOffer(offerId);
+        if (order.UserName == initatorUserName)
+            order.SetTrackCode(trackCode);
+        else
+            throw new ForbiddenActionException(initatorUserName);
         await _orderRepository.UpdateAsync(order);
-        return offerId;
+    }
+
+    public async Task SelectOffer(int orderId, int offerId, string initatorUserName)
+    {
+        var order = await GetByIdAsync(orderId);
+        if (order.UserName == initatorUserName)
+            order.SelectOffer(offerId);
+        else
+            throw new ForbiddenActionException(initatorUserName);
+        await _orderRepository.UpdateAsync(order);
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using IntermediarySearchService.Api.DtoModels;
+using IntermediarySearchService.Core.Entities.OfferAggregate;
 using IntermediarySearchService.Core.Entities.OrderAggregate;
 using IntermediarySearchService.Core.Exceptions;
 using IntermediarySearchService.Core.Interfaces;
@@ -14,13 +15,15 @@ public class UserController : BaseController
 {
     private readonly IUserService _userService;
     private readonly IOrderService _orderService;
+    private readonly IOfferService _offerService;
     private readonly IMapper _mapper;
     private readonly ILogger<UserController> _logger;
-    public UserController(IUserService userService, IOrderService orderService,
+    public UserController(IUserService userService, IOrderService orderService, IOfferService offerService,
                           IMapper mapper, ILogger<UserController> logger)
     {
         _userService = userService;
         _orderService = orderService;
+        _offerService = offerService;
         _mapper = mapper;
         _logger = logger;
     }
@@ -101,7 +104,7 @@ public class UserController : BaseController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetUserOrders([FromQuery] State[] orderStates,
+    public async Task<IActionResult> GetUserOrders([FromQuery] OrderState[] orderStates,
                                                    [FromQuery] string[] shops,
                                                    [FromQuery] string? sortBy)
     {
@@ -112,6 +115,20 @@ public class UserController : BaseController
         {
             var mappedOrders = _mapper.Map<IEnumerable<OrderModel>>(orders);
             return Ok(mappedOrders);
+        }
+    }
+
+    [HttpGet("offers")]
+    public async Task<IActionResult> GetUserOffers([FromQuery] OfferState[] offerStates, 
+                                                   [FromQuery] string? sortBy)
+    {
+        var offers = await _offerService.GetUserOffersAsync("user1", offerStates, sortBy);
+        if (offers.Count() == 0)
+            return NoContent();
+        else
+        {
+            var mappedOffers = _mapper.Map<IEnumerable<OfferModel>>(offers);
+            return Ok(mappedOffers);
         }
     }
 }

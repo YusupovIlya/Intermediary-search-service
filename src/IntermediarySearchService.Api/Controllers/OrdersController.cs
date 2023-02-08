@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using IntermediarySearchService.Api.DtoModels;
+using IntermediarySearchService.Core.Entities.OfferAggregate;
 using IntermediarySearchService.Core.Exceptions;
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Core.Services;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IntermediarySearchService.Api.Controllers;
 
-[ApiController]
+
 public class OrdersController : BaseController
 {
     private readonly IOrderService _orderService;
@@ -110,8 +111,8 @@ public class OrdersController : BaseController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> CreateOrder([FromBody] NewOrderModel order)
     {
-        int orderId = await _orderService.CreateAsync(UserName, order.SiteName, order.SiteLink,
-                                        order.PerformerFee, order.OrderItems, order.Address);
+        int orderId = await _orderService.CreateAsync(UserName, order.SiteName, order.SiteLink, order.PerformerFee, 
+                                                      order.OrderItems, order.Address, order.isBuyingByMyself);
         var response = new ResponseModel(orderId.ToString(), ResponseModel.Success);
         return Created($"{Request.Path}/{orderId}", response);
     }
@@ -135,8 +136,8 @@ public class OrdersController : BaseController
     {
         try
         {
-            int id = await _orderService.SelectOfferForOrderByIdAsync(orderId, offerId);
-            var response = new ResponseModel(id.ToString(), $"offer status with id - {id} was updated");
+            await _orderService.SelectOffer(orderId, offerId, UserName);
+            var response = new ResponseModel(offerId.ToString(), $"offer status with id - {offerId} was updated");
             return Ok(response);
         }
         catch(OfferNotFoundException ex)

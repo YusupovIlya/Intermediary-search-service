@@ -1,5 +1,4 @@
-﻿using IntermediarySearchService.Core.Entities.OrderAggregate;
-using IntermediarySearchService.Core.Interfaces;
+﻿using IntermediarySearchService.Core.Interfaces;
 
 namespace IntermediarySearchService.Core.Entities.OfferAggregate;
 
@@ -13,6 +12,9 @@ public class Offer: BaseEntity, IAggregateRoot
     public bool isSelected { get; private set; } = false;
     public string? Comment { get; set; }
 
+    private readonly List<StateOffer> _statesOffer = new List<StateOffer>();
+    public IReadOnlyCollection<StateOffer> StatesOffer => _statesOffer.AsReadOnly();
+
     private Offer() { }
 
     public Offer(int orderId, string userName, decimal itemsTotalCost,
@@ -24,7 +26,28 @@ public class Offer: BaseEntity, IAggregateRoot
         DeliveryCost = deliveryCost;
         Expenses = expenses;
         Comment = comment;
+        AddStateOffer();
     }
 
-    public void ChangeSelectStatus(bool state) => isSelected = state;
+    public void ChangeSelectStatus(bool state)
+    {
+        if (state)
+        {
+            AddStateOffer(OfferState.Confirmed);
+            isSelected = true;
+        }
+        else
+        {
+            var selectedStatus = _statesOffer.FirstOrDefault(s => s.State == OfferState.Confirmed);
+            if (selectedStatus != null) _statesOffer.Remove(selectedStatus);
+            isSelected = false;
+        }
+    }
+
+
+    public void AddStateOffer(OfferState stateOffer = OfferState.SentToCustomer)
+    {
+        StateOffer newState = new StateOffer(stateOffer, DateTime.Now);
+        _statesOffer.Add(newState);
+    }
 }

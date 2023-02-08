@@ -4,13 +4,13 @@ namespace IntermediarySearchService.Core.Entities.OrderAggregate;
 
 public class StateOrder
 {
-    public State State { get; private set; }
+    public OrderState State { get; private set; }
     public string? Description { get; private set; }
     public DateTime? Date { get; private set; }
 
     private StateOrder() { }
 
-    public StateOrder(State state, string description, DateTime date)
+    public StateOrder(OrderState state, string description, DateTime date)
     {
         State = state;
         Description = description;
@@ -27,7 +27,7 @@ public class StateOrder
     }
 }
 
-public enum State
+public enum OrderState
 {
     [Description("In search performer")] InSearchPerformer,
     [Description("Awaiting shipment")] AwaitingShipment,

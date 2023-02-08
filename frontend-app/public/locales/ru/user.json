@@ -1,0 +1,42 @@
+{
+    "login": {
+        "title": "Вход в аккаунт",
+        "email": "Адрес электронной почты",
+        "password": "Пароль",
+        "login": "Войти",
+        "forgotPass": "Забыли свой пароль?",
+        "registration": "Еще нет аккаунта?"
+    },
+    "messages": {
+        "emailRequired": "Введите email !",
+        "emailRegex": "Неверный формат!",
+        "passwordRequired": "Введите пароль!"
+    },
+    "toastLogin":{
+        "success": "Вы были успешно авторизованы!",
+        "pending": "Вход...",
+        "error": "Не удалось выполнить вход !\n{{msg}}"
+    },
+    "toastDeleteAddress":{
+        "success": "Адрес удален!",
+        "pending": "Удаление адреса...",
+        "error": "Не удалось удалить адрес"
+    },
+    "toastAddAddress":{
+        "success": "Адрес успешно добавлен!",
+        "pending": "Добавление адреса...",
+        "error": "Не удалось добавить адрес"
+    },
+    "addresses": {
+        "city": "Город: {{city}}",
+        "country": "Страна: {{country}}",
+        "postCode": "Индекс: {{postCode}}",
+        "addPlaceholder": "Страна, город или почтовый индекс..."
+    },
+    "buttons": {
+        "del": "Удалить",
+        "add": "Добавить",
+        "cancel": "Отмена",
+        "save": "Сохранить"   
+    }
+}

@@ -1,19 +1,18 @@
 import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { INav } from "../store/navigation";
 
 
 export interface NavbarProps {
-  unAuthRoutes: INav[]
-  authRoutes: INav[]
   currentRoute: string
   setCurrentRoute: (option: any) => void
 }
 
 
-export default function Navbar({ unAuthRoutes, authRoutes, currentRoute, setCurrentRoute }: NavbarProps) {
+export default function Navbar({ currentRoute, setCurrentRoute }: NavbarProps) {
     const auth = useAuth()
+    const { t, i18n } = useTranslation('navigation');
     return (
         <div>
             <nav className="bg-white border-gray-200 dark:bg-gray-900">
@@ -29,7 +28,7 @@ export default function Navbar({ unAuthRoutes, authRoutes, currentRoute, setCurr
                         }
                         {auth.user
                          ? <Link to="/auth/logout" className="text-base font-medium text-blue-600 dark:text-blue-500 hover:underline">Выйти</Link>
-                         : <Link to="/auth/login" className="text-base font-medium text-blue-600 dark:text-blue-500 hover:underline">Войти</Link>
+                         : <Link to="/auth/login" className="text-base font-medium text-blue-600 dark:text-blue-500 hover:underline">{t("login")}</Link>
                         }
                     </div>
                 </div>
@@ -38,37 +37,64 @@ export default function Navbar({ unAuthRoutes, authRoutes, currentRoute, setCurr
                 <div className="max-w-screen-xl px-4 py-3 mx-auto md:px-6">
                     <div className="flex items-center justify-between">
                         <ul className="flex flex-row mt-0 mr-6 space-x-8 text-base font-medium">
-                            {unAuthRoutes.map((item, index) => (
                             <li
-                                key={index}
-                                onClick={() => setCurrentRoute(item.text)}>
+                                onClick={() => setCurrentRoute("/orders/create")}>
                                 <Link 
-                                to={item.route}
+                                to="/orders/create"
                                 className={classNames([
                                     "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3",
-                                    currentRoute === item.text && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
+                                    currentRoute === "/orders/create" && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
                                 ])}>
-                                {item.text}
+                                {t("unAuthRoutes.createOrder")}
                                 </Link>
                             </li>           
-                            ))}
+                            <li
+                                onClick={() => setCurrentRoute("/orders/all")}>
+                                <Link 
+                                to="/orders/all"
+                                className={classNames([
+                                    "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3",
+                                    currentRoute === "/orders/all" && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
+                                ])}>
+                                {t("unAuthRoutes.findOrder")}
+                                </Link>
+                            </li>   
                         </ul>
-                        {authRoutes.length > 0 &&
+                        {auth.user &&
                         <ul className="flex flex-row mt-0 mr-6 space-x-8 text-base font-medium">
-                            {authRoutes.map((item, index) => (
                             <li
-                                key={index}
-                                onClick={() => setCurrentRoute(item.text)}>
+                                onClick={() => setCurrentRoute("/user/profile")}>
                                 <Link 
-                                to={item.route}
+                                to={"/user/profile"}
                                 className={classNames([
                                     "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3",
-                                    currentRoute === item.text && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
+                                    currentRoute === "/user/profile" && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
                                 ])}>
-                                {item.text}
+                                {t("authRoutes.myProfile")}
+                                </Link>
+                            </li>
+                            <li
+                                onClick={() => setCurrentRoute("/user/addresses")}>
+                                <Link 
+                                to={"/user/addresses"}
+                                className={classNames([
+                                    "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3",
+                                    currentRoute === "/user/addresses" && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
+                                ])}>
+                                {t("authRoutes.myAddresses")}
+                                </Link>
+                            </li> 
+                            <li
+                                onClick={() => setCurrentRoute("/user/orders")}>
+                                <Link 
+                                to={"/user/orders"}
+                                className={classNames([
+                                    "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3",
+                                    currentRoute === "/user/orders" && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
+                                ])}>
+                                {t("authRoutes.myOrders")}
                                 </Link>
                             </li>           
-                            ))}
                         </ul>                        
                         }
                     </div>

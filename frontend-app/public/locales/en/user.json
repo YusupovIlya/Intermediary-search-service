@@ -1,0 +1,42 @@
+{
+    "login": {
+        "title": "Login to your account",
+        "email": "E-mail address",
+        "password": "Password",
+        "login": "Login",
+        "forgotPass": "Forgot Your Password?",
+        "registration": "You don't have an account?"
+    },
+    "messages": {
+        "emailRequired": "Enter an email !",
+        "emailRegex": "Invalid format!",
+        "passwordRequired": "Please enter a password!"
+    },
+    "toastLogin":{
+        "success": "You were successfully logged in!",
+        "pending": "Entering...",
+        "error": "Login failed !\n{{msg}}"
+    },
+    "toastDeleteAddress":{
+        "success": "Address deleted!",
+        "pending": "Deleting an address...",
+        "error": "Unable to delete address"
+    },
+    "toastAddAddress":{
+        "success": "Address added successfully!",
+        "pending": "Adding an address...",
+        "error": "Could not add address"
+    },
+    "addresses": {
+        "city": "City: {{city}}",
+        "country": "Country: {{country}}",
+        "postCode": "Postal code: {{postCode}}",
+        "addPlaceholder": "Country, city or postal code..."
+    },
+    "buttons": {
+        "del": "Remove",
+        "add": "Add",
+        "cancel": "Cancel",
+        "save": "Save"   
+    }  
+}

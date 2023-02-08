@@ -1,0 +1,12 @@
+{
+    "unAuthRoutes": {
+        "createOrder": "Create order",
+        "findOrder": "Become an intermediary",
+        "login": "Sign In"
+    },
+    "authRoutes": {
+        "myProfile": "My profile",
+        "myAddresses": "My addresses",
+        "myOrders": "My orders"
+    }
+}

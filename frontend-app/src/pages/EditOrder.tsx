@@ -77,9 +77,9 @@ export default function EditOrder() {
     await toast.promise(
       promise,
       {
-        pending: 'Редактирование заказа...',
-        success: `Заказ №${id} успешно отредактирован!`,
-        error: 'Не удалось отредактировать заказ'
+        pending: t("toastEditOrder.pending"),
+        success: t("toastEditOrder.success", {id: id})!,
+        error: t("toastEditOrder.error")
       }
     );
     history.push("/user/orders");
@@ -97,8 +97,8 @@ export default function EditOrder() {
       <div className="mx-auto">
         <div className="flex items-center space-x-5">
           <div className="block pl-2 font-semibold text-xl self-start text-gray-700">
-            <h2 className="leading-relaxed">Заказ №{order?.id} от {order?.statesOrder.length! > 0 && order?.statesOrder[0].date}</h2>
-            <p className="text-sm text-gray-500 font-normal leading-relaxed">Редактирование</p>
+            <h2 className="leading-relaxed">{t("orderForm.editTitle", {id: order?.id, from: order?.statesOrder[0].date})}</h2>
+            <p className="text-sm text-gray-500 font-normal leading-relaxed">{t("orderForm.editInfo")}</p>
           </div>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 pt-6">

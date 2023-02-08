@@ -1,4 +1,5 @@
 {
+    "title": "Заказ доставки товаров",
     "unAuthRoutes": {
         "createOrder": "Создать заказ",
         "findOrder": "Стать посредником",

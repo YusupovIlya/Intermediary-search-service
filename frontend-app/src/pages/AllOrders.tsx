@@ -5,31 +5,7 @@ import OrderCard from "../components/OrderCard";
 import { IOrdersFilter } from "../models";
 import classNames from "classnames";
 import { useDebounce } from "../hooks/useDebounce";
-
-export interface TypesSort{
-  value: any,
-  text: string,
-}
-
-
-export const sortList: TypesSort[] = [
-  {
-    value: "newest",
-    text: "Новые",  
-  },
-  {
-    value: "oldest",
-    text: "Старые",  
-  },
-  {
-    value: "maxmin",
-    text: "Стоимость заказа Max --> Min",  
-  },
-  {
-    value: "minmax",
-    text: "Стоимость заказа Min --> Max",  
-  }
-]
+import { useTranslation } from "react-i18next";
 
 export default function AllOrders() {
     const [filter, setFilter] = useState<IOrdersFilter>({
@@ -42,6 +18,7 @@ export default function AllOrders() {
       minOrderPrice: -1,
       sortBy: "newest"
     });
+    const { t } = useTranslation('order');
     const { data: countries, isLoading: isLoadingCountries } = useGetParamsForFilterQuery(1);
     const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(0);
     const { data: allOrdersResponse, isLoading } = useFilteredOrdersQuery(filter);
@@ -141,7 +118,7 @@ export default function AllOrders() {
             <div className="fixed inset-0 z-40 flex">
             <div className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl">
               <div className="flex items-center justify-between px-4">
-                <h2 className="text-lg font-medium text-gray-900">Фильтры</h2>
+                <h2 className="text-lg font-medium text-gray-900">{t("allOrders.filters")}</h2>
                 <button 
                 className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
                 onClick={() => setMobileFilter(false)}
@@ -162,7 +139,7 @@ export default function AllOrders() {
                     className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" 
                     onClick={() => (setShopActive(!shopActive))}
                     >
-                      <span className="font-medium text-gray-900">Магазин</span>
+                      <span className="font-medium text-gray-900">{t("allOrders.shop")}</span>
                       <span className="ml-6 flex items-center">
                         {shopActive ?
                             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -217,7 +194,7 @@ export default function AllOrders() {
                     className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" 
                     onClick={() => (setPlaceActive(!placeActive))}
                     >
-                      <span className="font-medium text-gray-900">Страна доставки</span>
+                      <span className="font-medium text-gray-900">{t("allOrders.place")}</span>
                       <span className="ml-6 flex items-center">
                         {placeActive ?
                             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -272,7 +249,7 @@ export default function AllOrders() {
                     className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" 
                     onClick={() => (setAmountOrderItemsActive(!amountOrderItemsActive))}
                     >
-                      <span className="font-medium text-gray-900">Кол-во товаров в заказе</span>
+                      <span className="font-medium text-gray-900">{t("allOrders.numItems")}</span>
                       <span className="ml-6 flex items-center">
                         {amountOrderItemsActive ?
                             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -299,7 +276,7 @@ export default function AllOrders() {
                               value={numOrderItems}
                               onChange={(e) =>setNumOrderItems(e.target.valueAsNumber)}
                             />
-                            <label className="ml-3 text-sm text-gray-600">До {numOrderItems} шт.</label>
+                            <label className="ml-3 text-sm text-gray-600">{t("allOrders.numMsg", {num: numOrderItems})}</label>
                           </div>
                       </div>
                     </div>                    
@@ -312,7 +289,7 @@ export default function AllOrders() {
                     className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" 
                     onClick={() => (setOrderPriceActive(!orderPriceActive))}
                     >
-                      <span className="font-medium text-gray-900">Стоимость заказа</span>
+                      <span className="font-medium text-gray-900">{t("allOrders.price")}</span>
                       <span className="ml-6 flex items-center">
                         {orderPriceActive ?
                             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -343,7 +320,7 @@ export default function AllOrders() {
                                 setMaxPrice(e.maxValue);  
                               }}
                             />
-                              <label className="ml-3 text-sm text-gray-600">От {minPrice}$ до {maxPrice}$</label>
+                              <label className="ml-3 text-sm text-gray-600">{t("allOrders.priceRange", {min: minPrice, max: maxPrice})}</label>
                             </div>
                       </div>
                     </div>                    
@@ -357,8 +334,7 @@ export default function AllOrders() {
 
           <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900">Заказы пользователей</h1>
-      
+              <h1 className="text-4xl font-bold tracking-tight text-gray-900">{t("allOrders.title")}</h1>
               <div className="flex items-center">
                 <div className="relative inline-block text-left">
                   <div>
@@ -368,7 +344,7 @@ export default function AllOrders() {
                           e.stopPropagation();
                           setSortActive(!sortActive);
                         }}>
-                      Сортировка
+                      {t("buttons.sort")}
                       <svg className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                       </svg>
@@ -378,19 +354,38 @@ export default function AllOrders() {
                   {sortActive && 
                     <div className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <div className="py-1">
-                            {sortList.map((item, index) => {
-                              return(
-                                <button
-                                  className={classNames([
-                                    "text-gray-500 block px-4 py-2 text-sm",
-                                    valueSort == item.value && "font-medium text-gray-900",
-                                  ])} 
-                                  onClick={() => setTypeSort(item.value)}
-                                  key={index}
-                                  >{item.text}
-                                </button>
-                              )
-                            })}   
+                          <button
+                            className={classNames([
+                              "text-gray-500 block px-4 py-2 text-sm",
+                              valueSort == "newest" && "font-medium text-gray-900",
+                            ])} 
+                            onClick={() => setTypeSort("newest")}
+                            >{t("sortTypes.new")}
+                          </button>
+                          <button
+                            className={classNames([
+                              "text-gray-500 block px-4 py-2 text-sm",
+                              valueSort == "oldest" && "font-medium text-gray-900",
+                            ])} 
+                            onClick={() => setTypeSort("oldest")}
+                            >{t("sortTypes.old")}
+                          </button>
+                          <button
+                            className={classNames([
+                              "text-gray-500 block px-4 py-2 text-sm",
+                              valueSort == "maxmin" && "font-medium text-gray-900",
+                            ])} 
+                            onClick={() => setTypeSort("maxmin")}
+                            >{t("sortTypes.maxmin")}
+                          </button>
+                          <button
+                            className={classNames([
+                              "text-gray-500 block px-4 py-2 text-sm",
+                              valueSort == "minmax" && "font-medium text-gray-900",
+                            ])} 
+                            onClick={() => setTypeSort("minmax")}
+                            >{t("sortTypes.minmax")}
+                          </button>                          
                         </div>
                     </div>                  
                   }
@@ -417,7 +412,7 @@ export default function AllOrders() {
                           className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
                           onClick={() => setShopActive(!shopActive)}
                           >
-                          <span className="font-medium text-gray-900">Магазин</span>
+                          <span className="font-medium text-gray-900">{t("allOrders.shop")}</span>
                           <span className="ml-6 flex items-center">
                               {shopActive ?                           
                                   <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -472,7 +467,7 @@ export default function AllOrders() {
                       <button 
                         className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
                         onClick={() => (setPlaceActive(!placeActive))}>
-                        <span className="font-medium text-gray-900">Страна доставки</span>
+                        <span className="font-medium text-gray-900">{t("allOrders.place")}</span>
                         <span className="ml-6 flex items-center">
                             {placeActive ?                           
                                 <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -527,7 +522,7 @@ export default function AllOrders() {
                       <button 
                         className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
                         onClick={() => setAmountOrderItemsActive(!amountOrderItemsActive)}>
-                        <span className="font-medium text-gray-900">Кол-во товаров в заказе</span>
+                        <span className="font-medium text-gray-900">{t("allOrders.numItems")}</span>
                         <span className="ml-6 flex items-center">
                             {amountOrderItemsActive ?                           
                                 <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -555,7 +550,7 @@ export default function AllOrders() {
                                 value={numOrderItems}
                                 onChange={(e) =>setNumOrderItems(e.target.valueAsNumber)}
                               />
-                              <label className="ml-3 text-sm text-gray-600">До {numOrderItems} шт.</label>
+                              <label className="ml-3 text-sm text-gray-600">{t("allOrders.numMsg", {num: numOrderItems})}</label>
                             </div>
 
                           </div>
@@ -569,7 +564,7 @@ export default function AllOrders() {
                         className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
                         onClick={() => setOrderPriceActive(!orderPriceActive)}                                  
                         >
-                        <span className="font-medium text-gray-900">Стоимость заказа</span>
+                        <span className="font-medium text-gray-900">{t("allOrders.price")}</span>
                         <span className="ml-6 flex items-center">
                             {orderPriceActive ?                           
                                 <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -601,7 +596,7 @@ export default function AllOrders() {
                                 setMaxPrice(e.maxValue);  
                               }}
 		                        />
-                              <label className="ml-3 text-sm text-gray-600">От {minPrice}$ до {maxPrice}$</label>
+                              <label className="ml-3 text-sm text-gray-600">{t("allOrders.priceRange", {min: minPrice, max: maxPrice})}</label>
                             </div>
 
                           </div>
@@ -642,7 +637,7 @@ export default function AllOrders() {
                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700 font-medium">
-                      На странице {paginationText()} заказов из {allOrdersResponse?.paginationMeta.totalCount}
+                      {t("allOrders.numPages", {txt: paginationText(), total: allOrdersResponse?.paginationMeta.totalCount})}
                     </p>
                   </div>
                   <div>

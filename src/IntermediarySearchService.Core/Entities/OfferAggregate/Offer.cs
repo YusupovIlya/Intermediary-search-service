@@ -11,9 +11,20 @@ public class Offer: BaseEntity, IAggregateRoot
     public decimal? Expenses { get; private set; }
     public bool isSelected { get; private set; } = false;
     public string? Comment { get; set; }
+    public DateTime? Deleted { get; private set; } = null;
 
     private readonly List<StateOffer> _statesOffer = new List<StateOffer>();
     public IReadOnlyCollection<StateOffer> StatesOffer => _statesOffer.AsReadOnly();
+
+    public bool isEditable => _statesOffer.Last().State == OfferState.SentToCustomer;
+
+    public bool isDeletable =>
+        _statesOffer.Last().State != OfferState.ConfirmedByCreator &&
+        _statesOffer.Last().State != OfferState.Shipped;
+
+    public bool isNeedConfirmation => _statesOffer.Last().State == OfferState.Confirmed;
+
+    public bool isNeedTrackNumber => _statesOffer.Last().State == OfferState.ConfirmedByCreator;
 
     private Offer() { }
 
@@ -50,4 +61,6 @@ public class Offer: BaseEntity, IAggregateRoot
         StateOffer newState = new StateOffer(stateOffer, DateTime.Now);
         _statesOffer.Add(newState);
     }
+
+    public void Remove() => Deleted = DateTime.Now;
 }

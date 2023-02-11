@@ -2,8 +2,6 @@
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Core.Specifications;
 using IntermediarySearchService.Core.Exceptions;
-using System.Linq;
-using IntermediarySearchService.Core.Entities.OfferAggregate;
 
 namespace IntermediarySearchService.Core.Services;
 
@@ -47,39 +45,29 @@ public class OrderService : IOrderService
         return SortByParam(sortBy, orders);
     }
 
-    public async Task DeleteAsync(int orderId, string initatorUserName)
+    public async Task DeleteAsync(int id)
     {
-        var order = await _orderRepository.GetByIdAsync(orderId);
+        var order = await _orderRepository.GetByIdAsync(id);
         if (order != null)
         {
-            if (order.UserName == initatorUserName)
-                await _orderRepository.DeleteAsync(order);
-            else
-                throw new ForbiddenActionException(initatorUserName);
+            await _orderRepository.DeleteAsync(order);
         }
         else
-            throw new OrderNotFoundException(orderId);
+            throw new OrderNotFoundException(id);
     }
 
-    public async Task UpdateAsync(string initatorUserName, int orderId, string siteName, string siteLink, 
+    public async Task UpdateAsync(int id, string siteName, string siteLink, 
                                   Address address, decimal performerFee, List<OrderItem> orderItems)
     {
-        var order = await GetByIdAsync(orderId);
+        var order = await GetByIdAsync(id);
         if (order != null)
         {
-            if (order.UserName == initatorUserName)
-            {
-                order.Update(siteName, siteLink, address, performerFee, orderItems);
-                await _orderRepository.UpdateAsync(order);
-            }
-            else
-                throw new ForbiddenActionException(initatorUserName);
+            order.Update(siteName, siteLink, address, performerFee, orderItems);
+            await _orderRepository.UpdateAsync(order);
         }
         else
-            throw new OrderNotFoundException(orderId);
+            throw new OrderNotFoundException(id);
     }
-
-
 
     public async Task<string[]> GetShopsForFilter(string userName = null)
     {
@@ -152,7 +140,7 @@ public class OrderService : IOrderService
             _ => orders,
         };
 
-    public async Task<string?[]> GetParam(FilterParam type, string userName) =>
+    public async Task<string?[]> GetParamAsync(FilterParam type, string userName) =>
         type switch
         {
             FilterParam.AllShops => await GetShopsForFilter(),
@@ -161,23 +149,17 @@ public class OrderService : IOrderService
             _ => new string[0],
         };
 
-    public async Task SetTrackCode(int orderId, string initatorUserName, string trackCode)
+    public async Task SetTrackCodeAsync(int orderId, string trackCode)
     {
         var order = await GetByIdAsync(orderId);
-        if (order.UserName == initatorUserName)
-            order.SetTrackCode(trackCode);
-        else
-            throw new ForbiddenActionException(initatorUserName);
+        order.SetTrackCode(trackCode);
         await _orderRepository.UpdateAsync(order);
     }
 
-    public async Task SelectOffer(int orderId, int offerId, string initatorUserName)
+    public async Task SelectOfferAsync(int orderId, int offerId)
     {
         var order = await GetByIdAsync(orderId);
-        if (order.UserName == initatorUserName)
-            order.SelectOffer(offerId);
-        else
-            throw new ForbiddenActionException(initatorUserName);
+        order.SelectOffer(offerId);
         await _orderRepository.UpdateAsync(order);
     }
 }

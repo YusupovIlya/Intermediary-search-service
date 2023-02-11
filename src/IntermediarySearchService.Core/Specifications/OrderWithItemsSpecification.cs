@@ -5,10 +5,10 @@ namespace IntermediarySearchService.Core.Specifications;
 
 public sealed class OrderWithItemsSpecification : Specification<Order>, ISingleResultSpecification
 {
-    public OrderWithItemsSpecification(int orderId)
+    public OrderWithItemsSpecification(int id)
     {
         Query
-            .Where(o => o.Id == orderId)
+            .Where(o => o.Id == id)
             .Include(o => o.Offers)
             .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Images);

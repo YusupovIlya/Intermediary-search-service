@@ -25,23 +25,19 @@ public class OfferService : IOfferService
         return offer.Id;
     }
 
-    public async Task DeleteAsync(int offerId)
+    public async Task DeleteAsync(int id)
     {
-        var offer = await _offerRepository.GetByIdAsync(offerId);
+        var offer = await _offerRepository.GetByIdAsync(id);
         if (offer != null)
             await _offerRepository.DeleteAsync(offer);
         else
-            throw new OfferNotFoundException(offerId);
+            throw new OfferNotFoundException(id);
     }
 
 
-    public async Task ChangeOfferStateAsync(int offerId, int orderId, OfferState offerState, string initatorUserName)
+    public async Task ChangeOfferStateAsync(int offerId, int orderId, OfferState offerState)
     {
         var order = await _orderRepository.GetByIdAsync(orderId);
-        var offer = order.GetActiveOffer();
-
-        if (offer.UserName != initatorUserName)
-            throw new ForbiddenActionException(initatorUserName);
 
         switch (offerState)
         {
@@ -51,7 +47,6 @@ public class OfferService : IOfferService
             case OfferState.CanceledByCreator:
                 order.CancelOffer(offerId);
                 break;
-            default: throw new ForbiddenActionException(initatorUserName);
         }
         await _orderRepository.UpdateAsync(order);
     }
@@ -60,7 +55,10 @@ public class OfferService : IOfferService
     {
         var offerSpec = new OffersSpecification(userName);
         var offers = await _offerRepository.ListAsync(offerSpec);
-        if (offerStates.Length > 0) offers = offers.Where(o => offerStates.Contains((OfferState)o.StatesOffer.Last()?.State)).ToList();
+
+        if (offerStates.Length > 0) 
+            offers = offers.Where(o => offerStates.Contains((OfferState)o.StatesOffer.Last()?.State)).ToList();
+
         return SortByParam(sortBy, offers);
     }
 
@@ -71,4 +69,14 @@ public class OfferService : IOfferService
         oldest => offers.OrderBy(o => o.StatesOffer.First().Date),
         _ => offers,
     };
+
+    public async Task<Offer> GetByIdAsync(int id)
+    {
+        var offerSpec = new OfferSpecification(id);
+        var offer = await _offerRepository.FirstOrDefaultAsync(offerSpec);
+        if (offer != null)
+            return offer;
+        else
+            throw new OfferNotFoundException(id);
+    }
 }

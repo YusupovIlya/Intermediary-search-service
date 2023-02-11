@@ -71,14 +71,20 @@ public class Order: BaseEntity, IAggregateRoot
 
     public void ConfirmOffer(int offerId)
     {
-        foreach(var offer in _offers)
+        var offer = _offers.FirstOrDefault(o => o.Id == offerId);
+        if (offer != null)
         {
-            if (offer.Id != offerId)
-                offer.AddStateOffer(OfferState.Canceled);
-            else
-                offer.AddStateOffer(OfferState.ConfirmedByCreator);
+            foreach (var item in _offers)
+            {
+                if (item.Id != offerId)
+                    item.AddStateOffer(OfferState.Canceled);
+                else
+                    item.AddStateOffer(OfferState.ConfirmedByCreator);
+            }
+            AddStateOrder(OrderState.AwaitingShipment);
         }
-        AddStateOrder(OrderState.AwaitingShipment);
+        else
+            throw new OfferNotFoundException(offerId);
     }
 
     public void SelectOffer(int offerId)

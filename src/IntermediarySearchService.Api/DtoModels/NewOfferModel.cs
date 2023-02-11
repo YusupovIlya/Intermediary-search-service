@@ -8,3 +8,5 @@ public class NewOfferModel
     public decimal? Expenses { get; set; }
     public string? Comment { get; set; }
 }
+
+public class EditedOfferModel: NewOfferModel { }

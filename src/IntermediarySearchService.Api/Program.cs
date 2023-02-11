@@ -14,6 +14,7 @@ using IntermediarySearchService.Infrastructure.Services;
 using System.Reflection;
 using IntermediarySearchService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
+using IntermediarySearchService.Core.Entities.OfferAggregate;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,9 +41,12 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
 builder.Services.AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>));
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOfferService, OfferService>();
+
 builder.Services.AddScoped<ITokenService, IdentityTokenClaimService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorizationHandler, OwnerAuthorizationHandler>();
+
+builder.Services.AddScoped<EntityNotFoundExceptionFilter>();
 
 var key = Encoding.ASCII.GetBytes(AuthConstants.JWT_SECRET_KEY);
 builder.Services
@@ -75,6 +79,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
 {

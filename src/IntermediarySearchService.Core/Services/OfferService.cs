@@ -10,6 +10,8 @@ public class OfferService : IOfferService
 {
     private readonly IRepository<Offer> _offerRepository;
     private readonly IRepository<Order> _orderRepository;
+    private const string maxMin = "maxmin";
+    private const string minMax = "minmax";
     private const string newest = "newest";
     private const string oldest = "oldest";
     public OfferService(IRepository<Offer> offerRepository, IRepository<Order> orderRepository)
@@ -29,26 +31,34 @@ public class OfferService : IOfferService
     {
         var offer = await _offerRepository.GetByIdAsync(id);
         if (offer != null)
-            await _offerRepository.DeleteAsync(offer);
+        {
+            offer.Remove();
+            await _offerRepository.UpdateAsync(offer);
+        }
         else
             throw new OfferNotFoundException(id);
     }
 
 
-    public async Task ChangeOfferStateAsync(int offerId, int orderId, OfferState offerState)
+    public async Task ChangeOfferStateAsync(int id, OfferState offerState)
     {
-        var order = await _orderRepository.GetByIdAsync(orderId);
-
-        switch (offerState)
+        var offer = await GetByIdAsync(id);
+        if (offer != null)
         {
-            case OfferState.ConfirmedByCreator:
-                order.ConfirmOffer(offerId);
-                break;
-            case OfferState.CanceledByCreator:
-                order.CancelOffer(offerId);
-                break;
+            var order = await _orderRepository.GetByIdAsync(offer.OrderId);
+            switch (offerState)
+            {
+                case OfferState.ConfirmedByCreator:
+                    order.ConfirmOffer(id);
+                    break;
+                case OfferState.CanceledByCreator:
+                    order.CancelOffer(id);
+                    break;
+            }
+            await _orderRepository.UpdateAsync(order);
         }
-        await _orderRepository.UpdateAsync(order);
+        else
+            throw new OfferNotFoundException(id);
     }
 
     public async Task<IEnumerable<Offer>> GetUserOffersAsync(string userName, OfferState[] offerStates, string? sortBy)
@@ -67,6 +77,8 @@ public class OfferService : IOfferService
     {
         newest => offers.OrderByDescending(o => o.StatesOffer.First().Date),
         oldest => offers.OrderBy(o => o.StatesOffer.First().Date),
+        minMax => offers.OrderBy(o => o.ItemsTotalCost),
+        maxMin => offers.OrderByDescending(o => o.ItemsTotalCost),
         _ => offers,
     };
 
@@ -76,6 +88,19 @@ public class OfferService : IOfferService
         var offer = await _offerRepository.FirstOrDefaultAsync(offerSpec);
         if (offer != null)
             return offer;
+        else
+            throw new OfferNotFoundException(id);
+    }
+
+    public async Task UpdateAsync(int id, decimal itemsTotalCost, decimal deliveryCost, 
+                                  decimal? expenses, string? comment)
+    {
+        var offer = await GetByIdAsync(id);
+        if (offer != null)
+        {
+            offer.Update(itemsTotalCost, deliveryCost, expenses, comment);
+            await _offerRepository.UpdateAsync(offer);
+        }
         else
             throw new OfferNotFoundException(id);
     }

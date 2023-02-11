@@ -49,6 +49,7 @@ public interface IOrderService
     /// <summary>
     /// Updates order
     /// </summary>
+    /// <exception cref="OrderNotFoundException"></exception>
     Task UpdateAsync(int id, string siteName, string siteLink, 
                      Address address, decimal performerFee, List<OrderItem> orderItems);
 

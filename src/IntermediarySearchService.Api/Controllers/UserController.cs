@@ -86,7 +86,7 @@ public class UserController : BaseController
 
 
     /// <summary>
-    /// Get user's orders
+    /// Gets user's orders
     /// </summary>
     /// <param name="orderStates">order's states array</param>
     /// <param name="shops">shops array</param>
@@ -99,14 +99,13 @@ public class UserController : BaseController
     /// <response code="204">Not found orders</response>
     /// <response code="401">Unauthorized</response>
     [Authorize]
-    [Route("orders")]
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetUserOrders([FromQuery] OrderState[] orderStates,
-                                                   [FromQuery] string[] shops,
-                                                   [FromQuery] string? sortBy)
+    [HttpGet("orders")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderModel>))]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    public async Task<IActionResult> GetOrders([FromQuery] OrderState[] orderStates,
+                                               [FromQuery] string[] shops,
+                                               [FromQuery] string? sortBy)
     {
         var orders = await _orderService.GetUserOrdersAsync(UserName, orderStates, shops, sortBy);
         if (orders.Count() == 0)
@@ -118,11 +117,24 @@ public class UserController : BaseController
         }
     }
 
+    /// <summary>
+    /// Gets user offers by params
+    /// </summary>
+    /// <param name="offerStates">array of offer states</param>
+    /// <param name="sortBy">sort type (newest, oldest, minmax, maxmin)</param>
+    /// <returns>Filtered offers</returns>
+    /// <response code="200">Return offers by params</response>
+    /// <response code="204">Not found offers with filter's params</response>
+    /// <response code="401">Unauthorized</response>
+    [Authorize]
     [HttpGet("offers")]
-    public async Task<IActionResult> GetUserOffers([FromQuery] OfferState[] offerStates, 
-                                                   [FromQuery] string? sortBy)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OfferModel>))]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    public async Task<IActionResult> GetOffers([FromQuery] OfferState[] offerStates, 
+                                               [FromQuery] string? sortBy)
     {
-        var offers = await _offerService.GetUserOffersAsync("user1", offerStates, sortBy);
+        var offers = await _offerService.GetUserOffersAsync(UserName, offerStates, sortBy);
         if (offers.Count() == 0)
             return NoContent();
         else

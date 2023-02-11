@@ -45,10 +45,15 @@ public interface IOfferService
     /// <summary>
     /// Changes current offer state
     /// </summary>
-    /// <param name="offerId">offer id</param>
-    /// <param name="orderId">order id</param>
+    /// <param name="id">offer id</param>
     /// <param name="offerState">new offer state</param>
-    /// <exception cref="OrderNotFoundException"></exception>
     /// <exception cref="OfferNotFoundException"></exception>
-    Task ChangeOfferStateAsync(int offerId, int orderId, OfferState offerState);
+    Task ChangeOfferStateAsync(int id, OfferState offerState);
+
+    /// <summary>
+    /// Updates offer
+    /// </summary>
+    /// <exception cref="OfferNotFoundException"></exception>
+    Task UpdateAsync(int id, decimal itemsTotalCost, decimal deliveryCost, 
+                     decimal? expenses, string? comment);
 }

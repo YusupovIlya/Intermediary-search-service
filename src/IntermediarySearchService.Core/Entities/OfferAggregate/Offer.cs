@@ -19,6 +19,7 @@ public class Offer: BaseEntity, IAggregateRoot
     public bool isEditable => _statesOffer.Last().State == OfferState.SentToCustomer;
 
     public bool isDeletable =>
+        _statesOffer.Last().State != OfferState.Confirmed &&
         _statesOffer.Last().State != OfferState.ConfirmedByCreator &&
         _statesOffer.Last().State != OfferState.Shipped;
 
@@ -63,4 +64,13 @@ public class Offer: BaseEntity, IAggregateRoot
     }
 
     public void Remove() => Deleted = DateTime.Now;
+
+    public void Update(decimal itemsTotalCost, decimal deliveryCost,
+                       decimal? expenses, string? comment)
+    {
+        ItemsTotalCost = itemsTotalCost;
+        DeliveryCost = deliveryCost;
+        Expenses = expenses;
+        Comment = comment;
+    }
 }

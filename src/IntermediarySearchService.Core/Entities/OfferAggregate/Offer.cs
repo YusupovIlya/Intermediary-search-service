@@ -1,4 +1,5 @@
-﻿using IntermediarySearchService.Core.Interfaces;
+﻿using IntermediarySearchService.Core.Exceptions;
+using IntermediarySearchService.Core.Interfaces;
 
 namespace IntermediarySearchService.Core.Entities.OfferAggregate;
 
@@ -26,6 +27,8 @@ public class Offer: BaseEntity, IAggregateRoot
     public bool isNeedConfirmation => _statesOffer.Last().State == OfferState.Confirmed;
 
     public bool isNeedTrackNumber => _statesOffer.Last().State == OfferState.ConfirmedByCreator;
+
+    public bool isCanceld => _statesOffer.Last().State == OfferState.CanceledByCreator;
 
     private Offer() { }
 
@@ -63,14 +66,34 @@ public class Offer: BaseEntity, IAggregateRoot
         _statesOffer.Add(newState);
     }
 
-    public void Remove() => Deleted = DateTime.Now;
+    /// <summary>
+    /// Remove offer (set date delete)
+    /// </summary>
+    /// <exception cref="DeleteOfferException"></exception>
+    public void Remove()
+    {
+        if (isDeletable) Deleted = DateTime.Now;
+        else throw new DeleteOfferException(Id);
+    }
 
+    /// <summary>
+    /// Updates offer by params
+    /// </summary>
+    /// <param name="itemsTotalCost"></param>
+    /// <param name="deliveryCost"></param>
+    /// <param name="expenses"></param>
+    /// <param name="comment"></param>
+    /// <exception cref="UpdateOfferException"></exception>
     public void Update(decimal itemsTotalCost, decimal deliveryCost,
                        decimal? expenses, string? comment)
     {
-        ItemsTotalCost = itemsTotalCost;
-        DeliveryCost = deliveryCost;
-        Expenses = expenses;
-        Comment = comment;
+        if (isEditable)
+        {
+            ItemsTotalCost = itemsTotalCost;
+            DeliveryCost = deliveryCost;
+            Expenses = expenses;
+            Comment = comment;
+        }
+        else throw new UpdateOfferException(Id);
     }
 }

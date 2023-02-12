@@ -9,5 +9,7 @@ public class OfferModel : NewOfferModel
     public bool isDeletable { get; set; }
     public bool isNeedConfirmation { get; set; }
     public bool isNeedTrackNumber { get; set; }
+    public bool isCanceld { get; set; }
     public IEnumerable<StateModel> StatesOffer { get; set; }
+    public string Deleted { get; set; }
 }

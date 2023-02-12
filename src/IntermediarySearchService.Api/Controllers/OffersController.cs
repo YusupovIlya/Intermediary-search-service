@@ -1,15 +1,14 @@
-﻿using AutoMapper;
-using IntermediarySearchService.Api.DtoModels;
+﻿using IntermediarySearchService.Api.DtoModels;
 using IntermediarySearchService.Api.Services;
 using IntermediarySearchService.Core.Entities.OfferAggregate;
-using IntermediarySearchService.Core.Exceptions;
 using IntermediarySearchService.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntermediarySearchService.Api.Controllers;
 
-[ApiController]
+[TypeFilter(typeof(EntityNotFoundExceptionFilter))]
+[TypeFilter(typeof(EntityStateChangeExceptionFilter))]
 public class OffersController : BaseController
 {
     private readonly IOfferService _offerService;
@@ -48,13 +47,14 @@ public class OffersController : BaseController
     /// <response code="401">Unauthorized</response>
     /// <response code="403">Forbidden</response>
     /// <response code="404">Offer wasn't found with this id</response>
+    /// <response code="409">Failed to change offer status</response>
     [Authorize(Policy = "OwnerEntity")]
     [HttpPut("{id:int}/states/{state}")]
-    [TypeFilter(typeof(EntityNotFoundExceptionFilter))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
     public async Task<IActionResult> ChangeState([FromRoute] int id, 
                                                  [FromRoute] OfferState state)
     {
@@ -73,19 +73,21 @@ public class OffersController : BaseController
     /// <response code="401">Unauthorized</response>
     /// <response code="403">Forbidden</response>
     /// <response code="404">Offer wasn't found with this id</response>
+    /// <response code="409">Failed to update offer</response>
     [Authorize(Policy = "OwnerEntity")]
     [HttpPut("{id:int}")]
-    [TypeFilter(typeof(EntityNotFoundExceptionFilter))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmptyResult))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
     public async Task<IActionResult> Update([FromRoute] int id,
                                             [FromBody] EditedOfferModel model)
     {
         await _offerService.UpdateAsync(id, model.ItemsTotalCost, model.DeliveryCost,
                                         model.Expenses, model.Comment);
-        return Ok();
+        var response = new ResponseModel(id.ToString(), $"Offer with id - {id} was updated");
+        return Ok(response);
     }
 
 
@@ -98,13 +100,14 @@ public class OffersController : BaseController
     /// <response code="401">Unauthorized</response>
     /// <response code="403">Forbidden</response>
     /// <response code="404">Offer wasn't found with this id</response>
+    /// <response code="409">Failed to delete offer</response>
     [Authorize(Policy = "OwnerEntity")]
     [HttpDelete("{id:int}")]
-    [TypeFilter(typeof(EntityNotFoundExceptionFilter))]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         await _offerService.DeleteAsync(id);

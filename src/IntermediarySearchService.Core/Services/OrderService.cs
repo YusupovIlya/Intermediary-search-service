@@ -50,7 +50,10 @@ public class OrderService : IOrderService
         var order = await _orderRepository.GetByIdAsync(id);
         if (order != null)
         {
-            await _orderRepository.DeleteAsync(order);
+            if (order.isDeletable)
+                await _orderRepository.DeleteAsync(order);
+            else
+                throw new DeleteOrderException(id);
         }
         else
             throw new OrderNotFoundException(id);
@@ -160,6 +163,13 @@ public class OrderService : IOrderService
     {
         var order = await GetByIdAsync(orderId);
         order.SelectOffer(offerId);
+        await _orderRepository.UpdateAsync(order);
+    }
+
+    public async Task CloseAsync(int id)
+    {
+        var order = await GetByIdAsync(id);
+        order.CloseOrder();
         await _orderRepository.UpdateAsync(order);
     }
 }

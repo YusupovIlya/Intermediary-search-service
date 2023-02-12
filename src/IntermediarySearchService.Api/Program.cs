@@ -47,6 +47,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorizationHandler, OwnerAuthorizationHandler>();
 
 builder.Services.AddScoped<EntityNotFoundExceptionFilter>();
+builder.Services.AddScoped<EntityStateChangeExceptionFilter>();
 
 var key = Encoding.ASCII.GetBytes(AuthConstants.JWT_SECRET_KEY);
 builder.Services

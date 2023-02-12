@@ -44,12 +44,14 @@ public interface IOrderService
     /// </summary>
     /// <param name="id">order id</param>
     /// <exception cref="OrderNotFoundException"></exception>
+    /// <exception cref="DeleteOrderException"></exception>
     Task DeleteAsync(int id);
 
     /// <summary>
     /// Updates order
     /// </summary>
     /// <exception cref="OrderNotFoundException"></exception>
+    /// <exception cref="UpdateOrderException"></exception>
     Task UpdateAsync(int id, string siteName, string siteLink, 
                      Address address, decimal performerFee, List<OrderItem> orderItems);
 
@@ -67,7 +69,16 @@ public interface IOrderService
     /// <param name="id">order id</param>
     /// <param name="trackCode"></param>
     /// <exception cref="OrderNotFoundException"></exception>
+    /// <exception cref="SetTrackCodeException"></exception>
     Task SetTrackCodeAsync(int id, string trackCode);
+
+    /// <summary>
+    /// Close order by its id
+    /// </summary>
+    /// <param name="id">order id</param>
+    /// <exception cref="OrderNotFoundException"></exception>
+    /// <exception cref="CloseOrderException"></exception>
+    Task CloseAsync(int id);
 
     /// <summary>
     /// Selects offer for order by these ids
@@ -76,6 +87,7 @@ public interface IOrderService
     /// <param name="offerId">offer id</param>
     /// <exception cref="OrderNotFoundException"></exception>
     /// <exception cref="OfferNotFoundException"></exception>
+    /// <exception cref="SelectOfferException"></exception>
     Task SelectOfferAsync(int id, int offerId);
 
     /// <summary>

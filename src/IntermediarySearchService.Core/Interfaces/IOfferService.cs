@@ -40,6 +40,7 @@ public interface IOfferService
     /// </summary>
     /// <param name="id">offer id</param>
     /// <exception cref="OfferNotFoundException"></exception>
+    /// <exception cref="DeleteOfferException"></exception>
     Task DeleteAsync(int id);
 
     /// <summary>
@@ -48,12 +49,14 @@ public interface IOfferService
     /// <param name="id">offer id</param>
     /// <param name="offerState">new offer state</param>
     /// <exception cref="OfferNotFoundException"></exception>
+    /// <exception cref="ConfirmOfferException"></exception>
     Task ChangeOfferStateAsync(int id, OfferState offerState);
 
     /// <summary>
     /// Updates offer
     /// </summary>
     /// <exception cref="OfferNotFoundException"></exception>
+    /// <exception cref="UpdateOfferException"></exception>
     Task UpdateAsync(int id, decimal itemsTotalCost, decimal deliveryCost, 
                      decimal? expenses, string? comment);
 }

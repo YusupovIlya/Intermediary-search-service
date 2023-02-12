@@ -11,4 +11,7 @@ public class OrderModel : NewOrderModel
     public decimal TotalPrice { get; set; }
     public bool isEditable { get; set; }
     public bool isDeletable { get; set; }
+    public bool HasConfirmedOffer { get; set; }
+    public bool CanBeClosed { get; set; }
+    public string? TrackCode { get; set; }
 }

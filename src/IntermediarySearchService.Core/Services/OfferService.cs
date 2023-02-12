@@ -10,14 +10,17 @@ public class OfferService : IOfferService
 {
     private readonly IRepository<Offer> _offerRepository;
     private readonly IRepository<Order> _orderRepository;
+    private readonly IOrderService _orderService;
     private const string maxMin = "maxmin";
     private const string minMax = "minmax";
     private const string newest = "newest";
     private const string oldest = "oldest";
-    public OfferService(IRepository<Offer> offerRepository, IRepository<Order> orderRepository)
+    public OfferService(IRepository<Offer> offerRepository, IRepository<Order> orderRepository, 
+                        IOrderService orderService)
     {
         _offerRepository = offerRepository;
         _orderRepository = orderRepository;
+        _orderService = orderService;
     }
     public async Task<int> CreateAsync(int orderId, string userName, decimal itemsTotalCost,
                             decimal deliveryCost, decimal? expenses = 0m, string? comment = null)
@@ -45,7 +48,7 @@ public class OfferService : IOfferService
         var offer = await GetByIdAsync(id);
         if (offer != null)
         {
-            var order = await _orderRepository.GetByIdAsync(offer.OrderId);
+            var order = await _orderService.GetByIdAsync(offer.OrderId);
             switch (offerState)
             {
                 case OfferState.ConfirmedByCreator:
@@ -93,7 +96,7 @@ public class OfferService : IOfferService
     }
 
     public async Task UpdateAsync(int id, decimal itemsTotalCost, decimal deliveryCost, 
-                                  decimal? expenses, string? comment)
+                                        decimal? expenses, string? comment)
     {
         var offer = await GetByIdAsync(id);
         if (offer != null)

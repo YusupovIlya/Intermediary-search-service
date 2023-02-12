@@ -7,6 +7,6 @@ public class OfferSpecification : Specification<Offer>, ISingleResultSpecificati
 {
     public OfferSpecification(int id)
     {
-        Query.Where(of => of.Id == id);
+        Query.Where(of => of.Id == id && of.Deleted == null);
     }
 }

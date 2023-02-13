@@ -9,9 +9,9 @@ import { useTranslation } from "react-i18next";
 
 export default function OrderSummary() {
     const { id } = useParams();
-    const { t } = useTranslation('order');
+    const { t } = useTranslation(['order', 'buttons', 'validation_messages']);
     const [showForm, setShowForm] = useState(false);
-    const [btnText, setbtnText] = useState(t("buttons.open"));
+    const [btnText, setbtnText] = useState(t("open", {ns: 'buttons'}));
     const [createOffer, response] = useCreateOfferMutation();
     const {register, control, handleSubmit, formState: { errors }} = useForm<INewOffer>({
       mode: "onBlur"
@@ -73,10 +73,10 @@ export default function OrderSummary() {
                   onClick={() => {
                     setShowForm(!showForm);
                     setbtnText((btnText) => {
-                      if(btnText == t("buttons.open"))
-                        return t("buttons.close")
+                      if(btnText == t("open", {ns: 'buttons'}))
+                        return t("close", {ns: 'buttons'})
                       else
-                        return t("buttons.open")
+                        return t("send", {ns: 'buttons'})
                     })
                   }}
                 >{btnText}</button>
@@ -92,11 +92,11 @@ export default function OrderSummary() {
                     <input
                       {...register("itemsTotalCost",
                       { 
-                        required: t("messages.requredField")!,
+                        required: t("requredField", {ns: 'validation_messages'})!,
                         valueAsNumber: true,
                         min: {
                           value: 1,
-                          message: t("messages.offerRule")
+                          message: t("offerRule", {ns: 'validation_messages'})
                       }, max: 99999999.99 })}
                       type="number"
                       step="any"
@@ -112,11 +112,11 @@ export default function OrderSummary() {
                     <input
                       {...register("deliveryCost",
                       { 
-                        required: t("messages.requredField")!,
+                        required: t("requredField", {ns: 'validation_messages'})!,
                         valueAsNumber: true,
                         min: {
                           value: 1,
-                          message: t("messages.offerRule")
+                          message: t("offerRule", {ns: 'validation_messages'})
                       }, max: 99999999.99 })}
                       type="number"
                       step="any"
@@ -135,7 +135,7 @@ export default function OrderSummary() {
                         valueAsNumber: true,
                         min: {
                           value: 1,
-                          message: t("messages.offerRule")
+                          message: t("offerRule", {ns: 'validation_messages'})
                       }, max: 99999999.99 })}
                       type="number"
                       step="any"
@@ -158,7 +158,7 @@ export default function OrderSummary() {
                       />               
                 </div>
                 <div className="w-full flex justify-center items-center">
-                  <button type="submit" className="hover:bg-black dark:bg-white dark:text-gray-800 dark:hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-base font-medium leading-4 text-white">{t("buttons.send")}</button>
+                  <button type="submit" className="hover:bg-black dark:bg-white dark:text-gray-800 dark:hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-base font-medium leading-4 text-white">{t("send", {ns: 'buttons'})}</button>
                 </div>
             </form>           
           </div>          

@@ -3,14 +3,14 @@ import { toast, ToastContentProps } from 'react-toastify';
 import { useForm} from "react-hook-form";
 import { ILoginRequest, ILoginResponse } from "../models";
 import { useLoginMutation } from "../store/intermediarysearchservice.api";
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
+import history from '../hooks/history';
 
 export default function Login() {
-  const { t } = useTranslation('user');
+  const { t } = useTranslation(['user', 'toast_messages']);
   const [loginRequest] = useLoginMutation();
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {register, handleSubmit, formState: { errors }, reset} = useForm<ILoginRequest>({
     mode: "onBlur"
   });
@@ -22,16 +22,20 @@ export default function Login() {
         await toast.promise(
           promise,
           {
-            pending: t("toastLogin.pending"),
-            success: t("toastLogin.success")!,
+            pending: t("toastLogin.pending", {ns: 'toast_messages'}),
+            success: t("toastLogin.success", {ns: 'toast_messages'})!,
             error: {
               render(response: ToastContentProps<ILoginResponse>){
-                return t("toastLogin.error", {msg: response.data?.message})!
+                return t("toastLogin.error", {msg: response.data?.message, ns: 'toast_messages'})!
               }
             },
           }
         );
-        (await promise).token && navigate("/user/profile");
+        if((await promise).token != null) {
+          const returnUrl = searchParams.get("returnUrl");
+          if(returnUrl != null) history.push(returnUrl);
+          else history.push("/user/profile")
+        }
       } catch (err) {
         console.log(err);
       }

@@ -18,10 +18,10 @@ export default function AllOrders() {
       minOrderPrice: -1,
       sortBy: "newest"
     });
-    const { t } = useTranslation('order');
+    const { t } = useTranslation(['order', 'buttons']);
     const { data: countries, isLoading: isLoadingCountries } = useGetParamsForFilterQuery(1);
     const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(0);
-    const { data: allOrdersResponse, isLoading } = useFilteredOrdersQuery(filter);
+    const { data: allOrdersResponse, isLoading } = useFilteredOrdersQuery(filter, {refetchOnMountOrArgChange: 10});
     const [mobileFilter, setMobileFilter] = useState(false);
     const [sortActive, setSortActive] = useState(false);
     const [placeActive, setPlaceActive] = useState(false);
@@ -34,7 +34,7 @@ export default function AllOrders() {
     const [minPrice, setMinPrice] = useState(1);
     const [maxPrice, setMaxPrice] = useState(500);
     const [numOrderItems, setNumOrderItems] = useState(1);
-    const [valueSort, setTypeSort] = useState("newest");
+    const [typeSort, setTypeSort] = useState("newest");
     const debouncedItems = useDebounce(numOrderItems, 500);
     const debouncedMin = useDebounce(minPrice, 500);
     const debouncedMax = useDebounce(maxPrice, 500);
@@ -65,9 +65,9 @@ export default function AllOrders() {
       setFilter(filter => {
         return {
           ...filter,
-          sortBy: valueSort,
+          sortBy: typeSort,
         }});
-    }, [valueSort]);
+    }, [typeSort]);
 
 
     useEffect(() => {
@@ -101,6 +101,22 @@ export default function AllOrders() {
             numOrderItems: debouncedItems,
           }});
     }, [amountOrderItemsActive]);
+
+    useEffect(() => {
+      setFilter(filter => {
+        return {
+          ...filter,
+          shops: []
+        }});
+    }, [shopActive]);
+
+    useEffect(() => {
+      setFilter(filter => {
+        return {
+          ...filter,
+          countries: []
+        }});
+    }, [placeActive]);
 
 
 
@@ -344,7 +360,7 @@ export default function AllOrders() {
                           e.stopPropagation();
                           setSortActive(!sortActive);
                         }}>
-                      {t("buttons.sort")}
+                      {t("sort", {ns: 'buttons'})}
                       <svg className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                       </svg>
@@ -354,38 +370,19 @@ export default function AllOrders() {
                   {sortActive && 
                     <div className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <div className="py-1">
-                          <button
-                            className={classNames([
-                              "text-gray-500 block px-4 py-2 text-sm",
-                              valueSort == "newest" && "font-medium text-gray-900",
-                            ])} 
-                            onClick={() => setTypeSort("newest")}
-                            >{t("sortTypes.new")}
-                          </button>
-                          <button
-                            className={classNames([
-                              "text-gray-500 block px-4 py-2 text-sm",
-                              valueSort == "oldest" && "font-medium text-gray-900",
-                            ])} 
-                            onClick={() => setTypeSort("oldest")}
-                            >{t("sortTypes.old")}
-                          </button>
-                          <button
-                            className={classNames([
-                              "text-gray-500 block px-4 py-2 text-sm",
-                              valueSort == "maxmin" && "font-medium text-gray-900",
-                            ])} 
-                            onClick={() => setTypeSort("maxmin")}
-                            >{t("sortTypes.maxmin")}
-                          </button>
-                          <button
-                            className={classNames([
-                              "text-gray-500 block px-4 py-2 text-sm",
-                              valueSort == "minmax" && "font-medium text-gray-900",
-                            ])} 
-                            onClick={() => setTypeSort("minmax")}
-                            >{t("sortTypes.minmax")}
-                          </button>                          
+                          {
+                            t<string, {text: string, value: string}[]>('sortTypes', { returnObjects: true }).map((item, index) => (
+                            <button
+                              key={index}
+                              className={classNames([
+                                "text-gray-500 block px-4 py-2 text-sm",
+                                typeSort == item.value && "font-medium text-gray-900",
+                              ])} 
+                              onClick={() => setTypeSort(item.value)}
+                              >{item.text}
+                            </button>
+                            ))
+                          }                     
                         </div>
                     </div>                  
                   }

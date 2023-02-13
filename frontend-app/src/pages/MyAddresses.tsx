@@ -6,14 +6,16 @@ import Address from "../components/Address"
 import { Modal } from "../components/Modal"
 import { useDebounce } from "../hooks/useDebounce"
 import { IPlace, useGeoCoder } from "../hooks/useGeoCoder"
-import { useAddAddressMutation, useDeleteAddressMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api"
+import { useAddAddressMutation, useRemoveAddressMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api"
 import { IAddress } from '../models';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../hooks/useAuth';
 
 export default function MyAddresses() {
-    const { t } = useTranslation('user');
-    const {data: addresses,isLoading,refetch} = useGetUserAddressesQuery(null);
-    const [deleteAddress] = useDeleteAddressMutation();
+    const auth = useAuth();
+    const { t } = useTranslation(['user', 'buttons', 'toast_messages']);
+    const {data: addresses,isLoading,refetch} = useGetUserAddressesQuery({id: auth.user.id!});
+    const [deleteAddress] = useRemoveAddressMutation();
     const [addAddress] = useAddAddressMutation();
 
     const [modalActive, setModalActive] = useState(false);
@@ -25,9 +27,10 @@ export default function MyAddresses() {
     const [selectedPlace, setSelectedPlace] = useState("");
     const [addressInModal, setAddressInModal] = useState<IAddress>(
         {
+            id: 0,
             postalCode: "",
             country: "",
-            region: "",
+            city: "",
             label: ""
         }
     );
@@ -35,34 +38,29 @@ export default function MyAddresses() {
     const { handleSubmit, setValue} = useForm<IAddress>({
         mode: "onBlur"
       });
-    
-
-  useEffect(() => {
-    setDropdown(debounced.length > 3 && places?.length! > 0)
-  }, [debounced, places]);
 
 
   const clickOnPlaceHandler = (place: IPlace) => {
         setSelectedPlace(place.label);
         setDropdown(false);
+        setValue("id", 0);
         setValue("country", place.country);
         setValue("postalCode", place.postal_code);
-        setValue("region", place.region);
+        setValue("city", place.region);
         setValue("label", place.label);
   }
 
   const onSubmit = async (data: IAddress) => {
     try {
-        if(data.label == null) data.label = selectedPlace;
-        const promise = addAddress(data).unwrap();
+        const promise = addAddress({id: auth.user.id!, data: data}).unwrap();
         setSelectedPlace("");
         setShowAddForm(false);
         await toast.promise(
             promise,
             {
-              pending: t("toastAddAddress.pending"),
-              success: t("toastAddAddress.success")!,
-              error: t("toastAddAddress.error")
+              pending: t("toastAddAddress.pending", {ns: 'toast_messages'}),
+              success: t("toastAddAddress.success", {ns: 'toast_messages'})!,
+              error: t("toastAddAddress.error", {ns: 'toast_messages'})
             }
         );
         refetch();
@@ -71,17 +69,16 @@ export default function MyAddresses() {
       }
   }
 
-  const deleteAddressHandler = async () => {
+  const onDeleteAddressHandler = async () => {
     try {
-        console.log(addressInModal);
         setModalActive(false);
-        const promise = deleteAddress(addressInModal).unwrap();
+        const promise = deleteAddress({id: addressInModal.id, userId: auth.user.id!}).unwrap();
         await toast.promise(
           promise,
           {
-            pending: t("toastDeleteAddress.pending"),
-            success: t("toastDeleteAddress.success")!,
-            error: t("toastDeleteAddress.error")
+            pending: t("toastDeleteAddress.pending", {ns: 'toast_messages'}),
+            success: t("toastDeleteAddress.success", {ns: 'toast_messages'})!,
+            error: t("toastDeleteAddress.error", {ns: 'toast_messages'})
           }
         );
         refetch();
@@ -95,13 +92,13 @@ export default function MyAddresses() {
             <Modal active={modalActive} setActive={setModalActive} content={
                 <div className="p-4">
                     <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("addresses.country", {country: addressInModal.country})}</p>
-                    <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("addresses.city", {city: addressInModal.region})}</p>
+                    <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("addresses.city", {city: addressInModal.city})}</p>
                     <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("addresses.postCode", {postCode: addressInModal.postalCode})}</p>
                     <p className="mt-2 mb-2 text-lg text-slate-600 not-italic font-semibold font-sans">{addressInModal.label}</p>
                     <button 
                     className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                    onClick={() => deleteAddressHandler()}
-                    >{t("buttons.del")}</button>
+                    onClick={() => onDeleteAddressHandler()}
+                    >{t("remove", {ns: 'buttons'})}</button>
                 </div>
             }/>
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
@@ -119,7 +116,7 @@ export default function MyAddresses() {
             <button 
                 className="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                 onClick={() => setShowAddForm(true)}>
-                {t("buttons.add")}
+                {t("add", {ns: 'buttons'})}
             </button>}
             {showAddForm && 
             <form className="mt-6 flex flex-col space-y-2 sm:w-3/4" onSubmit={handleSubmit(onSubmit)}>   
@@ -140,7 +137,7 @@ export default function MyAddresses() {
                     />                   
                     { dropdown && <ul className="list-none max-h-[200px] overflow-y-scroll shadow-md bg-white">
                     { loading && <p className="text-center text-slate-600">Loading...</p> }
-                    { places?.map((place, index) => (
+                    { places?.filter(p => p.postal_code != null).map((place, index) => (
                         <li
                             key={index}
                             onClick={() => clickOnPlaceHandler(place)}
@@ -150,11 +147,11 @@ export default function MyAddresses() {
                     )) }
                     </ul>}                    
                     <div className="mt-3 flex flex-row space-x-2">
-                        <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{t("buttons.save")}</button>
+                        <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{t("save", {ns: 'buttons'})}</button>
                         <button 
                             className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                             onClick={() => setShowAddForm(false)}>
-                            {t("buttons.cancel")}
+                            {t("cancel", {ns: 'buttons'})}
                         </button>                        
                     </div>
                 </div>

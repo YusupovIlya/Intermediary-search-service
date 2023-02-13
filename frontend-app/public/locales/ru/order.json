@@ -20,7 +20,8 @@
         "from": "От {{from}}",
         "numItems": "и еще {{numItems}} ед. в этом заказе",
         "totalPrice": "Стоимость заказа: ${{totalPrice}}",
-        "numItemsAll": "{{numItemsAll}} ед. в этом заказе"
+        "numItemsAll": "{{numItemsAll}} ед. в этом заказе",
+        "trackText": "Трек-номер: {{track}}"
     },
     "orderSummary": {
         "title": "Заказ №{{id}}",
@@ -35,47 +36,18 @@
         "contacts": "Контакты заказчика",
         "place": "Куда доставить",
         "confirmRemove": "Подтвердите удаление заказа #{{id}}",
-        "removeWarn": "Это действие нельзя будет отменить"
+        "removeWarn": "Это действие нельзя будет отменить",
+        "confirmRecived": "Подтвердите получение заказа #{{id}}"
     },
     "userOrder": {
         "offers": "Заявки",
         "offer": "Заявка #{{id}}",
+        "offerWithStatus": "Заявка #{{id}}, {{status}}",
         "noneOffers": "Нет заявок"
     },
     "orderItem": {
         "options": "Параметры: ",
         "units": "{{units}} шт."
-    },
-    "buttons": {
-        "addItem": "Добавить товар",
-        "create": "Создать",
-        "back": "Вернуться назад",
-        "send": "Отправить",
-        "open": "Открыть",
-        "close": "Закрыть",
-        "sort": "Сортировка",
-        "edit": "Редактировать",
-        "remove": "Удалить",
-        "confirm": "Подтвердить"
-    },
-    "messages": {
-        "nameRequired": "Введите название сайта!",
-        "linkRequired": "Введите ссылку на сайт!",
-        "linkRegex": "Неверный формат ссылки!",
-        "feeRequired": "Введите размер вознограждения!",
-        "feeRule": "Вознограждение должно быть не менее 1 ден.ед.!",
-        "feePlaceholder": "Укажите размер вознограждения в $",
-        "producNameRequired": "Введите название товара!",
-        "optionsRequired": "Введите характеристики товара!",
-        "optionPlaceholder": "Размер, цвет, вес и т.д.",
-        "productLinkRequired": "Введите ссылку на товар!",
-        "productLinkRegex": "Неверный формат ссылки!",
-        "unitPriceRequired": "Укажите стоимость за ед. товара!",
-        "unitPriceRule": "Минимальная стоимость ед. товара составляет 0.1 ден. ед.!",
-        "unitsRequired": "Укажите количество товара!",
-        "unitsRule": "Минимальное количество товара составляет 1 ед.",
-        "requredField": "Обязательное поле!",
-        "offerRule": "Значение должно быть не менее 1 ден.ед.!"
     },
     "allOrders": {
         "title": "Заказы пользователей",
@@ -90,27 +62,10 @@
         "priceRange": "От {{min}}$ до {{max}}$",
         "numPages": "На странице {{txt}} заказов из {{total}}"
     },
-    "sortTypes": {
-        "new": "Новые",
-        "old": "Старые",
-        "maxmin": "Стоимость заказа Max --> Min",
-        "minmax": "Стоимость заказа Min --> Max"
-    },
-    "toastDeleteOrder":{
-        "success": "Заказ №{{id}} был успешно удален!",
-        "pending": "Удаление заказа...",
-        "error": "Возникла ошибка при удалении...",
-        "info": "Заказ нельзя удалить, так как он уже в работе!",
-        "editInfo": "Заказ нельзя редактировать, так как он уже в работе!"
-    },
-    "toastCreateOrder":{
-        "success": "Заказ №{{id}} успешно создан!",
-        "pending": "Создание заказа...",
-        "error": "Не удалось создать заказ"
-    },
-    "toastEditOrder":{
-        "success": "Заказ №{{id}} успешно отредактирован!",
-        "pending": "Редактирование заказа...",
-        "error": "Не удалось отредактировать заказ"
-    }
+    "sortTypes": [
+        {"text": "Новые", "value": "newest"},
+        {"text": "Старые", "value": "oldest"},
+        {"text": "Стоимость заказа Max --> Min", "value": "maxmin"},
+        {"text": "Стоимость заказа Min --> Max", "value": "minmax"}
+    ]
 }

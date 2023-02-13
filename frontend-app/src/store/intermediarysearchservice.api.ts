@@ -1,5 +1,5 @@
 import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter } from '../models'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter, IOffer, IUserOffersFilter } from '../models'
 import { RootState } from '.'
 import history from '../hooks/history';
 import { resetStateAction } from '../hooks/resetState';
@@ -31,7 +31,6 @@ const baseQueryWithRedir: BaseQueryFn<
   if (result.error && result.error.status === 401) {
     api.dispatch(resetStateAction());
     history.push('/auth/login');
-    toast.error("Вам необходимо авторизоваться!");
   }
   return result
 }
@@ -57,17 +56,29 @@ export const intermediarySearchServiceApi = createApi({
                 body: payload,
             }),
         }),
-        removeOrder: builder.mutation<IResponse, {orderId: number}>({
+        removeOrder: builder.mutation<null, {id: number}>({
             query: (payload) => ({
-                url: `/orders/${payload.orderId}`,
+                url: `/orders/${payload.id}`,
                 method: 'DELETE',
             }),
         }),
-        editOrder: builder.mutation<IResponse, {orderId: number, data: INewOrder}>({
+        updateOrder: builder.mutation<IResponse, {id: number, data: INewOrder}>({
             query: (payload) => ({
-                url: `/orders/${payload.orderId}`,
+                url: `/orders/${payload.id}`,
                 method: 'PUT',
                 body: payload.data,
+            }),
+        }),
+        addTrackToOrder: builder.mutation<IResponse, {id: number, trackNumber: string}>({
+            query: (payload) => ({
+                url: `/orders/${payload.id}/tracknumber/${payload.trackNumber}`,
+                method: 'PUT'
+            }),
+        }),
+        closeOrder: builder.mutation<IResponse, {id: number}>({
+            query: (payload) => ({
+                url: `/orders/${payload.id}/close`,
+                method: 'PUT'
             }),
         }),
         filteredOrders: builder.query<IPaginatedOrders, IOrdersFilter>({
@@ -95,9 +106,22 @@ export const intermediarySearchServiceApi = createApi({
 
         createOffer: builder.mutation<IResponse, INewOffer>({
             query: (payload) => ({
-                url: "/offer/create",
+                url: "/offers",
                 method: 'POST',
                 body: payload,
+            }),
+        }),
+        updateOffer: builder.mutation<IResponse, {id: number, data: INewOffer}>({
+            query: (payload) => ({
+                url: `/offers/${payload.id}`,
+                method: 'PUT',
+                body: payload.data,
+            }),
+        }),
+        removeOffer: builder.mutation<null, {id: number}>({
+            query: (payload) => ({
+                url: `/offers/${payload.id}`,
+                method: 'DELETE',
             }),
         }),
         selectOffer: builder.mutation<IResponse, {orderId: number, offerId: number}>({
@@ -106,36 +130,51 @@ export const intermediarySearchServiceApi = createApi({
                 method: 'PUT',
             }),
         }),
-
-        getUserOrders: builder.query<IOrder[], IUserOrdersFilter>({
+        changeStateOffer: builder.mutation<IResponse, {id: number, state: number}>({
             query: (payload) => ({
-                url:"/user/orders",
+                url: `/offers/${payload.id}/states/${payload.state}`,
+                method: 'PUT',
+            }),
+        }),
+        getUserOffers: builder.query<IOffer[], {id: string, param: IUserOffersFilter}>({
+            query: (payload) => ({
+                url: `/users/${payload.id}/offers`,
                 method: 'GET',
                 params: {
-                    orderStates: payload.orderStates.length == 0 ? undefined : payload.orderStates,
-                    shops: payload.shops.length == 0 ? undefined : payload.shops,
-                    sortBy: payload.sortBy
+                    offerStates: payload.param.offerStates.length == 0 ? undefined : payload.param.offerStates,
+                    sortBy: payload.param.sortBy
                 },
             }),
         }),
-        addAddress: builder.mutation<IResponse, IAddress>({
+
+        getUserOrders: builder.query<IOrder[], {id: string, param: IUserOrdersFilter}>({
             query: (payload) => ({
-                url: "/user/addresses/add",
-                method: 'POST',
-                body: payload,
+                url: `/users/${payload.id}/orders`,
+                method: 'GET',
+                params: {
+                    orderStates: payload.param.orderStates.length == 0 ? undefined : payload.param.orderStates,
+                    shops: payload.param.shops.length == 0 ? undefined : payload.param.shops,
+                    sortBy: payload.param.sortBy
+                },
             }),
         }),
-        getUserAddresses: builder.query<IAddress[], null>({
-            query: () => ({
-                url: "/user/addresses",
+        addAddress: builder.mutation<IResponse, {id: string, data: IAddress}>({
+            query: (payload) => ({
+                url: `/users/${payload.id}/addresses`,
+                method: 'POST',
+                body: payload.data,
+            }),
+        }),
+        getUserAddresses: builder.query<IAddress[], {id: string}>({
+            query: (payload) => ({
+                url: `/users/${payload.id}/addresses`,
                 method: 'GET',
             }),
         }),
-        deleteAddress: builder.mutation<IResponse, IAddress>({
+        removeAddress: builder.mutation<IResponse, {id: number, userId: string}>({
             query: (payload) => ({
-                url: "/user/addresses/delete",
+                url: `/users/${payload.userId}/addresses/${payload.id}`,
                 method: 'DELETE',
-                body: payload,
             }),
         }),
         getParamsForFilter: builder.query<string[], number>({
@@ -150,9 +189,12 @@ export const intermediarySearchServiceApi = createApi({
 export const { useLoginMutation, useCreateOrderMutation, 
                useGetOrderByIdQuery, useCreateOfferMutation, 
                useAddAddressMutation, useFilteredOrdersQuery,
-               useGetUserAddressesQuery, useDeleteAddressMutation,
+               useGetUserAddressesQuery, useRemoveAddressMutation,
                useGetUserOrdersQuery, useSelectOfferMutation,
-               useRemoveOrderMutation, useEditOrderMutation,
-               useGetParamsForFilterQuery}
+               useRemoveOrderMutation, useUpdateOrderMutation,
+               useGetParamsForFilterQuery, useGetUserOffersQuery,
+               useUpdateOfferMutation, useRemoveOfferMutation,
+               useChangeStateOfferMutation, useAddTrackToOrderMutation,
+               useCloseOrderMutation}
                
                = intermediarySearchServiceApi

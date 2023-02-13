@@ -3,16 +3,17 @@ import {getOrderImg} from "../hooks/getImage";
 import { useState } from "react";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
-import {getStateOrder} from "../hooks/getStateOrder";
+import {getStateOrder, getStateOfferForCustomer} from "../hooks/getState";
 import { useTranslation } from "react-i18next";
 
 interface UserOrderProps {
     order: IOrder,
     setOfferInModal: (option: IOffer) => void,
     setOfferModalActive: (option: boolean) => void,
+    setHasConfirmedOffer: (option: boolean) => void,
   }
 
-export default function UserOrder({order, setOfferInModal, setOfferModalActive}
+export default function UserOrder({order, setOfferInModal, setOfferModalActive, setHasConfirmedOffer}
                                    : UserOrderProps) {
 
     const [showOffers, setShowOffers] = useState(false);
@@ -50,6 +51,7 @@ export default function UserOrder({order, setOfferInModal, setOfferModalActive}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setShowOffers(!showOffers);
+                                    setHasConfirmedOffer(order.hasConfirmedOffer);
                                 }}
                                 >{t("userOrder.offers")}</button>
                         </div>
@@ -57,7 +59,7 @@ export default function UserOrder({order, setOfferInModal, setOfferModalActive}
                 </div>               
             </Link>
             {showOffers &&
-                <ul className="mt-2 list-none border-2 bg-white w-full lg:w-1/2">
+                <ul className="mt-2 list-none border-2 bg-white w-full lg:w-3/4">
                     {order.offers.length > 0 ?
                         order.offers.map((item, index) => {
                             return(
@@ -72,7 +74,7 @@ export default function UserOrder({order, setOfferInModal, setOfferModalActive}
                                         setOfferModalActive(true);
                                     }}  
                                     >
-                                    {t("userOrder.offer", {id: item.id})}
+                                    {t("userOrder.offerWithStatus", {id: item.id, status: getStateOfferForCustomer(order, item, i18n.language)})} {}
                                 </li>
                             )
                         })

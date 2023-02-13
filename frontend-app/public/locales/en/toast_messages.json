@@ -1,0 +1,68 @@
+{
+    "toastSelectOffer": {
+        "success": "Offer #{{id}} selected!",
+        "pending": "Selecting an application...",
+        "error": "Failed to select request"
+    },
+    "toastUpdateOffer":{
+        "success": "Offer #{{id}} edited successfully!",
+        "pending": "Editing request...",
+        "error": "Failed to edit request"
+    },
+    "toastDeleteOffer":{
+        "success": "Offer #{{id}} deleted successfully!",
+        "pending": "Deleting request...",
+        "error": "Failed to delete request"
+    },
+    "toastConfirmOffer":{
+        "success": "Offer #{{id}} successfully confirmed!",
+        "pending": "Offer confirmation...",
+        "error": "Could not validate request"
+    },
+    "toastCancelOffer":{
+        "success": "Offer #{{id}} canceled successfully!",
+        "pending": "Canceling the application...",
+        "error": "Unable to cancel request"
+    },
+    "toastAddTrack":{
+        "success": "Track number added successfully!",
+        "pending": "Adding track number...",
+        "error": "Unable to add tracking number"
+    },
+    "toastDeleteOrder":{
+        "success": "Order #{{id}} was deleted successfully!",
+        "pending": "Deleting order...",
+        "error": "An error occurred while deleting..."
+    },
+    "toastCreateOrder":{
+        "success": "Order #{{id}} created successfully!",
+        "pending": "Creating an order...",
+        "error": "Failed to create order"
+    },
+    "toastEditOrder":{
+        "success": "Order #{{id}} edited successfully!",
+        "pending": "Editing order...",
+        "error": "Failed to edit order"
+    },
+     "toastCloseOrder":{
+         "success": "Order completed!",
+         "pending": "Confirmation...",
+         "error": "Failed to confirm receipt of order"
+     },
+    "toastLogin":{
+        "success": "You were successfully logged in!",
+        "pending": "Entering...",
+        "error": "Login failed !\n{{msg}}"
+    },
+    "toastDeleteAddress":{
+        "success": "Address removed!",
+        "pending": "Deleting an address...",
+        "error": "Unable to delete address"
+    },
+    "toastAddAddress":{
+        "success": "Address added successfully!",
+        "pending": "Adding an address...",
+        "error": "Could not add address"
+    },
+    "unAuthMessage": "You need to login!"
+}

@@ -1,31 +1,29 @@
 import { useEffect, useState } from "react";
-import { useGetParamsForFilterQuery, useGetUserOrdersQuery } from "../store/intermediarysearchservice.api";
-import { IOffer, IUserOrdersFilter } from "../models";
+import { useGetUserOffersQuery } from "../store/intermediarysearchservice.api";
+import { IOffer, IUserOffersFilter } from "../models";
 import classNames from "classnames";
-import {statesOrder} from "../hooks/getState";
+import {statesOffer} from "../hooks/getState";
 import UserOrder from "../components/UserOrder";
 import { Modal } from "../components/Modal";
 import OfferModal from "../components/OfferModal";
 import { useTranslation } from "react-i18next";
+import UserOffer from "../components/UserOffer";
+import OfferOwnerModal from "../components/OfferOwnerModal";
 import { useAuth } from "../hooks/useAuth";
 
-export default function UserOrders() {
+export default function UserOffers() {
 
     const auth = useAuth();
-    const [filter, setFilter] = useState<IUserOrdersFilter>({
-        orderStates: [],
-        shops: [],
+    const [filter, setFilter] = useState<IUserOffersFilter>({
+        offerStates: [],
         sortBy: "newest"
       });
       const { t, i18n } = useTranslation(['order', 'buttons']);
-      const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(2);
-      const { data: orders, isLoading, refetch } = useGetUserOrdersQuery({id: auth.user.id!, param: filter}, {refetchOnMountOrArgChange: true});
+      const { data: offers, isLoading, refetch } = useGetUserOffersQuery({id: auth.user.id!, param: filter}, {refetchOnMountOrArgChange: true});
       const [mobileFilter, setMobileFilter] = useState(false);
       const [sortActive, setSortActive] = useState(false);
-      const [shopActive, setShopActive] = useState(false);
-      const [stateOrderActive, setStateOrderActive] = useState(false);
+      const [stateOfferActive, setStateOfferActive] = useState(false);
       const [offerModalActive, setOfferModalActive] = useState(false);
-      const [HasConfirmedOffer, setHasConfirmedOffer] = useState(false);
       const [typeSort, setTypeSort] = useState("newest");
       const [offerInModal, setOfferInModal] = useState<IOffer>({
           id: 0,
@@ -57,9 +55,9 @@ export default function UserOrders() {
         setFilter(filter => {
           return {
             ...filter,
-            orderStates: []
+            offerStates: []
           }});
-      }, [stateOrderActive]);
+      }, [stateOfferActive]);
   
         return(
         <div className="bg-white w-10/12" onClick={() => setSortActive(false)}>        
@@ -67,11 +65,11 @@ export default function UserOrders() {
             active={offerModalActive} 
             setActive={setOfferModalActive}
             content={
-              <OfferModal 
+              <OfferOwnerModal 
                 offer={offerInModal}
+                modalActive={offerModalActive}
                 setOfferModalActive={setOfferModalActive}
                 updateFunc={refetch}
-                hasConfirmedOffer={HasConfirmedOffer}
                 />
             }/>
           <div>
@@ -99,11 +97,11 @@ export default function UserOrders() {
                     <h3 className="-mx-2 -my-3 flow-root">
                       <button 
                       className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" 
-                      onClick={() => setStateOrderActive(!stateOrderActive)}
+                      onClick={() => setStateOfferActive(!stateOfferActive)}
                       >
                         <span className="font-medium text-gray-900">{t("allOrders.status")}</span>
                         <span className="ml-6 flex items-center">
-                          {stateOrderActive ?
+                          {stateOfferActive ?
                               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
                               </svg>                         
@@ -115,10 +113,10 @@ export default function UserOrders() {
                         </span>
                       </button>
                     </h3>
-                    {stateOrderActive &&
+                    {stateOfferActive &&
                       <div className="pt-6" id="filter-section-mobile-0">
                         <div className="space-y-6">
-                          {statesOrder?.map((item, index) => {
+                          {statesOffer?.map((item, index) => {
                               return(
                                   <div className="flex items-center" key={index}>
                                     <input 
@@ -130,75 +128,20 @@ export default function UserOrders() {
                                         setFilter(filter => {
                                           return {
                                             ...filter,
-                                            orderStates: [...filter.orderStates, e.target.value]
+                                            offerStates: [...filter.offerStates, e.target.value]
                                           }
                                         })
                                         :
                                         setFilter(filter => {
                                           return {
                                             ...filter,
-                                            orderStates: filter.orderStates.filter(v => v != e.target.value )
+                                            offerStates: filter.offerStates.filter(v => v != e.target.value )
                                           }
                                       })}                                                                
                                     />
                                     <label className="ml-3 min-w-0 flex-1 text-gray-500">
                                       {i18n.language == "en" ? item.textEn : item.textRu}
                                     </label>
-                                  </div> 
-                              )                              
-                          })}
-                        </div>
-                      </div>                    
-                    }
-                  </div>
-
-                  <div className="border-t border-gray-200 px-4 py-6">
-                    <h3 className="-mx-2 -my-3 flow-root">
-                      <button 
-                      className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" 
-                      onClick={() => (setShopActive(!shopActive))}
-                      >
-                        <span className="font-medium text-gray-900">{t("allOrders.shop")}</span>
-                        <span className="ml-6 flex items-center">
-                          {shopActive ?
-                              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
-                              </svg>                         
-                              :
-                              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                              </svg>                         
-                          }
-                        </span>
-                      </button>
-                    </h3>
-                    {shopActive &&
-                      <div className="pt-6" id="filter-section-mobile-0">
-                        <div className="space-y-6">
-                          {shops?.map((item, index) => {
-                              return(
-                                  <div className="flex items-center" key={index}>
-                                    <input 
-                                    value={item} 
-                                    type="checkbox" 
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    onChange={(e) =>
-                                      e.target.checked ? 
-                                        setFilter(filter => {
-                                          return {
-                                            ...filter,
-                                            shops: [...filter.shops!, e.target.value]
-                                          }
-                                        })
-                                        :
-                                        setFilter(filter => {
-                                          return {
-                                            ...filter,
-                                            shops: filter.shops!.filter(v => v != e.target.value )
-                                          }
-                                      })}                                                                
-                                    />
-                                    <label className="ml-3 min-w-0 flex-1 text-gray-500">{item}</label>
                                   </div> 
                               )                              
                           })}
@@ -271,11 +214,11 @@ export default function UserOrders() {
                         <h3 className="-my-3 flow-root">
                           <button 
                             className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
-                            onClick={() => setStateOrderActive(!stateOrderActive)}
+                            onClick={() => setStateOfferActive(!stateOfferActive)}
                             >
                             <span className="font-medium text-gray-900">{t("allOrders.status")}</span>
                             <span className="ml-6 flex items-center">
-                                {stateOrderActive ?                           
+                                {stateOfferActive ?                           
                                     <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
                                     </svg>
@@ -287,10 +230,10 @@ export default function UserOrders() {
                             </span>
                           </button>
                         </h3>
-                        {stateOrderActive &&
+                        {stateOfferActive &&
                             <div className="pt-6">
                                 <div className="space-y-4">
-                                  {statesOrder?.map((item, index) => {
+                                  {statesOffer?.map((item, index) => {
                                     return(
                                         <div className="flex items-center pl-2" key={index}>
                                           <input 
@@ -302,14 +245,14 @@ export default function UserOrders() {
                                               setFilter(filter => {
                                                 return {
                                                   ...filter,
-                                                  orderStates: [...filter.orderStates!, e.target.value]
+                                                  offerStates: [...filter.offerStates!, e.target.value]
                                                 }
                                               })
                                               :
                                               setFilter(filter => {
                                                 return {
                                                   ...filter,
-                                                  orderStates: filter.orderStates!.filter(v => v != e.target.value )
+                                                  offerStates: filter.offerStates!.filter(v => v != e.target.value )
                                                 }
                                             })}
                                           />
@@ -323,75 +266,19 @@ export default function UserOrders() {
                             </div>                    
                         }
                   </div>
-
-                    <div className="border-b border-gray-200 py-6">
-                        <h3 className="-my-3 flow-root">
-                          <button 
-                            className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
-                            onClick={() => setShopActive(!shopActive)}
-                            >
-                            <span className="font-medium text-gray-900">{t("allOrders.shop")}</span>
-                            <span className="ml-6 flex items-center">
-                                {shopActive ?                           
-                                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fillRule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clipRule="evenodd" />
-                                    </svg>
-                                            :
-                                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                                    </svg>                             
-                                }
-                            </span>
-                          </button>
-                        </h3>
-                        {shopActive &&
-                            <div className="pt-6">
-                                {isLoadingShops && <p className="text-center text-slate-600">Loading...</p>}
-                                <div className="space-y-4 max-h-[150px] overflow-y-scroll">
-                                  {shops?.map((item, index) => {
-                                    return(
-                                        <div className="flex items-center pl-2" key={index}>
-                                          <input 
-                                          value={item} 
-                                          type="checkbox" 
-                                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                          onChange={(e) =>
-                                            e.target.checked ? 
-                                              setFilter(filter => {
-                                                return {
-                                                  ...filter,
-                                                  shops: [...filter.shops!, e.target.value]
-                                                }
-                                              })
-                                              :
-                                              setFilter(filter => {
-                                                return {
-                                                  ...filter,
-                                                  shops: filter.shops!.filter(v => v != e.target.value )
-                                                }
-                                            })}
-                                          />
-                                          <label className="ml-3 text-sm text-gray-600">{item}</label>
-                                        </div> 
-                                    )                              
-                                  })}
-                                </div>
-                            </div>                    
-                        }
-                    </div>
       
                   </div>
                   <div className="lg:col-span-3">
                     <div className="h-full rounded-lg border-4 border-dashed border-gray-200">
                       {isLoading && <p className="text-center text-slate-600">Loading...</p>}
                       <div className="py-2 mx-auto max-w-2xl px-4 sm:py-15 sm:px-6 lg:max-w-7xl lg:px-8">
-                          {orders?.map((item, index) => (
-                            <UserOrder 
-                              order={item} 
+                          {offers?.map((item, index) => (
+                            <UserOffer 
+                              offer={item} 
                               key={index} 
                               setOfferModalActive={setOfferModalActive}
                               setOfferInModal={setOfferInModal}
-                              setHasConfirmedOffer={setHasConfirmedOffer}
+                              updateFunc={refetch}
                             />
                           ))}
                       </div>                    

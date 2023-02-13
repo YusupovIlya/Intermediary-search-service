@@ -20,7 +20,8 @@
         "from": "From {{from}}",
         "numItems": "and {{numItems}} more items in this order",
         "totalPrice": "Order value: ${{totalPrice}}",
-        "numItemsAll": "{{numItemsAll}} items in this order"
+        "numItemsAll": "{{numItemsAll}} items in this order",
+        "trackText": "Track-code: {{track}}"
     },
     "orderSummary": {
         "title": "Order #{{id}}",
@@ -35,47 +36,18 @@
         "contacts": "Customer contacts",
         "place": "Where to deliver",
         "confirmRemove": "Confirm order removal #{{id}}",
-        "removeWarn": "This action cannot be undone"
+        "removeWarn": "This action cannot be undone",
+        "confirmRecived": "Confirm receipt of order #{{id}}"
     },
     "userOrder": {
         "offers": "Offer",
         "offer": "Offer #{{id}}",
+        "offerWithStatus": "Offer #{{id}}, {{status}}",
         "noneOffers": "No Offers"
     },
     "orderItem": {
         "options": "Options: ",
         "units": "{{units}} units"
-    },
-    "buttons": {
-        "addItem": "Add Item",
-        "create": "Create",
-        "back": "Go back",
-        "send": "Send",
-        "open": "Open",
-        "close": "Close",
-        "sort": "Sort",
-        "edit": "Edit",
-        "remove": "Remove",
-        "confirm": "Confirm"
-    },
-    "messages": {
-        "nameRequired": "Enter a site name!",
-        "linkRequired": "Enter a link to the site!",
-        "linkRegex": "Invalid link format!",
-        "feeRequired": "Enter the amount of the reward!",
-        "feeRule": "Reward must be at least 1 cash!",
-        "feePlaceholder": "Enter the reward amount in $",
-        "producNameRequired": "Please enter a product name!",
-        "optionsRequired": "Enter product features!",
-        "optionPlaceholder": "Size, color, weight, etc.",
-        "productLinkRequired": "Enter a product link!",
-        "productLinkRegex": "Invalid link format!",
-        "unitPriceRequired": "Enter unit price!",
-        "unitPriceRule": "Minimum unit price is $0.1!",
-        "unitsRequired": "Enter quantity of item!",
-        "unitsRule": "Minimum item quantity is 1 unit",
-        "requredField": "Required field!",
-        "offerRule": "Value must be at least 1 dollar!"
     },
     "allOrders": {
         "title": "User Orders",
@@ -90,27 +62,10 @@
         "priceRange": "From {{min}}$ to {{max}}$",
         "numPages": "On page {{txt}} of orders from {{total}}"
     },
-    "sortTypes": {
-        "new": "New",
-        "old": "Old",
-        "maxmin": "Order value Max --> Min",
-        "minmax": "Order value Min --> Max"
-    },
-    "toastDeleteOrder":{
-        "success": "Order #{{id}} was deleted successfully!",
-        "pending": "Deleting order...",
-        "error": "An error occurred while deleting...",
-        "info": "The order cannot be deleted because it is already in progress!",
-        "editInfo": "The order cannot be edited because it is already in progress!"
-    },
-    "toastCreateOrder":{
-        "success": "Order #{{id}} created successfully!",
-        "pending": "Creating an order...",
-        "error": "Failed to create order"
-    },
-    "toastEditOrder":{
-        "success": "Order #{{id}} edited successfully!",
-        "pending": "Editing order...",
-        "error": "Failed to edit order"
-    }
+    "sortTypes": [
+        {"text": "Newest", "value": "newest"},
+        {"text": "Oldest", "value": "oldest"},
+        {"text": "Order price Max --> Min", "value": "maxmin"},
+        {"text": "Order price Min --> Max", "value": "minmax"}
+    ]
 }

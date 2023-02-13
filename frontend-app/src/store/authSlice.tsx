@@ -6,16 +6,18 @@ import { intermediarySearchServiceApi } from './intermediarysearchservice.api'
 type AuthState = {
   user: IUser | null
   token: string | null
+  id: string | null
 }
 
 const slice = createSlice({
   name: 'auth',
-  initialState: { user: null, token: null } as AuthState,
+  initialState: { user: null, token: null, id: null} as AuthState,
   reducers: {},
   extraReducers: (builder) => {
     builder.addMatcher(
       intermediarySearchServiceApi.endpoints.login.matchFulfilled,
       (state, { payload }) => {
+        state.id = payload.id
         state.token = payload.token
         state.user = payload.user
       }
@@ -25,4 +27,4 @@ const slice = createSlice({
 
 export default slice.reducer
 
-export const selectCurrentUser = (state: RootState) => state.auth.user
+export const selectCurrentUser = (state: RootState) => state.auth

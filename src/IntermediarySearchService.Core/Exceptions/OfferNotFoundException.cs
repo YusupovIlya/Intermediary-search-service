@@ -1,6 +1,6 @@
 ﻿namespace IntermediarySearchService.Core.Exceptions;
 
-public class OfferNotFoundException : Exception
+public class OfferNotFoundException : EntityNotFoundException
 {
     public OfferNotFoundException(int offerId) : base($"Offer doesn't found with id = {offerId}")
     { }

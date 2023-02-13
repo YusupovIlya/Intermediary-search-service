@@ -5,9 +5,5 @@
         "findOrder": "Become an intermediary",
         "login": "Sign In"
     },
-    "authRoutes": {
-        "myProfile": "My profile",
-        "myAddresses": "My addresses",
-        "myOrders": "My orders"
-    }
+    "authRoutes": ["My profile", "My addresses", "My orders", "My offers"]
 }

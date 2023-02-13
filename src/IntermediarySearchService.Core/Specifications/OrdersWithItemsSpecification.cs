@@ -1,6 +1,5 @@
 ﻿using Ardalis.Specification;
 using IntermediarySearchService.Core.Entities.OrderAggregate;
-using System.Linq.Expressions;
 
 namespace IntermediarySearchService.Core.Specifications;
 
@@ -9,8 +8,7 @@ public sealed class OrdersWithItemsSpecification : Specification<Order>
     public OrdersWithItemsSpecification()
     {
         Query
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Images);
+            .Include(o => o.OrderItems);
     }
 
     public OrdersWithItemsSpecification(string userName)
@@ -18,7 +16,6 @@ public sealed class OrdersWithItemsSpecification : Specification<Order>
         Query
             .Where(o => o.UserName == userName)
             .Include(o => o.Offers)
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Images);
+            .Include(o => o.OrderItems);
     }
 }

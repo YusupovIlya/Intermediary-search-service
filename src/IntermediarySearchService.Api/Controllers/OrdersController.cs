@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using IntermediarySearchService.Api.DtoModels;
-using IntermediarySearchService.Core.Exceptions;
+using IntermediarySearchService.Api.Services;
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Core.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -8,18 +8,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IntermediarySearchService.Api.Controllers;
 
-[ApiController]
+[TypeFilter(typeof(EntityNotFoundExceptionFilter))]
+[TypeFilter(typeof(EntityStateChangeExceptionFilter))]
 public class OrdersController : BaseController
 {
     private readonly IOrderService _orderService;
     private readonly IMapper _mapper;
-    private readonly ILogger<OrdersController> _logger;
 
-    public OrdersController(IOrderService orderService, IMapper mapper, ILogger<OrdersController> logger)
+    public OrdersController(IOrderService orderService, IMapper mapper)
     {
         _orderService = orderService;
         _mapper = mapper;
-        _logger = logger;
     }
 
     /// <summary>
@@ -36,20 +35,11 @@ public class OrdersController : BaseController
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
-    public async Task<IActionResult> GetOrderById([FromRoute] int id)
+    public async Task<IActionResult> GetById([FromRoute] int id)
     {
-        try
-        {
-            var order = await _orderService.GetByIdAsync(id);
-            var orderDto = _mapper.Map<OrderModel>(order);
-            return Ok(orderDto);
-        }
-        catch(OrderNotFoundException ex)
-        {
-            _logger.LogInformation(ex.Message);
-            var response = new ResponseModel(id.ToString(), ex.Message);
-            return NotFound(response);
-        }
+        var order = await _orderService.GetByIdAsync(id);
+        var orderDto = _mapper.Map<OrderModel>(order);
+        return Ok(orderDto);
     }
 
     /// <summary>
@@ -70,7 +60,7 @@ public class OrdersController : BaseController
     [AllowAnonymous]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedOrdersModel))]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
     public async Task<IActionResult> GetPaginatedOrders([FromQuery] int page,
                                                         [FromQuery] int pageSize,
@@ -107,11 +97,11 @@ public class OrdersController : BaseController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> CreateOrder([FromBody] NewOrderModel order)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    public async Task<IActionResult> Create([FromBody] NewOrderModel order)
     {
-        int orderId = await _orderService.CreateAsync(UserName, order.SiteName, order.SiteLink,
-                                        order.PerformerFee, order.OrderItems, order.Address);
+        int orderId = await _orderService.CreateAsync(UserName, order.SiteName, order.SiteLink, order.PerformerFee, 
+                                                      order.OrderItems, order.Address, order.isBuyingByMyself);
         var response = new ResponseModel(orderId.ToString(), ResponseModel.Success);
         return Created($"{Request.Path}/{orderId}", response);
     }
@@ -120,37 +110,72 @@ public class OrdersController : BaseController
     /// Selects an offer by order id and offer id
     /// </summary>
     /// <remarks>PUT api/v1/orders/23/offers/1</remarks>
-    /// <param name="orderId">order id</param>
+    /// <param name="id">order id</param>
     /// <param name="offerId">offer id</param>
-    /// <returns>Returns update result message</returns>
     /// <response code="200">Returns success message</response>
-    /// <response code="404">Not found offer or order with these ids</response>
     /// <response code="401">Unauthorized</response>
-    [Authorize]
-    [HttpPut("{orderId:int}/offers/{offerId:int}")]
+    /// <response code="403">Forbidden</response>
+    /// <response code="404">Not found offer or order with these ids</response> 
+    /// <response code="409">Failed to select offer</response>
+    [Authorize(Policy = "OwnerEntity")]
+    [HttpPut("{id:int}/offers/{offerId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseModel))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
-    public async Task<IActionResult> SelectOffer([FromRoute] int orderId, [FromRoute] int offerId)
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
+    public async Task<IActionResult> SelectOffer([FromRoute] int id, [FromRoute] int offerId)
     {
-        try
-        {
-            int id = await _orderService.SelectOfferForOrderByIdAsync(orderId, offerId);
-            var response = new ResponseModel(id.ToString(), $"offer status with id - {id} was updated");
-            return Ok(response);
-        }
-        catch(OfferNotFoundException ex)
-        {
-            _logger.LogInformation(ex.Message);
-            var response = new ResponseModel(offerId.ToString(), ex.Message);
-            return NotFound(response);
-        }
-        catch (OrderNotFoundException ex)
-        {
-            _logger.LogInformation(ex.Message);
-            var response = new ResponseModel(orderId.ToString(), ex.Message);
-            return NotFound(response);
-        }
+        await _orderService.SelectOfferAsync(id, offerId);
+        var response = new ResponseModel(offerId.ToString(), $"Offer status with id - {offerId} was updated");
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Set track number to order
+    /// </summary>
+    /// <param name="id">order id</param>
+    /// <param name="track">track number</param>
+    /// <response code="200">Returns success message</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="404">Not found order with this id</response>
+    /// <response code="409">Failed to add tracking number</response>
+    [Authorize]
+    [HttpPut("{id:int}/tracknumber/{track:length(8,25)}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
+    public async Task<IActionResult> AddTrackNumber([FromRoute] int id, 
+                                                    [FromRoute] string track)
+    {
+        await _orderService.SetTrackCodeAsync(id, track);
+        var response = new ResponseModel(id.ToString(), $"Track number was added to order - {id}");
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Closes order
+    /// </summary>
+    /// <remarks>PUT api/v1/orders/5</remarks>
+    /// <param name="id">order id</param>
+    /// <response code="200">Order was closed</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden</response>
+    /// <response code="404">Order wasn't found with this id</response>
+    /// <response code="409">Failed to close order</response>
+    [Authorize(Policy = "OwnerEntity")]
+    [HttpPut("{id:int}/close")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
+    public async Task<IActionResult> Close([FromRoute] int id)
+    {
+        await _orderService.CloseAsync(id);
+        var response = new ResponseModel(id.ToString(), $"Order was closed - {id}");
+        return Ok(response);
     }
 
     /// <summary>
@@ -163,31 +188,19 @@ public class OrdersController : BaseController
     /// <response code="401">Unauthorized</response>
     /// <response code="403">Forbidden</response>
     /// <response code="404">Order wasn't found with this id</response>
-    [Authorize]
+    /// <response code="409">Failed to update order</response>
+    [Authorize(Policy = "OwnerEntity")]
     [HttpPut("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
-    public async Task<IActionResult> UpdateOrder([FromRoute] int id, [FromBody] EditedOrderModel model)
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] EditedOrderModel model)
     {
-        try
-        {
-            await _orderService.UpdateAsync(UserName, id, model.SiteName, model.SiteLink, model.Address,
-                                            model.PerformerFee, model.OrderItems);
-            return Ok();
-        }
-        catch (OrderNotFoundException ex)
-        {
-            _logger.LogInformation(ex.Message);
-            var response = new ResponseModel(id.ToString(), ex.Message);
-            return NotFound(response);
-        }
-        catch (ForbiddenActionException ex)
-        {
-            _logger.LogInformation(ex.Message);
-            return Forbid();
-        }
+        await _orderService.UpdateAsync(id, model.SiteName, model.SiteLink, model.PerformerFee, model.OrderItems);
+        var response = new ResponseModel(id.ToString(), $"Order with id - {id} was updated");
+        return Ok(response);
     }
 
     /// <summary>
@@ -199,30 +212,18 @@ public class OrdersController : BaseController
     /// <response code="401">Unauthorized</response>
     /// <response code="403">Forbidden</response>
     /// <response code="404">Order wasn't found with this id</response>
-    [Authorize]
+    /// <response code="409">Failed to delete order</response>
+    [Authorize(Policy = "OwnerEntity")]
     [HttpDelete("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
-    public async Task<IActionResult> DeleteOrderById(int id)
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
+    public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        try
-        {
-            await _orderService.DeleteAsync(id, UserName);
-            return NoContent();
-        }
-        catch (OrderNotFoundException ex)
-        {
-            _logger.LogInformation(ex.Message);
-            var response = new ResponseModel(id.ToString(), ex.Message);
-            return NotFound(response);
-        }
-        catch (ForbiddenActionException ex)
-        {
-            _logger.LogInformation(ex.Message);
-            return Forbid();
-        }
+        await _orderService.DeleteAsync(id);
+        return NoContent();
     }
 
     /// <summary>
@@ -233,12 +234,12 @@ public class OrdersController : BaseController
     /// <response code="204">Empty list</response>
     /// <response code="200">params array</response>
     [AllowAnonymous]
-    [HttpGet("params/{type:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [HttpGet("params/{type}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Array))]
     public async Task<IActionResult> GetParamsForFilter([FromRoute] FilterParam type)
     {
-        var result = await _orderService.GetParam(type, UserName);
+        var result = await _orderService.GetParamAsync(type, UserName);
         if (result.Length == 0)
             return NoContent();
         else

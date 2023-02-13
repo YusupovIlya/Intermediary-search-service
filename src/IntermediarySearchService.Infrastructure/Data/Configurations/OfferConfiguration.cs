@@ -26,5 +26,13 @@ public class OfferConfiguration : IEntityTypeConfiguration<Offer>
         builder
             .Property(of => of.isSelected)
             .HasDefaultValue(false);
+
+        builder
+            .OwnsMany(a => a.StatesOffer, c =>
+            {
+                c.WithOwner().HasForeignKey("OwnerId");
+                c.Property<int>("Id");
+                c.HasKey("Id");
+            });
     }
 }

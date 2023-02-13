@@ -2,46 +2,64 @@ import { useEffect, useState } from "react";
 import { useGetParamsForFilterQuery, useGetUserOrdersQuery } from "../store/intermediarysearchservice.api";
 import { IOffer, IUserOrdersFilter } from "../models";
 import classNames from "classnames";
-import {statesOrder} from "../hooks/getStateOrder";
+import {statesOrder} from "../hooks/getState";
 import UserOrder from "../components/UserOrder";
 import { Modal } from "../components/Modal";
 import OfferModal from "../components/OfferModal";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../hooks/useAuth";
 
 export default function UserOrders() {
 
+    const auth = useAuth();
     const [filter, setFilter] = useState<IUserOrdersFilter>({
         orderStates: [],
         shops: [],
         sortBy: "newest"
       });
-      const { t, i18n } = useTranslation('order');
+      const { t, i18n } = useTranslation(['order', 'buttons']);
       const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(2);
-      const { data: orders, isLoading, refetch } = useGetUserOrdersQuery(filter, {refetchOnMountOrArgChange: true});
+      const { data: orders, isLoading, refetch } = useGetUserOrdersQuery({id: auth.user.id!, param: filter}, {refetchOnMountOrArgChange: true});
       const [mobileFilter, setMobileFilter] = useState(false);
       const [sortActive, setSortActive] = useState(false);
       const [shopActive, setShopActive] = useState(false);
       const [stateOrderActive, setStateOrderActive] = useState(false);
       const [offerModalActive, setOfferModalActive] = useState(false);
-      const [valueSort, setTypeSort] = useState("newest");
+      const [HasConfirmedOffer, setHasConfirmedOffer] = useState(false);
+      const [typeSort, setTypeSort] = useState("newest");
       const [offerInModal, setOfferInModal] = useState<IOffer>({
           id: 0,
           orderId: 0,
-          userName: "",
           itemsTotalCost: 0,
           deliveryCost: 0,
           expenses: 0,
           isSelected: false,
-          comment: ""
+          comment: "",
+          statesOffer: [],
+          userName: "",
+          isEditable: false,
+          isDeletable: false,
+          isNeedConfirmation: false,
+          isNeedTrackNumber: false,
+          isCanceld: false,
+          deleted: ""
       });
   
       useEffect(() => {
         setFilter(filter => {
           return {
             ...filter,
-            sortBy: valueSort,
+            sortBy: typeSort,
           }});
-      }, [valueSort]);
+      }, [typeSort]);
+
+      useEffect(() => {
+        setFilter(filter => {
+          return {
+            ...filter,
+            orderStates: []
+          }});
+      }, [stateOrderActive]);
   
         return(
         <div className="bg-white w-10/12" onClick={() => setSortActive(false)}>        
@@ -53,6 +71,7 @@ export default function UserOrders() {
                 offer={offerInModal}
                 setOfferModalActive={setOfferModalActive}
                 updateFunc={refetch}
+                hasConfirmedOffer={HasConfirmedOffer}
                 />
             }/>
           <div>
@@ -206,7 +225,7 @@ export default function UserOrders() {
                             e.stopPropagation();
                             setSortActive(!sortActive);
                           }}>
-                        {t("buttons.sort")}
+                        {t("sort", {ns: 'buttons'})}
                         <svg className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                         </svg>
@@ -216,38 +235,19 @@ export default function UserOrders() {
                     {sortActive && 
                       <div className="absolute right-125 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <div className="py-1">
-                          <button
-                            className={classNames([
-                              "text-gray-500 block px-4 py-2 text-sm",
-                              valueSort == "newest" && "font-medium text-gray-900",
-                            ])} 
-                            onClick={() => setTypeSort("newest")}
-                            >{t("sortTypes.new")}
-                          </button>
-                          <button
-                            className={classNames([
-                              "text-gray-500 block px-4 py-2 text-sm",
-                              valueSort == "oldest" && "font-medium text-gray-900",
-                            ])} 
-                            onClick={() => setTypeSort("oldest")}
-                            >{t("sortTypes.old")}
-                          </button>
-                          <button
-                            className={classNames([
-                              "text-gray-500 block px-4 py-2 text-sm",
-                              valueSort == "maxmin" && "font-medium text-gray-900",
-                            ])} 
-                            onClick={() => setTypeSort("maxmin")}
-                            >{t("sortTypes.maxmin")}
-                          </button>
-                          <button
-                            className={classNames([
-                              "text-gray-500 block px-4 py-2 text-sm",
-                              valueSort == "minmax" && "font-medium text-gray-900",
-                            ])} 
-                            onClick={() => setTypeSort("minmax")}
-                            >{t("sortTypes.minmax")}
-                          </button>                          
+                          {
+                            t<string, {text: string, value: string}[]>('sortTypes', { returnObjects: true }).map((item, index) => (
+                            <button
+                              key={index}
+                              className={classNames([
+                                "text-gray-500 block px-4 py-2 text-sm",
+                                typeSort == item.value && "font-medium text-gray-900",
+                              ])} 
+                              onClick={() => setTypeSort(item.value)}
+                              >{item.text}
+                            </button>
+                            ))
+                          }                     
                         </div>
                       </div>                  
                     }
@@ -391,6 +391,7 @@ export default function UserOrders() {
                               key={index} 
                               setOfferModalActive={setOfferModalActive}
                               setOfferInModal={setOfferInModal}
+                              setHasConfirmedOffer={setHasConfirmedOffer}
                             />
                           ))}
                       </div>                    

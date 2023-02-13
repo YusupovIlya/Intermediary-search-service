@@ -12,6 +12,8 @@ using IntermediarySearchService.Core.Constants;
 using System.Text;
 using IntermediarySearchService.Infrastructure.Services;
 using System.Reflection;
+using IntermediarySearchService.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +40,13 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
 builder.Services.AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>));
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOfferService, OfferService>();
+
 builder.Services.AddScoped<ITokenService, IdentityTokenClaimService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthorizationHandler, OwnerAuthorizationHandler>();
+
+builder.Services.AddScoped<EntityNotFoundExceptionFilter>();
+builder.Services.AddScoped<EntityStateChangeExceptionFilter>();
 
 var key = Encoding.ASCII.GetBytes(AuthConstants.JWT_SECRET_KEY);
 builder.Services
@@ -65,9 +72,14 @@ builder.Services
         };
     });
 
-
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("OwnerEntity", policy =>
+        policy.Requirements.Add(new SameOwnerRequirement()));
+});
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
 {

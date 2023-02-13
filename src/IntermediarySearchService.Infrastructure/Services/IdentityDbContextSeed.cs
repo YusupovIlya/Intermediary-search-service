@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using IntermediarySearchService.Core.Constants;
+using IntermediarySearchService.Infrastructure.Identity;
 
-namespace IntermediarySearchService.Infrastructure.Identity;
+namespace IntermediarySearchService.Infrastructure.Services;
 
 public class IdentityDbContextSeed
 {

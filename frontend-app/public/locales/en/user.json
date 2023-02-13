@@ -12,32 +12,11 @@
         "emailRegex": "Invalid format!",
         "passwordRequired": "Please enter a password!"
     },
-    "toastLogin":{
-        "success": "You were successfully logged in!",
-        "pending": "Entering...",
-        "error": "Login failed !\n{{msg}}"
-    },
-    "toastDeleteAddress":{
-        "success": "Address deleted!",
-        "pending": "Deleting an address...",
-        "error": "Unable to delete address"
-    },
-    "toastAddAddress":{
-        "success": "Address added successfully!",
-        "pending": "Adding an address...",
-        "error": "Could not add address"
-    },
     "addresses": {
         "city": "City: {{city}}",
         "country": "Country: {{country}}",
         "postCode": "Postal code: {{postCode}}",
         "addPlaceholder": "Country, city or postal code..."
-    },
-    "buttons": {
-        "del": "Remove",
-        "add": "Add",
-        "cancel": "Cancel",
-        "save": "Save"   
     },
     "offer": {
         "total": "Total order value: {{total}}$",
@@ -45,11 +24,9 @@
         "expenses": "Additional expenses: {{expenses}}$",
         "comment": "Comment: {{comment}}",
         "toUserProfile": "Open User Profile",
-        "selectOffer": "Select this offer"
-    },
-    "offerTotas": {
-        "success": "Offer #{{id}} selected!",
-        "pending": "Selecting an application...",
-        "error": "Failed to select request"
-    }  
+        "selectOffer": "Select this offer",
+        "goToOrder": "Go to order",
+        "goToUser": "Customer Profile",
+        "trackPlaceholder": "Example: JD014600004291022110"
+    }
 }

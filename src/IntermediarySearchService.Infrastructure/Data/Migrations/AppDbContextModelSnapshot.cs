@@ -33,6 +33,9 @@ namespace IntermediarySearchService.Infrastructure.Data.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("DeliveryCost")
                         .HasColumnType("decimal(8,2)");
 
@@ -74,18 +77,24 @@ namespace IntermediarySearchService.Infrastructure.Data.Migrations
 
                     b.Property<string>("SiteLink")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<string>("SiteName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("TrackCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<bool>("isBuyingByMyself")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -100,6 +109,9 @@ namespace IntermediarySearchService.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Options")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -110,13 +122,13 @@ namespace IntermediarySearchService.Infrastructure.Data.Migrations
 
                     b.Property<string>("ProductLink")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(8,2)");
@@ -131,37 +143,42 @@ namespace IntermediarySearchService.Infrastructure.Data.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("IntermediarySearchService.Core.Entities.OrderAggregate.OrderItemImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("ImageLink")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OrderItemId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderItemId");
-
-                    b.ToTable("OrderItemImage");
-                });
-
             modelBuilder.Entity("IntermediarySearchService.Core.Entities.OfferAggregate.Offer", b =>
                 {
-                    b.HasOne("IntermediarySearchService.Core.Entities.OrderAggregate.Order", "Order")
+                    b.HasOne("IntermediarySearchService.Core.Entities.OrderAggregate.Order", null)
                         .WithMany("Offers")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.OwnsMany("IntermediarySearchService.Core.Entities.OfferAggregate.StateOffer", "StatesOffer", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
+
+                            b1.Property<DateTime?>("Date")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<int>("OwnerId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("State")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("OwnerId");
+
+                            b1.ToTable("StateOffer");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OwnerId");
+                        });
+
+                    b.Navigation("StatesOffer");
                 });
 
             modelBuilder.Entity("IntermediarySearchService.Core.Entities.OrderAggregate.Order", b =>
@@ -171,17 +188,20 @@ namespace IntermediarySearchService.Infrastructure.Data.Migrations
                             b1.Property<int>("OrderId")
                                 .HasColumnType("int");
 
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
                             b1.Property<string>("Country")
+                                .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Label")
+                                .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("PostalCode")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Region")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("OrderId");
@@ -236,24 +256,11 @@ namespace IntermediarySearchService.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("IntermediarySearchService.Core.Entities.OrderAggregate.OrderItemImage", b =>
-                {
-                    b.HasOne("IntermediarySearchService.Core.Entities.OrderAggregate.OrderItem", null)
-                        .WithMany("Images")
-                        .HasForeignKey("OrderItemId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("IntermediarySearchService.Core.Entities.OrderAggregate.Order", b =>
                 {
                     b.Navigation("Offers");
 
                     b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("IntermediarySearchService.Core.Entities.OrderAggregate.OrderItem", b =>
-                {
-                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

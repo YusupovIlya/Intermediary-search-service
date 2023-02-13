@@ -4,19 +4,20 @@ export interface INewOrder {
     siteName: string
     siteLink: string
     performerFee: number
-    address?: IAddress
+    address: IAddress
     orderItems: IOrderItem[]
   }
   export interface IAddress {
+    id: number
     postalCode: string
     country: string
-    region: string
+    city: string
     label: string
   }
 
 export interface IOrder {
   id: number
-  statesOrder: IStateOrder[]
+  statesOrder: IState[]
   siteName: string
   siteLink: string
   performerFee: number
@@ -26,9 +27,12 @@ export interface IOrder {
   offers: IOffer[],
   isEditable: boolean,
   isDeletable: boolean,
+  hasConfirmedOffer: boolean,
+  canBeClosed: boolean,
+  trackCode: string
 }
 
-export interface IStateOrder {
+export interface IState {
   id: number,
   state: string
   description: string
@@ -37,13 +41,20 @@ export interface IStateOrder {
 
 export interface IOffer {
   id: number
-  orderId: number
   userName: string
+  orderId: number
   itemsTotalCost: number
   deliveryCost: number
   expenses: number
   isSelected: boolean,
   comment: string
+  statesOffer: IState[],
+  isEditable: boolean,
+  isDeletable: boolean,
+  isNeedConfirmation: boolean,
+  isNeedTrackNumber: boolean,
+  isCanceld: boolean,
+  deleted: string
 } 
 
 export interface INewOffer {
@@ -58,7 +69,7 @@ export interface IOrderItem {
     productName: string
     options: string
     productLink: string
-    images: IOrderItemImage[]
+    imageLink: string
     unitPrice: number
     units: number
   }
@@ -68,19 +79,17 @@ export interface IResponse{
     message: string
   }
 
-export interface IOrderItemImage {
-    imageLink: string
-  }
-
 export interface IUser {
   firsName: string
   lastName: string
+  role: string
 }
 
 export interface ILoginResponse {
   user: IUser
   token: string
   message: string
+  id: string
 }
 
 export interface ILoginRequest {
@@ -116,5 +125,10 @@ export interface IOrdersFilter {
 export interface IUserOrdersFilter {
   orderStates: string[],
   shops: string[],
+  sortBy: string
+}
+
+export interface IUserOffersFilter {
+  offerStates: string[],
   sortBy: string
 }

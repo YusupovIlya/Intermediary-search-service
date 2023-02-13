@@ -15,6 +15,8 @@ public class IdentityDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<ApplicationUser>(entity => entity.ToTable("Users"));
 
+        builder.Entity<UserAddress>(entity => entity.ToTable("Addresses"));
+
         builder.Entity<IdentityRole>(entity => entity.ToTable("Roles"));
 
         builder.Entity<IdentityUserRole<string>>(entity => entity.ToTable("UserRoles"));
@@ -27,12 +29,9 @@ public class IdentityDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<IdentityRoleClaim<string>>(entity => entity.ToTable("RoleClaims"));
 
-        builder.Entity<ApplicationUser>().
-                OwnsMany(user => user.Addresses, c =>
-                {
-                    c.WithOwner().HasForeignKey("OwnerId");
-                    c.Property<int>("Id");
-                    c.HasKey("Id");
-                });
+        builder.Entity<ApplicationUser>()
+            .HasMany(u => u.Addresses)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

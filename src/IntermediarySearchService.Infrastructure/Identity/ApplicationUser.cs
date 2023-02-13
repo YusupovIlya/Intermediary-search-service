@@ -1,5 +1,5 @@
-﻿using IntermediarySearchService.Core.Entities.OrderAggregate;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using IntermediarySearchService.Core.Exceptions;
 
 namespace IntermediarySearchService.Infrastructure.Identity;
 
@@ -14,18 +14,22 @@ public class ApplicationUser : IdentityUser
     }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string? Country { get; set; }
+    public string AdditionalContact { get; set; }
 
-    private readonly List<Address> _addresses = new List<Address>();
-    public IReadOnlyCollection<Address> Addresses => _addresses.AsReadOnly();
+    private readonly List<UserAddress> _addresses = new List<UserAddress>();
+    public IReadOnlyCollection<UserAddress> Addresses => _addresses.AsReadOnly();
 
-    public void AddAddress(Address address)
+    public void AddAddress(UserAddress address) => _addresses.Add(address);
+
+    /// <summary>
+    /// Removes address by its id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <exception cref="AddressNotFoundException"></exception>
+    public void RemoveAddress(int id)
     {
-        _addresses.Add(address);
-    }
-    public void DeleteAddress(Address address)
-    {
-        var item = _addresses.FirstOrDefault(a => a.Label == address.Label);
-        _addresses.Remove(item);
+        var address = _addresses.FirstOrDefault(a => a.Id == id);
+        if (address != null) _addresses.Remove(address);
+        else throw new AddressNotFoundException(id, UserName);
     }
 }

@@ -3,14 +3,15 @@
 public class Address
 {
     public string PostalCode { get; private set; }
-    public string? Country { get; private set; }
-    public string? Region { get; private set; }
-    public string? Label { get; private set; }
-    public Address(string postalCode, string? country, string? region, string? label)
+    public string Country { get; private set; }
+    public string City { get; private set; }
+    public string Label { get; private set; }
+    private Address() { }
+    public Address(string postalCode, string country, string city, string label)
     {
         PostalCode = postalCode;
         Country = country;
-        Region = region;
+        City = city;
         Label = label;
     }
 }

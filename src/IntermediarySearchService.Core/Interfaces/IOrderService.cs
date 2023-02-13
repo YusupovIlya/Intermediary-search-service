@@ -53,7 +53,7 @@ public interface IOrderService
     /// <exception cref="OrderNotFoundException"></exception>
     /// <exception cref="UpdateOrderException"></exception>
     Task UpdateAsync(int id, string siteName, string siteLink, 
-                     Address address, decimal performerFee, List<OrderItem> orderItems);
+                     decimal performerFee, List<OrderItem> orderItems);
 
     /// <summary>
     /// Get param for filter by type

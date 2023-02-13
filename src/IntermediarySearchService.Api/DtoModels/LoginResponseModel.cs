@@ -12,9 +12,12 @@ public class UserModel
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public UserModel(string firstName, string lastName)
+    public string Role { get; set; }
+    public UserModel(string firstName, string lastName, 
+                     string role)
     {
         FirstName = firstName;
         LastName = lastName;
+        Role = role;
     }
 }

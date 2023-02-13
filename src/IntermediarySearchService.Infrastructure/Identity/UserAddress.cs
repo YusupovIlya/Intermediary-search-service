@@ -1,13 +1,18 @@
-﻿namespace IntermediarySearchService.Core.Entities.OrderAggregate;
+﻿using IntermediarySearchService.Core.Entities;
 
-public class Address
+namespace IntermediarySearchService.Infrastructure.Identity;
+
+public class UserAddress : BaseEntity
 {
     public string PostalCode { get; private set; }
     public string Country { get; private set; }
     public string City { get; private set; }
     public string Label { get; private set; }
-    private Address() { }
-    public Address(string postalCode, string country, string city, string label)
+
+    private UserAddress() { }
+
+    public UserAddress(string postalCode, string country, 
+                       string city, string label)
     {
         PostalCode = postalCode;
         Country = country;

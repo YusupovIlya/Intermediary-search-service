@@ -2,6 +2,6 @@
 
 public class UserNotFoundException: EntityNotFoundException
 {
-    public UserNotFoundException(string email) : base($"User doesn't found with this email = {email}")
+    public UserNotFoundException(string id) : base($"User doesn't found with this id = {id}")
     { }
 }

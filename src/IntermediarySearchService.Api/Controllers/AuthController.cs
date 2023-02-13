@@ -4,6 +4,7 @@ using IntermediarySearchService.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace IntermediarySearchService.Api.Controllers;
 
@@ -28,10 +29,11 @@ public class AuthController : BaseController
     public async Task<IActionResult> Login(LoginRequestModel request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
-        var response = new LoginResponseModel(Guid.NewGuid().ToString());
+        var role = await _userManager.GetRolesAsync(user).ContinueWith(r => r.Result.First());
+        var response = new LoginResponseModel(user.Id);
         if (user != null)
         {
-            response.User = new UserModel(user.FirstName, user.LastName);
+            response.User = new UserModel(user.FirstName, user.LastName, role);
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
             if (result.Succeeded)
             {

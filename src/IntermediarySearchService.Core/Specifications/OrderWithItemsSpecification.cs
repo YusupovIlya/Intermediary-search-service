@@ -10,7 +10,6 @@ public sealed class OrderWithItemsSpecification : Specification<Order>, ISingleR
         Query
             .Where(o => o.Id == id)
             .Include(o => o.Offers)
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Images);
+            .Include(o => o.OrderItems);
     }
 }

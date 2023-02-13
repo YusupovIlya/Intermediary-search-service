@@ -60,12 +60,12 @@ public class OrderService : IOrderService
     }
 
     public async Task UpdateAsync(int id, string siteName, string siteLink, 
-                                  Address address, decimal performerFee, List<OrderItem> orderItems)
+                                  decimal performerFee, List<OrderItem> orderItems)
     {
         var order = await GetByIdAsync(id);
         if (order != null)
         {
-            order.Update(siteName, siteLink, address, performerFee, orderItems);
+            order.Update(siteName, siteLink, performerFee, orderItems);
             await _orderRepository.UpdateAsync(order);
         }
         else

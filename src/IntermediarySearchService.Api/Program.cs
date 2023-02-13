@@ -14,7 +14,6 @@ using IntermediarySearchService.Infrastructure.Services;
 using System.Reflection;
 using IntermediarySearchService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
-using IntermediarySearchService.Core.Entities.OfferAggregate;
 
 var builder = WebApplication.CreateBuilder(args);
 

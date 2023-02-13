@@ -16,11 +16,16 @@ public class OrderConfigurations : IEntityTypeConfiguration<Order>
             .HasMany(o => o.OrderItems)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
-     
+
+        builder
+            .HasMany(o => o.Offers)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder
             .Property(o => o.UserName)
             .IsRequired()
-            .HasMaxLength(20);
+            .HasMaxLength(40);
 
         builder
             .Property(o => o.SiteName)
@@ -30,7 +35,7 @@ public class OrderConfigurations : IEntityTypeConfiguration<Order>
         builder
             .Property(o => o.SiteLink)
             .IsRequired()
-            .HasMaxLength(256);
+            .HasMaxLength(512);
 
         builder
             .Property(o => o.PerformerFee)

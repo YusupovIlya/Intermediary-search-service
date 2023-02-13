@@ -51,15 +51,13 @@ public class Order: BaseEntity, IAggregateRoot
     /// Updates order by params
     /// </summary>
     /// <exception cref="UpdateOrderException"></exception>
-    public void Update(string siteName, string siteLink, Address address,
-                       decimal performerFee, List<OrderItem> orderItems)
+    public void Update(string siteName, string siteLink, decimal performerFee, List<OrderItem> orderItems)
     {
         if (isEditable)
         {
             SiteName = siteName;
             SiteLink = siteLink;
             PerformerFee = performerFee;
-            Address = address;
             _orderItems.Clear();
             _orderItems.AddRange(orderItems);
         }

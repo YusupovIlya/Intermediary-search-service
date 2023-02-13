@@ -5,8 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using IntermediarySearchService.Infrastructure.Identity;
 
-namespace IntermediarySearchService.Infrastructure.Identity;
+namespace IntermediarySearchService.Infrastructure.Services;
 
 public class IdentityTokenClaimService : ITokenService
 {

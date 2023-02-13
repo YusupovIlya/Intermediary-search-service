@@ -198,8 +198,7 @@ public class OrdersController : BaseController
     [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] EditedOrderModel model)
     {
-        await _orderService.UpdateAsync(id, model.SiteName, model.SiteLink, model.Address,
-                                        model.PerformerFee, model.OrderItems);
+        await _orderService.UpdateAsync(id, model.SiteName, model.SiteLink, model.PerformerFee, model.OrderItems);
         var response = new ResponseModel(id.ToString(), $"Order with id - {id} was updated");
         return Ok(response);
     }

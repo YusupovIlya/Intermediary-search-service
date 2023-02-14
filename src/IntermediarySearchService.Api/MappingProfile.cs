@@ -2,6 +2,7 @@
 using IntermediarySearchService.Api.DtoModels;
 using IntermediarySearchService.Core.Entities.OfferAggregate;
 using IntermediarySearchService.Core.Entities.OrderAggregate;
+using IntermediarySearchService.Infrastructure.Identity;
 
 namespace IntermediarySearchService.Api;
 
@@ -29,5 +30,7 @@ public class MappingProfile : Profile
                        src.StatesOffer.Select(s =>
                        new StateModel(s.State, StateOrder.GetDescription(s.State),
                                       $"{s.Date.Value.ToShortDateString()} {s.Date.Value.ToShortTimeString()}"))));
+        
+        CreateMap<ApplicationUser, UserProfileModel>();
     }
 }

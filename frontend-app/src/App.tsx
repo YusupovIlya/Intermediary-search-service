@@ -31,8 +31,8 @@ const App = () => {
 
           <Route path="/auth/login" element={ <Login /> } />
 
-          <Route path="/user/:username" element={ <UserProfile /> } />
-          <Route path="/user/profile" element={ <UserProfile /> } />
+          <Route path="/user/profile/:email" element={ <UserProfile isEditable={false}/> } />
+          <Route path="/user/profile" element={ <UserProfile isEditable={true}/> } />
           <Route path="/user/addresses" element={ <MyAddresses /> } />
           <Route path="/user/orders" element={ <UserOrders /> } />
           <Route path="/user/offers" element={ <UserOffers /> } />

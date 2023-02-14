@@ -1,5 +1,5 @@
 import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter, IOffer, IUserOffersFilter } from '../models'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter, IOffer, IUserOffersFilter, IUserProfile } from '../models'
 import { RootState } from '.'
 import history from '../hooks/history';
 import { resetStateAction } from '../hooks/resetState';
@@ -189,6 +189,19 @@ export const intermediarySearchServiceApi = createApi({
                 method: 'GET',
             }),
         }),
+        getUserProfile: builder.query<IUserProfile, {email: string}>({
+            query: (payload) => ({
+                url: `/users/${payload.email}`,
+                method: 'GET',
+            }),
+        }),
+        updateUserProfile: builder.mutation<IResponse, {id: string, data: IUserProfile}>({
+            query: (payload) => ({
+                url: `/users/${payload.id}`,
+                method: 'PUT',
+                body: payload.data,
+            }),
+        }),
     })
 })
 
@@ -201,6 +214,7 @@ export const { useLoginMutation, useCreateOrderMutation,
                useGetParamsForFilterQuery, useGetUserOffersQuery,
                useUpdateOfferMutation, useRemoveOfferMutation,
                useChangeStateOfferMutation, useAddTrackToOrderMutation,
-               useCloseOrderMutation}
+               useCloseOrderMutation, useGetUserProfileQuery,
+               useUpdateUserProfileMutation}
                
                = intermediarySearchServiceApi

@@ -28,5 +28,10 @@
         "goToOrder": "Go to order",
         "goToUser": "Customer Profile",
         "trackPlaceholder": "Example: JD014600004291022110"
-    }
+    },
+    "contact": "Contact for communication: ",
+    "contactInForm": "Contact for communication",
+    "contactPlaceholder": "Nickname, link to messenger (Telegram, WhatsApp ...)",
+    "firstName": "Name",
+    "lastName": "Last name"
 }

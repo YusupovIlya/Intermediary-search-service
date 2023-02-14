@@ -9,7 +9,19 @@ public interface IUserService
     /// Gets user by id with addresses
     /// </summary>
     /// <exception cref="UserNotFoundException"></exception>
-    Task<ApplicationUser> GetUserAsync(string id);
+    Task<ApplicationUser> GetUserByIdAsync(string id);
+
+    /// <summary>
+    /// Gets user by email
+    /// </summary>
+    /// <exception cref="UserNotFoundException"></exception>
+    Task<ApplicationUser> GetUserByEmailAsync(string email);
+
+    /// <summary>
+    /// Updates user by email
+    /// </summary>
+    /// <exception cref="UserNotFoundException"></exception>
+    Task UpdateUserAsync(string userId, string firstName, string lastName, string contact);
 
     /// <summary>
     /// Gets user addresses by id

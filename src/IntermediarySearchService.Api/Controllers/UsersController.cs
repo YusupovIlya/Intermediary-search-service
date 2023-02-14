@@ -29,6 +29,46 @@ public class UsersController : BaseController
     }
 
     /// <summary>
+    /// Gets user profile by email
+    /// </summary>
+    /// <param name="email">user email</param>
+    /// <response code="200">User profile</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="404">User not found</response>
+    [HttpGet("{email:length(3,100)}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserProfileModel))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    public async Task<IActionResult> GetUserProfile([FromRoute] string email)
+    {
+        var user = await _userService.GetUserByEmailAsync(email);
+        var mappedUser = _mapper.Map<UserProfileModel>(user);
+        return Ok(mappedUser);
+    }
+
+    /// <summary>
+    /// Updates user profile
+    /// </summary>
+    /// <param name="userId">user id</param>
+    /// <param name="model">updated user profile</param>
+    /// <response code="200">User profile was updated</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="404">User not found</response>
+    [HttpPut("{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    public async Task<IActionResult> UpdateUserProfile([FromRoute] string userId,
+                                                       [FromBody] UserProfileModel model)
+    {
+        await _userService.UpdateUserAsync(userId, model.FirstName, model.LastName, model.AdditionalContact);
+        var response = new ResponseModel(userId.ToString(), $"User profile with id - {userId} was updated");
+        return Ok(response);
+
+    }
+
+
+    /// <summary>
     /// Gets user addresses list
     /// </summary>
     /// <param name="userId">user id</param>

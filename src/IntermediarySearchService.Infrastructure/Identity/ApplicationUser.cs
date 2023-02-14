@@ -5,12 +5,13 @@ namespace IntermediarySearchService.Infrastructure.Identity;
 
 public class ApplicationUser : IdentityUser
 {
-    public ApplicationUser(string firstName, string lastName, string email)
+    public ApplicationUser(string firstName, string lastName, string email, string additionalContact)
                            : base(email)
     {
         FirstName = firstName;
         LastName = lastName;
         Email = email;
+        AdditionalContact = additionalContact;
     }
     public string FirstName { get; set; }
     public string LastName { get; set; }

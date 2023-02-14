@@ -28,5 +28,10 @@
         "goToOrder": "Перейти к заказу",
         "goToUser": "Профиль заказчика",
         "trackPlaceholder": "Пример: JD014600004291022110"
-    }
+    },
+    "contact": "Контакт для связи: ",
+    "contactInForm": "Контакт для связи",
+    "contactPlaceholder": "Никнейм, ссылка на месенджер (Telegram, WhatsApp ...)",
+    "firstName": "Имя",
+    "lastName": "Фамилия"
 }

@@ -35,9 +35,10 @@ public class AuthController : BaseController
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
             if (result.Succeeded)
             {
-                response.Id = user.Id;
                 var role = await _userManager.GetRolesAsync(user).ContinueWith(r => r.Result.First());
-                response.User = new UserModel(user.FirstName, user.LastName, role);
+                response.Id = user.Id;
+                response.Role = role;
+                response.Email = user.Email;
                 response.Token = await _tokenClaimsService.GetTokenAsync(user.UserName);
                 response.Message = "You have been successfully logged in!";
             }

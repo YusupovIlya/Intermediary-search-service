@@ -79,17 +79,12 @@ export interface IResponse{
     message: string
   }
 
-export interface IUser {
-  firsName: string
-  lastName: string
-  role: string
-}
-
 export interface ILoginResponse {
-  user: IUser
   token: string
   message: string
   id: string
+  role: string
+  email: string
 }
 
 export interface ILoginRequest {
@@ -131,4 +126,11 @@ export interface IUserOrdersFilter {
 export interface IUserOffersFilter {
   offerStates: string[],
   sortBy: string
+}
+
+export interface IUserProfile {
+  email: string
+  firstName: string
+  lastName: string
+  additionalContact: string
 }

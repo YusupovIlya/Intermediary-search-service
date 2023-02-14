@@ -70,5 +70,10 @@
         "error": "Failed to send request",
         "errorWhenOwner": "You can't send an offer for your order"
     },
-    "unAuthMessage": "You need to login!"
+    "unAuthMessage": "You need to login!",
+    "toastUpdateProfile":{
+        "success": "Profile updated!",
+        "pending": "Updating...",
+        "error": "Failed to update profile"
+    }
 }

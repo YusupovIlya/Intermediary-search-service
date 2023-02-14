@@ -1,9 +1,8 @@
-import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError} from '@reduxjs/toolkit/query/react'
+import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/query/react'
 import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter, IOffer, IUserOffersFilter } from '../models'
 import { RootState } from '.'
 import history from '../hooks/history';
 import { resetStateAction } from '../hooks/resetState';
-import { toast } from 'react-toastify';
 import queryString from 'query-string';
 
 const myParamsSerializer = (params:any) => {
@@ -30,7 +29,7 @@ const baseQueryWithRedir: BaseQueryFn<
   let result = await baseQuery(args, api, extraOptions)
   if (result.error && result.error.status === 401) {
     api.dispatch(resetStateAction());
-    history.push('/auth/login');
+    history.push(`/auth/login/?returnUrl=${history.location.pathname}`);
   }
   return result
 }
@@ -110,6 +109,7 @@ export const intermediarySearchServiceApi = createApi({
                 method: 'POST',
                 body: payload,
             }),
+            transformErrorResponse: (response: { status: 'PARSING_ERROR';originalStatus: number;data: string;error: string; }) => response.originalStatus,
         }),
         updateOffer: builder.mutation<IResponse, {id: number, data: INewOffer}>({
             query: (payload) => ({
@@ -136,7 +136,7 @@ export const intermediarySearchServiceApi = createApi({
                 method: 'PUT',
             }),
         }),
-        getUserOffers: builder.query<IOffer[], {id: string, param: IUserOffersFilter}>({
+        getUserOffers: builder.query<{data: IOffer[], status: number}, {id: string, param: IUserOffersFilter}>({
             query: (payload) => ({
                 url: `/users/${payload.id}/offers`,
                 method: 'GET',
@@ -145,9 +145,12 @@ export const intermediarySearchServiceApi = createApi({
                     sortBy: payload.param.sortBy
                 },
             }),
+            transformResponse: (response: IOffer[], meta: FetchBaseQueryMeta) => {
+                return {data: response, status: meta.response?.status!}
+            }
         }),
 
-        getUserOrders: builder.query<IOrder[], {id: string, param: IUserOrdersFilter}>({
+        getUserOrders: builder.query<{data: IOrder[], status: number}, {id: string, param: IUserOrdersFilter}>({
             query: (payload) => ({
                 url: `/users/${payload.id}/orders`,
                 method: 'GET',
@@ -157,6 +160,9 @@ export const intermediarySearchServiceApi = createApi({
                     sortBy: payload.param.sortBy
                 },
             }),
+            transformResponse: (response: IOrder[], meta: FetchBaseQueryMeta) => {
+                return {data: response, status: meta.response?.status!}
+            }
         }),
         addAddress: builder.mutation<IResponse, {id: string, data: IAddress}>({
             query: (payload) => ({

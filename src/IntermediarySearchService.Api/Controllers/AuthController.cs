@@ -29,14 +29,15 @@ public class AuthController : BaseController
     public async Task<IActionResult> Login(LoginRequestModel request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
-        var role = await _userManager.GetRolesAsync(user).ContinueWith(r => r.Result.First());
-        var response = new LoginResponseModel(user.Id);
+        LoginResponseModel response = new LoginResponseModel();
         if (user != null)
         {
-            response.User = new UserModel(user.FirstName, user.LastName, role);
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
             if (result.Succeeded)
             {
+                response.Id = user.Id;
+                var role = await _userManager.GetRolesAsync(user).ContinueWith(r => r.Result.First());
+                response.User = new UserModel(user.FirstName, user.LastName, role);
                 response.Token = await _tokenClaimsService.GetTokenAsync(user.UserName);
                 response.Message = "You have been successfully logged in!";
             }

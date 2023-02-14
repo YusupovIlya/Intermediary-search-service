@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { INewOffer } from "../models";
+import { INewOffer, IResponse } from "../models";
 import { useCreateOfferMutation, useGetOrderByIdQuery } from "../store/intermediarysearchservice.api";
 import OrderItemSummary from "../components/OrderItemSummary";
 import { useTranslation } from "react-i18next";
-
+import { toast, ToastContentProps } from "react-toastify";
+import history from '../hooks/history';
 
 export default function OrderSummary() {
     const { id } = useParams();
-    const { t } = useTranslation(['order', 'buttons', 'validation_messages']);
+    const { t } = useTranslation(['order', 'buttons', 'validation_messages', 'toast_messages']);
     const [showForm, setShowForm] = useState(false);
     const [btnText, setbtnText] = useState(t("open", {ns: 'buttons'}));
-    const [createOffer, response] = useCreateOfferMutation();
-    const {register, control, handleSubmit, formState: { errors }} = useForm<INewOffer>({
+    const [createOffer] = useCreateOfferMutation();
+    const {register, handleSubmit, formState: { errors }} = useForm<INewOffer>({
       mode: "onBlur"
     });
     const {data: order} = useGetOrderByIdQuery(id!);
@@ -21,9 +22,25 @@ export default function OrderSummary() {
     const onSubmit = async (data: INewOffer) => {
       try {
           data.orderId = order?.id!;
-          console.log(data);
-          await createOffer(data).unwrap().then(response => console.log(response));
-          console.log()
+          const promise = createOffer(data).unwrap();
+          await toast.promise(
+            promise,
+            {
+              pending: t("toastCreateOffer.pending", {ns: 'toast_messages'}),
+              success: {
+                render(response: ToastContentProps<IResponse>){
+                  history.push("/user/offers");
+                  return t("toastCreateOffer.success", {id: response.data?.id, ns: 'toast_messages'})!
+                }
+              },
+              error: {
+                render(response: ToastContentProps<number>){
+                  if(response.data == 409) return t("toastCreateOffer.errorWhenOwner", {ns: 'toast_messages'})!
+                  else return t("toastCreateOffer.error", {ns: 'toast_messages'})!
+                }
+              },
+            }
+          );
         } catch (err) {
           console.log(err);
         }

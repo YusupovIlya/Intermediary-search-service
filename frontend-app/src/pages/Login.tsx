@@ -14,6 +14,7 @@ export default function Login() {
   const {register, handleSubmit, formState: { errors }, reset} = useForm<ILoginRequest>({
     mode: "onBlur"
   });
+  const returnUrl = () => searchParams.get("returnUrl");
 
   const onSubmit = async (data: ILoginRequest) => {
     try {
@@ -32,9 +33,14 @@ export default function Login() {
           }
         );
         if((await promise).token != null) {
-          const returnUrl = searchParams.get("returnUrl");
-          if(returnUrl != null) history.push(returnUrl);
-          else history.push("/user/profile")
+          if(returnUrl() != null){
+            if(returnUrl() != "/auth/login")
+              history.push(returnUrl()!);
+            else
+              history.push("/user/profile");
+          }
+          else
+            history.push("/user/profile");
         }
       } catch (err) {
         console.log(err);

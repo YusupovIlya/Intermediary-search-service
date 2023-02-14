@@ -15,6 +15,8 @@ public interface IOfferService
     /// <param name="expenses">additional expenses</param>
     /// <param name="comment">some comment</param>
     /// <returns>Created offer id</returns>
+    /// <exception cref="OfferCreatingException"></exception>
+    /// <exception cref="OrderNotFoundException"></exception>
     Task<int> CreateAsync(int orderId, string userName, decimal itemsTotalCost,
                           decimal deliveryCost, decimal? expenses = 0m, string? comment = null);
 

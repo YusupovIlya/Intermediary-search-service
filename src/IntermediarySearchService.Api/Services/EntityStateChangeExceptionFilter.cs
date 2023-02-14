@@ -16,7 +16,12 @@ public class EntityStateChangeExceptionFilter : IAsyncExceptionFilter
         if(context.Exception is EntityStateChangeException)
         {
             _logger.LogError(context.Exception.Message);
-            var idFromRoute = context.HttpContext.Request.RouteValues["id"].ToString();
+            string idFromRoute = "0";
+            try
+            {
+                idFromRoute = context.HttpContext.Request.RouteValues["id"].ToString();
+            }
+            catch (NullReferenceException) { }
             context.HttpContext.Response.StatusCode = StatusCodes.Status409Conflict;
             var errorResponse = new ResponseModel(idFromRoute, context.Exception.Message);
             await context.HttpContext.Response.WriteAsJsonAsync(errorResponse);

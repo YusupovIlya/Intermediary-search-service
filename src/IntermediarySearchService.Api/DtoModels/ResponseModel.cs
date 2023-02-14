@@ -5,11 +5,9 @@ public class ResponseModel
     public static string Success = "success";
     public static string Error = "error";
     public string? Id { get; set; }
-    public string Message { get; set; }
-    public ResponseModel(string? id)
-    {
-        Id = id;
-    }
+    public string? Message { get; set; }
+    public ResponseModel()
+    {}
     public ResponseModel(string? id, string message)
     {
         Id = id;

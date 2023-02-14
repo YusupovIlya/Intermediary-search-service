@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import UserOffer from "../components/UserOffer";
 import OfferOwnerModal from "../components/OfferOwnerModal";
 import { useAuth } from "../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 export default function UserOffers() {
 
@@ -19,7 +20,7 @@ export default function UserOffers() {
         sortBy: "newest"
       });
       const { t, i18n } = useTranslation(['order', 'buttons']);
-      const { data: offers, isLoading, refetch } = useGetUserOffersQuery({id: auth.user.id!, param: filter}, {refetchOnMountOrArgChange: true});
+      const { data: response, isLoading, refetch } = useGetUserOffersQuery({id: auth.user.id!, param: filter}, {refetchOnMountOrArgChange: true});
       const [mobileFilter, setMobileFilter] = useState(false);
       const [sortActive, setSortActive] = useState(false);
       const [stateOfferActive, setStateOfferActive] = useState(false);
@@ -270,16 +271,26 @@ export default function UserOffers() {
                   </div>
                   <div className="lg:col-span-3">
                     <div className="h-full rounded-lg border-4 border-dashed border-gray-200">
-                      {isLoading && <p className="text-center text-slate-600">Loading...</p>}
+                      {isLoading && <p className="text-center text-slate-600">{t("load")}</p>}
                       <div className="py-2 mx-auto max-w-2xl px-4 sm:py-15 sm:px-6 lg:max-w-7xl lg:px-8">
-                          {offers?.map((item, index) => (
-                            <UserOffer 
-                              offer={item} 
-                              key={index} 
-                              setOfferModalActive={setOfferModalActive}
-                              setOfferInModal={setOfferInModal}
-                              updateFunc={refetch}
-                            />
+                          {isLoading && <p className="text-center font-medium text-gray-800">{t("load")}</p>}
+                          {response?.status == 204 &&
+                          <div className="flex justify-center items-center">
+                            <div className="mt-6 flex flex-col space-y-4 justify-center items-center">
+                              <p className="font-medium text-gray-800">{t("noOffers")}</p>
+                              <Link to="/orders/all" className="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("goToOrders")}</Link>
+                            </div>                            
+                          </div>
+                          }
+                          {response && response?.data != null && 
+                            response?.data.map((item, index) => (
+                              <UserOffer 
+                                offer={item} 
+                                key={index} 
+                                setOfferModalActive={setOfferModalActive}
+                                setOfferInModal={setOfferInModal}
+                                updateFunc={refetch}
+                              />
                           ))}
                       </div>                    
                     </div>

@@ -1,17 +1,11 @@
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { authRoutes } from "../store/navigation";
 
 
-export interface NavbarProps {
-  currentRoute: string
-  setCurrentRoute: (option: any) => void
-}
-
-
-export default function Navbar({ currentRoute, setCurrentRoute }: NavbarProps) {
+export default function Navbar() {
     const auth = useAuth()
     const { t, i18n } = useTranslation('navigation');
     return (
@@ -40,43 +34,37 @@ export default function Navbar({ currentRoute, setCurrentRoute }: NavbarProps) {
                 <div className="max-w-screen-xl px-4 py-3 mx-auto md:px-6">
                     <div className="flex items-center justify-between">
                         <ul className="flex flex-row mt-0 mr-6 space-x-8 text-base font-medium">
-                            <li
-                                onClick={() => setCurrentRoute("/orders/create")}>
-                                <Link 
-                                to="/orders/create"
-                                className={classNames([
-                                    "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3",
-                                    currentRoute === "/orders/create" && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
-                                ])}>
-                                {t("unAuthRoutes.createOrder")}
-                                </Link>
-                            </li>           
-                            <li
-                                onClick={() => setCurrentRoute("/orders/all")}>
-                                <Link 
-                                to="/orders/all"
-                                className={classNames([
-                                    "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3",
-                                    currentRoute === "/orders/all" && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
-                                ])}>
-                                {t("unAuthRoutes.findOrder")}
-                                </Link>
+                            <li>
+                                <NavLink to="/orders/create"
+                                    className={({ isActive }) =>(isActive 
+                                    ? "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100"
+                                    : "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3")}
+                                    >
+                                    {t("unAuthRoutes.createOrder")}
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/orders/all"
+                                    className={({ isActive }) =>(isActive 
+                                    ? "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100"
+                                    : "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3")}
+                                    >
+                                    {t("unAuthRoutes.findOrder")}
+                                </NavLink>
                             </li>   
                         </ul>
                         {auth.user.id != null &&
                         <ul className="flex flex-row mt-0 mr-6 space-x-8 text-base font-medium">
                             {t<string, string[]>('authRoutes', { returnObjects: true }).map((item, index) => (
                                 <li
-                                    key={index}
-                                    onClick={() => setCurrentRoute(authRoutes[index])}>
-                                    <Link 
-                                        to={authRoutes[index]}
-                                        className={classNames([
-                                            "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3",
-                                            currentRoute === authRoutes[index] && "text-gray-700 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100",
-                                        ])}>
-                                    {item}
-                                    </Link>
+                                    key={index}>
+                                    <NavLink to={authRoutes[index]} 
+                                        className={({ isActive }) =>(isActive 
+                                        ? "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3 border-b-4 border-gray-700 bg-gradient-to-b from-white to-gray-100"
+                                        : "w-fit text-neutral-700 hover:text-gray-700 cursor-pointer font-medium tracking-wide text-base flex items-start justify-center pb-3")}
+                                        >
+                                        {item}
+                                    </NavLink>
                                 </li>                                
                             ))
                             }          

@@ -25,9 +25,14 @@ public class OfferService : IOfferService
     public async Task<int> CreateAsync(int orderId, string userName, decimal itemsTotalCost,
                             decimal deliveryCost, decimal? expenses = 0m, string? comment = null)
     {
-        var offer = new Offer(orderId, userName, itemsTotalCost, deliveryCost, expenses, comment);
-        await _offerRepository.AddAsync(offer);
-        return offer.Id;
+        var order = await _orderService.GetByIdAsync(orderId);
+        if (order.UserName != userName)
+        {
+            var offer = new Offer(orderId, userName, itemsTotalCost, deliveryCost, expenses, comment);
+            await _offerRepository.AddAsync(offer);
+            return offer.Id;
+        }
+        else throw new OfferCreatingException(order.Id);
     }
 
     public async Task DeleteAsync(int id)

@@ -35,7 +35,7 @@ export default function MyAddresses() {
         }
     );
 
-    const { handleSubmit, setValue} = useForm<IAddress>({
+    const { handleSubmit, setValue, reset} = useForm<IAddress>({
         mode: "onBlur"
       });
 
@@ -55,6 +55,7 @@ export default function MyAddresses() {
         const promise = addAddress({id: auth.user.id!, data: data}).unwrap();
         setSelectedPlace("");
         setShowAddForm(false);
+        reset();
         await toast.promise(
             promise,
             {

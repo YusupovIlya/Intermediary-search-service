@@ -6,7 +6,7 @@ import Login from "./pages/Login";
 import AllOrders from "./pages/AllOrders";
 import OrderSummary from "./pages/OrderSummary";
 import UserProfile from "./pages/UserProfile";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/navbar";
 import MyAddresses from "./pages/MyAddresses";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -17,14 +17,10 @@ import UserOffers from "./pages/UserOffers";
 
 
 const App = () => {
-  const { currentRoute, setCurrentRoute } = useNavigation();
 
   return (
     <div className="p-2">     
-      <Navbar
-        currentRoute={currentRoute}
-        setCurrentRoute={setCurrentRoute}
-      />
+      <Navbar/>
       <div className="flex items-center justify-center text-gray-300 m-2 sm:m-8">
       <ToastContainer />
         <Routes>

@@ -67,5 +67,10 @@
         {"text": "Oldest", "value": "oldest"},
         {"text": "Order price Max --> Min", "value": "maxmin"},
         {"text": "Order price Min --> Max", "value": "minmax"}
-    ]
+    ],
+    "load": "Loading...",
+    "noOrders": "You don't have orders yet",
+    "goToCreateOrder": "Go to create order", 
+    "noOffers": "You have no orders yet",
+    "goToOrders": "View other users' orders"
 }

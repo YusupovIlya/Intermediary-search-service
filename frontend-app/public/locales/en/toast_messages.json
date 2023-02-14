@@ -64,5 +64,11 @@
         "pending": "Adding an address...",
         "error": "Could not add address"
     },
+    "toastCreateOffer":{
+        "success": "Offer #{{id}} sent!",
+        "pending": "Creating an offer...",
+        "error": "Failed to send request",
+        "errorWhenOwner": "You can't send an offer for your order"
+    },
     "unAuthMessage": "You need to login!"
 }

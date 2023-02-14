@@ -25,11 +25,15 @@ public class OffersController : BaseController
     /// <response code="201">Returns success message</response>
     /// <response code="400">Model state invalid</response>
     /// <response code="401">Unauthorized</response>
+    /// <response code="404">Order not found</response>
+    /// <response code="409">Attempt to send offer to the own order</response>
     [Authorize]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ResponseModel))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
     public async Task<IActionResult> Create([FromBody] NewOfferModel offer)
     {
         var offerId = await _offerService.CreateAsync(offer.OrderId, UserName, offer.ItemsTotalCost,

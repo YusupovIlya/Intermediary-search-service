@@ -425,7 +425,7 @@ export default function AllOrders() {
                       </h3>
                       {shopActive &&
                           <div className="pt-6">
-                              {isLoadingShops && <p className="text-center text-slate-600">Loading...</p>}
+                              {isLoadingShops && <p className="text-center text-slate-600">{t("load")}</p>}
                               <div className="space-y-4 max-h-[150px] overflow-y-scroll">
                                 {shops?.map((item, index) => {
                                   return(
@@ -480,7 +480,7 @@ export default function AllOrders() {
                     </h3>
                     {placeActive &&
                         <div className="pt-6">
-                            {isLoadingCountries && <p className="text-center text-slate-600">Loading...</p>}
+                            {isLoadingCountries && <p className="text-center text-slate-600">{t("load")}</p>}
                             <div className="space-y-4 max-h-[150px] overflow-y-scroll">
                               {countries?.map((item, index) => {
                                 return(
@@ -607,7 +607,7 @@ export default function AllOrders() {
                 <div className="lg:col-span-3">
                   {/* <!-- Replace with your content --> */}
                   <div className="h-full rounded-lg border-4 border-dashed border-gray-200">
-                    {isLoading && <p className="text-center text-slate-600">Loading...</p>}
+                    {isLoading && <p className="text-center text-slate-600">{t("load")}</p>}
                     <div className="py-2 mx-auto max-w-2xl px-4 sm:py-15 sm:px-6 lg:max-w-7xl lg:px-8">
                       <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 xl:grid-cols-3">
                         {allOrdersResponse?.orders?.map((item, index) => (

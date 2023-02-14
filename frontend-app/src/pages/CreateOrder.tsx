@@ -9,13 +9,14 @@ import { useEffect, useState } from "react";
 import { useCreateOrderMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api";
 import { useTranslation } from 'react-i18next';
 import { useAuth, useAuthWithRedir } from '../hooks/useAuth';
+import history from '../hooks/history';
 
 export default function CreateOrder() {
   useAuthWithRedir();
   const auth = useAuth();
   const { t } = useTranslation(['validation_messages', 'buttons', 'order', 'toast_messages']);
   const [createOrder] = useCreateOrderMutation();
-  const {data: addresses} = useGetUserAddressesQuery({id: auth.user.id!});
+  const {data: addresses} = useGetUserAddressesQuery({id: auth.user.id!}, {refetchOnMountOrArgChange: true});
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [images, setImages] = useState<string[]>([]);
   const [itemLinks, setItemLinks] = useState<string[]>([""]);
@@ -79,6 +80,7 @@ export default function CreateOrder() {
         pending: t("toastCreateOrder.pending", {ns: 'toast_messages'}),
         success: {
           render(response: ToastContentProps<IResponse>){
+            history.push("/user/orders");
             return t("toastCreateOrder.success", {id: response.data?.id, ns: 'toast_messages'})!
           }
         },

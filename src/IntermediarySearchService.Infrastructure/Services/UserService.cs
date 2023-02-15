@@ -3,6 +3,7 @@
 using IntermediarySearchService.Core.Entities.OrderAggregate;
 using IntermediarySearchService.Core.Exceptions;
 using IntermediarySearchService.Infrastructure.Identity;
+using IntermediarySearchService.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,22 @@ public class UserService : IUserService
         user.AddAddress(address);
         await _userManager.UpdateAsync(user);
         return address.Id;
+    }
+
+    public async Task<ApplicationUser> CreateUserAsync(string email, string firstName, string lastName, string contact, string password)
+    {
+        var user = new ApplicationUser(firstName, lastName, email, contact);
+        var result = await _userManager.CreateAsync(user, password);
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, "User");
+            return user;
+        }
+        else
+        {
+            var message = string.Join(' ', result.Errors.Select(e => e.Description));
+            throw new UserCreatingException(email, message);
+        }
     }
 
     public async Task DeleteAddressAsync(int id, string userId)

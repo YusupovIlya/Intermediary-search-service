@@ -1,7 +1,7 @@
 ﻿using IntermediarySearchService.Infrastructure.Identity;
 using IntermediarySearchService.Core.Exceptions;
 
-namespace IntermediarySearchService.Infrastructure.Services;
+namespace IntermediarySearchService.Infrastructure.Interfaces;
 
 public interface IUserService
 {
@@ -16,6 +16,13 @@ public interface IUserService
     /// </summary>
     /// <exception cref="UserNotFoundException"></exception>
     Task<ApplicationUser> GetUserByEmailAsync(string email);
+
+    /// <summary>
+    /// Creates new user with credentials
+    /// </summary>
+    /// <exception cref="UserCreatingException"></exception>
+    Task<ApplicationUser> CreateUserAsync(string email, string firstName, string lastName, 
+                                          string contact, string password);
 
     /// <summary>
     /// Updates user by email

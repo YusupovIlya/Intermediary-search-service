@@ -14,6 +14,8 @@ using IntermediarySearchService.Infrastructure.Services;
 using System.Reflection;
 using IntermediarySearchService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
+using IntermediarySearchService.Infrastructure.Interfaces;
+using IntermediarySearchService.Infrastructure.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +33,12 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext")));
 builder.Services.AddDbContext<IdentityDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opts =>
+                {
+                    opts.User.RequireUniqueEmail = true;
+                    opts.Password.RequireNonAlphanumeric = false;
+                    opts.Password.RequiredLength = 5;
+                })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -47,6 +54,11 @@ builder.Services.AddScoped<IAuthorizationHandler, OwnerAuthorizationHandler>();
 
 builder.Services.AddScoped<EntityNotFoundExceptionFilter>();
 builder.Services.AddScoped<EntityStateChangeExceptionFilter>();
+
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
+builder.Services.AddTransient<IEmailService, EmailService>();
+
 
 var key = Encoding.ASCII.GetBytes(AuthConstants.JWT_SECRET_KEY);
 builder.Services

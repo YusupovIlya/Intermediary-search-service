@@ -1,5 +1,5 @@
 import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter, IOffer, IUserOffersFilter, IUserProfile } from '../models'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter, IOffer, IUserOffersFilter, IUserProfile, INewUser } from '../models'
 import { RootState } from '.'
 import history from '../hooks/history';
 import { resetStateAction } from '../hooks/resetState';
@@ -46,6 +46,17 @@ export const intermediarySearchServiceApi = createApi({
               body: credentials,
             }),
             transformErrorResponse: (response: { status: number, data: ILoginResponse }) => response.data,
+        }),
+        registration: builder.mutation<{data: IResponse, status: number}, INewUser>({
+            query: (credentials) => ({
+              url: '/auth/registration',
+              method: 'POST',
+              body: credentials,
+            }),
+            transformResponse: (response: IResponse, meta: FetchBaseQueryMeta) => {
+                return {data: response, status: meta.response?.status!}
+            },
+            transformErrorResponse: (response: FetchBaseQueryError) => response.status
         }),
 
         createOrder: builder.mutation<IResponse, INewOrder>({
@@ -215,6 +226,6 @@ export const { useLoginMutation, useCreateOrderMutation,
                useUpdateOfferMutation, useRemoveOfferMutation,
                useChangeStateOfferMutation, useAddTrackToOrderMutation,
                useCloseOrderMutation, useGetUserProfileQuery,
-               useUpdateUserProfileMutation}
+               useUpdateUserProfileMutation, useRegistrationMutation}
                
                = intermediarySearchServiceApi

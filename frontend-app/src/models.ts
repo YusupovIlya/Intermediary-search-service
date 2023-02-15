@@ -134,3 +134,11 @@ export interface IUserProfile {
   lastName: string
   additionalContact: string
 }
+
+export interface INewUser {
+  email: string
+  firstName: string
+  lastName: string
+  additionalContact: string
+  password: string
+}

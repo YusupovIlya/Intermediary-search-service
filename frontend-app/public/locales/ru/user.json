@@ -10,7 +10,9 @@
     "messages": {
         "emailRequired": "Введите email !",
         "emailRegex": "Неверный формат!",
-        "passwordRequired": "Введите пароль!"
+        "passwordRequired": "Введите пароль!",
+        "passwordValidation": "Пароль должен содержать не менее одного символа a-z, A-z, и не менее 1 цифры",
+        "passwordLngth": "Длина пароля должна быть не менее 5 символов"
     },
     "addresses": {
         "city": "Город: {{city}}",
@@ -33,5 +35,7 @@
     "contactInForm": "Контакт для связи",
     "contactPlaceholder": "Никнейм, ссылка на месенджер (Telegram, WhatsApp ...)",
     "firstName": "Имя",
-    "lastName": "Фамилия"
+    "lastName": "Фамилия",
+    "next": "Продолжить",
+    "registrationTitile": "Регистрация"
 }

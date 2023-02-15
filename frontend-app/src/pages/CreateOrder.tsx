@@ -8,11 +8,10 @@ import { useScrapper } from 'react-tiny-link'
 import { useEffect, useState } from "react";
 import { useCreateOrderMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api";
 import { useTranslation } from 'react-i18next';
-import { useAuth, useAuthWithRedir } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
 import history from '../hooks/history';
 
 export default function CreateOrder() {
-  useAuthWithRedir();
   const auth = useAuth();
   const { t } = useTranslation(['validation_messages', 'buttons', 'order', 'toast_messages']);
   const [createOrder] = useCreateOrderMutation();

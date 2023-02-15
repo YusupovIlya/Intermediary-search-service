@@ -5,7 +5,7 @@ using IntermediarySearchService.Core.Entities.OfferAggregate;
 using IntermediarySearchService.Core.Entities.OrderAggregate;
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Infrastructure.Identity;
-using IntermediarySearchService.Infrastructure.Services;
+using IntermediarySearchService.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

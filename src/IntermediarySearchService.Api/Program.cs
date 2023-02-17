@@ -8,21 +8,23 @@ using IntermediarySearchService.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using IntermediarySearchService.Core.Constants;
 using System.Text;
 using IntermediarySearchService.Infrastructure.Services;
 using System.Reflection;
 using IntermediarySearchService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
+using IntermediarySearchService.Infrastructure.Interfaces;
+using IntermediarySearchService.Infrastructure.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
+var clientURL = builder.Configuration.GetSection("CLIENT_URL").Value;
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     builder =>
     {
         builder
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins(clientURL)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -31,7 +33,13 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext")));
 builder.Services.AddDbContext<IdentityDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opts =>
+                {
+                    opts.User.RequireUniqueEmail = true;
+                    opts.Password.RequireNonAlphanumeric = false;
+                    opts.Password.RequiredLength = 5;
+                    opts.SignIn.RequireConfirmedEmail = true;
+                })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -48,7 +56,12 @@ builder.Services.AddScoped<IAuthorizationHandler, OwnerAuthorizationHandler>();
 builder.Services.AddScoped<EntityNotFoundExceptionFilter>();
 builder.Services.AddScoped<EntityStateChangeExceptionFilter>();
 
-var key = Encoding.ASCII.GetBytes(AuthConstants.JWT_SECRET_KEY);
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
+builder.Services.AddTransient<IEmailService, EmailService>();
+
+var key = builder.Configuration.GetSection("JWT_SECRET_KEY").Value;
+var encodedKey = Encoding.ASCII.GetBytes(key);
 builder.Services
     .AddAuthentication(options =>
     {
@@ -61,7 +74,7 @@ builder.Services
         config.SaveToken = true;
         config.TokenValidationParameters = new TokenValidationParameters
         {
-            IssuerSigningKey = new SymmetricSecurityKey(key),
+            IssuerSigningKey = new SymmetricSecurityKey(encodedKey),
             ValidateIssuerSigningKey = true,
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -102,7 +115,8 @@ using (var scope = app.Services.CreateScope())
     {
         var userManager = scopedProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = scopedProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        await IdentityDbContextSeed.SeedAsync(userManager, roleManager);
+        var config = builder.Configuration;
+        await IdentityDbContextSeed.SeedAsync(userManager, roleManager, config);
     }
     catch (Exception ex)
     {

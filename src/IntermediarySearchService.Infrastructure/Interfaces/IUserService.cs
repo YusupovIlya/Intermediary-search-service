@@ -1,7 +1,7 @@
 ﻿using IntermediarySearchService.Infrastructure.Identity;
 using IntermediarySearchService.Core.Exceptions;
 
-namespace IntermediarySearchService.Infrastructure.Services;
+namespace IntermediarySearchService.Infrastructure.Interfaces;
 
 public interface IUserService
 {
@@ -12,10 +12,42 @@ public interface IUserService
     Task<ApplicationUser> GetUserByIdAsync(string id);
 
     /// <summary>
+    /// Deletes user by id
+    /// </summary>
+    /// <param name="id">user id</param>
+    /// <exception cref="UserNotFoundException"></exception>
+    Task DeleteUserAsync(string id);
+
+    /// <summary>
+    /// Gets all users
+    /// </summary>
+    Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
+
+    /// <summary>
+    /// Locks user by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <exception cref="UserNotFoundException"></exception>
+    Task LockUserAsync(string id);
+
+    /// <summary>
+    /// Unlocks user by id
+    /// </summary>
+    /// <exception cref="UserNotFoundException"></exception>
+    Task UnLockUserAsync(string id);
+
+    /// <summary>
     /// Gets user by email
     /// </summary>
     /// <exception cref="UserNotFoundException"></exception>
     Task<ApplicationUser> GetUserByEmailAsync(string email);
+
+    /// <summary>
+    /// Creates new user with credentials
+    /// </summary>
+    /// <exception cref="UserCreatingException"></exception>
+    Task<ApplicationUser> CreateUserAsync(string email, string firstName, string lastName, 
+                                          string contact, string password);
 
     /// <summary>
     /// Updates user by email

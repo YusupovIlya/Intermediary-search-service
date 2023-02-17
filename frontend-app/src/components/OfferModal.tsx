@@ -41,7 +41,7 @@ export default function OfferModal({offer, hasConfirmedOffer, setOfferModalActiv
             <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("offer.delivery", {delivery: offer.deliveryCost})}</p>
             <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("offer.expenses", {expenses: offer.expenses})}</p>
             <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("offer.comment", {comment: offer.comment})}</p>
-            <Link to={`/user/${offer.userName}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">{t("offer.toUserProfile")}</Link>
+            <Link to={`/user/profile/${offer.userName}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">{t("offer.toUserProfile")}</Link>
             {!offer.isSelected && !hasConfirmedOffer && !offer.isCanceld && offer.deleted == "" &&
             <button 
               className="w-48 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"

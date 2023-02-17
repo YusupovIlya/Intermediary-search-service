@@ -29,7 +29,8 @@ export interface IOrder {
   isDeletable: boolean,
   hasConfirmedOffer: boolean,
   canBeClosed: boolean,
-  trackCode: string
+  trackCode: string,
+  userName: string
 }
 
 export interface IState {
@@ -133,4 +134,14 @@ export interface IUserProfile {
   firstName: string
   lastName: string
   additionalContact: string
+  id: string
+  lockoutEnd: string
+}
+
+export interface INewUser {
+  email: string
+  firstName: string
+  lastName: string
+  additionalContact: string
+  password: string
 }

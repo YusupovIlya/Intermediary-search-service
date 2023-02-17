@@ -1,10 +1,13 @@
-import { createAction } from '@reduxjs/toolkit';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useCallback } from 'react';
+import { clearCredentials } from '../store/authSlice'
 
-export const RESET_STATE_ACTION_TYPE = 'resetState';
-export const resetStateAction = createAction(
- RESET_STATE_ACTION_TYPE,
- () => {
-    return { payload: null };
- }
-);
+export const useClearCredentials = () => {
+  const dispatch = useDispatch();
+
+  const clear = useCallback(() => {
+    dispatch(clearCredentials());
+  }, [dispatch]);
+
+  return clear;
+};

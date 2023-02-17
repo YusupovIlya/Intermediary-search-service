@@ -72,5 +72,7 @@
     "noOrders": "You don't have orders yet",
     "goToCreateOrder": "Go to create order", 
     "noOffers": "You have no orders yet",
-    "goToOrders": "View other users' orders"
+    "goToOrders": "View other users' orders",
+    "noAddresses": "You don't have shipping addresses yet",
+    "addAddr": "Add a shipping address"
 }

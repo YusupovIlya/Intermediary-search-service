@@ -1,22 +1,24 @@
 {
     "login": {
-        "title": "Login to your account",
-        "email": "E-mail address",
+        "title": "Login",
+        "email": "Email address",
         "password": "Password",
         "login": "Login",
-        "forgotPass": "Forgot Your Password?",
-        "registration": "You don't have an account?"
+        "forgotPass": "Forgot your password?",
+        "registration": "Don't have an account yet?"
     },
     "messages": {
         "emailRequired": "Enter an email !",
         "emailRegex": "Invalid format!",
-        "passwordRequired": "Please enter a password!"
+        "passwordRequired": "Please enter a password!",
+        "passwordValidation": "Password must contain at least one character a-z, A-z, at least 1 digit and nonalphanumeric smb.",
+        "passwordLngth": "Password must be at least 5 characters long"
     },
     "addresses": {
         "city": "City: {{city}}",
         "country": "Country: {{country}}",
-        "postCode": "Postal code: {{postCode}}",
-        "addPlaceholder": "Country, city or postal code..."
+        "postCode": "Index: {{postCode}}",
+        "addPlaceholder": "Country, city or zip code..."
     },
     "offer": {
         "total": "Total order value: {{total}}$",
@@ -26,12 +28,20 @@
         "toUserProfile": "Open User Profile",
         "selectOffer": "Select this offer",
         "goToOrder": "Go to order",
-        "goToUser": "Customer Profile",
+        "goToUser": "Customer profile",
         "trackPlaceholder": "Example: JD014600004291022110"
     },
     "contact": "Contact for communication: ",
     "contactInForm": "Contact for communication",
     "contactPlaceholder": "Nickname, link to messenger (Telegram, WhatsApp ...)",
     "firstName": "Name",
-    "lastName": "Last name"
+    "lastName": "Last name",
+    "next": "Continue",
+    "registrationTitile": "Registration",
+    "afterReg": "To activate your account, follow the link sent to the email you provided during registration",
+    "removeConfirm": "Confirm profile removal",
+    "warnMessg": "This action cannot be undone!",
+    "notFoundMsg1": "Sorry, we couldn't find this page.",
+    "notFoundMsg2": "But don't worry, go back to the homepage.",
+    "blocked": "Blocked"
 }

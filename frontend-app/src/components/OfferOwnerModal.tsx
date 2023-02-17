@@ -102,7 +102,7 @@ export default function OfferOwnerModal({offer, modalActive, updateFunc, setOffe
                 <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("offer.delivery", {delivery: offer.deliveryCost})}</p>
                 <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("offer.expenses", {expenses: offer.expenses})}</p>
                 <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("offer.comment", {comment: offer.comment})}</p>
-                <Link to={`/user/${offer.userName}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">{t("offer.toUserProfile")}</Link>
+                <Link to={`/user/profile/${offer.userName}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">{t("offer.toUserProfile")}</Link>
                 <div className="mt-2 flex flex-row">
                   {offer.isEditable &&
                     <button 

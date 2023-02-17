@@ -5,11 +5,12 @@ using IntermediarySearchService.Core.Entities.OfferAggregate;
 using IntermediarySearchService.Core.Entities.OrderAggregate;
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Infrastructure.Identity;
-using IntermediarySearchService.Infrastructure.Services;
+using IntermediarySearchService.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntermediarySearchService.Api.Controllers;
+
 
 [TypeFilter(typeof(EntityNotFoundExceptionFilter))]
 [Authorize]
@@ -47,6 +48,66 @@ public class UsersController : BaseController
     }
 
     /// <summary>
+    /// Gets all user (only for admin)
+    /// </summary>
+    /// <response code="200">List of users</response>
+    /// <response code="204">There is not users</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden (if role isn't admin)</response>
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserProfileForAdminModel>))]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(EmptyResult))]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var user = await _userService.GetAllUsersAsync();
+        var mappedUser = _mapper.Map<IEnumerable<UserProfileForAdminModel>>(user);
+        if (mappedUser.Count() == 0) 
+            return NoContent();
+        else 
+            return Ok(mappedUser);
+    }
+
+    /// <summary>
+    /// Locks user by id
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <response code="204">User was blocked</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden (if role isn't admin)</response>
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{userId:guid}/lock")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(EmptyResult))]
+
+    public async Task<IActionResult> LockUser([FromRoute] string userId)
+    {
+        await _userService.LockUserAsync(userId);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Unlocks user by id
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <response code="204">User was unlocked</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden (if role isn't admin)</response>
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{userId:guid}/unlock")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(EmptyResult))]
+    public async Task<IActionResult> UnLockUser([FromRoute] string userId)
+    {
+        await _userService.UnLockUserAsync(userId);
+        return NoContent();
+    }
+
+    /// <summary>
     /// Updates user profile
     /// </summary>
     /// <param name="userId">user id</param>
@@ -67,6 +128,22 @@ public class UsersController : BaseController
 
     }
 
+    /// <summary>
+    /// Deletes user by id
+    /// </summary>
+    /// <param name="userId">user id</param>
+    /// <response code="204">User was deleted</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="404">User not found</response>
+    [HttpDelete("{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
+    public async Task<IActionResult> DeleteUser([FromRoute] string userId)
+    {
+        await _userService.DeleteUserAsync(userId);
+        return NoContent();
+    }
 
     /// <summary>
     /// Gets user addresses list

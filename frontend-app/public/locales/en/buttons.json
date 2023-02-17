@@ -13,5 +13,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "addTrack": "Add track number",
-    "received": "Received"
+    "received": "Received",
+    "lock": "Lock",
+    "unlock": "Unlock"
 }

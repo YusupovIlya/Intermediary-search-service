@@ -75,5 +75,27 @@
         "success": "Profile updated!",
         "pending": "Updating...",
         "error": "Failed to update profile"
+    },
+    "toastRegistration":{
+        "success": "Profile created!",
+        "pending": "Registering...",
+        "error": "An error occurred while registering!",
+        "errorEmail": "Email - {{email}} is already taken!",
+        "sendingEmailError": "There was an error sending the email, please try again later"
+    },
+    "toastDeleteProfile":{
+        "success": "Profile deleted!",
+        "pending": "Deleting...",
+        "error": "Failed to delete profile"
+    },
+    "toastLockProfile":{
+        "success": "Profile blocked!",
+        "pending": "Blocking...",
+        "error": "Failed to block profile"
+    },
+    "toastUnLockProfile":{
+        "success": "Profile unlocked!",
+        "pending": "Unlocking...",
+        "error": "Unable to unlock profile"
     }
 }

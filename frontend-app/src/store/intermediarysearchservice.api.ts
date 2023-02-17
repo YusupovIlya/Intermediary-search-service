@@ -1,9 +1,10 @@
 import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/query/react'
-import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter, IOffer, IUserOffersFilter, IUserProfile } from '../models'
+import { INewOrder, ILoginResponse, ILoginRequest, IOrder, INewOffer, IResponse, IAddress, IPaginatedOrders, IOrdersFilter, IUserOrdersFilter, IOffer, IUserOffersFilter, IUserProfile, INewUser } from '../models'
 import { RootState } from '.'
 import history from '../hooks/history';
-import { resetStateAction } from '../hooks/resetState';
+
 import queryString from 'query-string';
+import { clearCredentials } from './authSlice';
 
 const myParamsSerializer = (params:any) => {
   return queryString.stringify(params);
@@ -28,8 +29,11 @@ const baseQueryWithRedir: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions)
   if (result.error && result.error.status === 401) {
-    api.dispatch(resetStateAction());
+    api.dispatch(clearCredentials());
     history.push(`/auth/login/?returnUrl=${history.location.pathname}`);
+  }
+  if (result.meta?.response?.status === 404) {
+    history.push("/notfound");
   }
   return result
 }
@@ -46,6 +50,17 @@ export const intermediarySearchServiceApi = createApi({
               body: credentials,
             }),
             transformErrorResponse: (response: { status: number, data: ILoginResponse }) => response.data,
+        }),
+        registration: builder.mutation<{data: IResponse, status: number}, INewUser>({
+            query: (credentials) => ({
+              url: '/auth/registration',
+              method: 'POST',
+              body: credentials,
+            }),
+            transformResponse: (response: IResponse, meta: FetchBaseQueryMeta) => {
+                return {data: response, status: meta.response?.status!}
+            },
+            transformErrorResponse: (response: FetchBaseQueryError) => response.status
         }),
 
         createOrder: builder.mutation<IResponse, INewOrder>({
@@ -100,7 +115,7 @@ export const intermediarySearchServiceApi = createApi({
             query: (id) => ({
                 url: `/orders/${id}`,
                 method: 'GET',
-            }),
+            })
         }),
 
         createOffer: builder.mutation<IResponse, INewOffer>({
@@ -171,11 +186,14 @@ export const intermediarySearchServiceApi = createApi({
                 body: payload.data,
             }),
         }),
-        getUserAddresses: builder.query<IAddress[], {id: string}>({
+        getUserAddresses: builder.query<{data: IAddress[], status: number}, {id: string}>({
             query: (payload) => ({
                 url: `/users/${payload.id}/addresses`,
                 method: 'GET',
             }),
+            transformResponse: (response: IAddress[], meta: FetchBaseQueryMeta) => {
+                return {data: response, status: meta.response?.status!}
+            }
         }),
         removeAddress: builder.mutation<IResponse, {id: number, userId: string}>({
             query: (payload) => ({
@@ -202,6 +220,30 @@ export const intermediarySearchServiceApi = createApi({
                 body: payload.data,
             }),
         }),
+        removeUserProfile: builder.mutation<IResponse, {id: string}>({
+            query: (payload) => ({
+                url: `/users/${payload.id}`,
+                method: 'DELETE',
+            }),
+        }),
+        getAllUsers: builder.query<IUserProfile[], null>({
+            query: () => ({
+                url: "/users",
+                method: 'GET',
+            }),
+        }),
+        lockUser: builder.mutation<IResponse, {id: string}>({
+            query: (payload) => ({
+                url: `/users/${payload.id}/lock`,
+                method: 'PUT',
+            }),
+        }),
+        unlockUser: builder.mutation<IResponse, {id: string}>({
+            query: (payload) => ({
+                url: `/users/${payload.id}/unlock`,
+                method: 'PUT',
+            }),
+        }),
     })
 })
 
@@ -215,6 +257,8 @@ export const { useLoginMutation, useCreateOrderMutation,
                useUpdateOfferMutation, useRemoveOfferMutation,
                useChangeStateOfferMutation, useAddTrackToOrderMutation,
                useCloseOrderMutation, useGetUserProfileQuery,
-               useUpdateUserProfileMutation}
+               useUpdateUserProfileMutation, useRegistrationMutation,
+               useRemoveUserProfileMutation, useGetAllUsersQuery,
+               useLockUserMutation, useUnlockUserMutation}
                
                = intermediarySearchServiceApi

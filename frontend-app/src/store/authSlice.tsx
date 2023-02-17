@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '.'
 import { intermediarySearchServiceApi } from './intermediarysearchservice.api'
 
-type AuthState = {
+
+export type AuthState = {
   token: string | null
   id: string | null
   role: string | null
@@ -12,7 +13,14 @@ type AuthState = {
 const slice = createSlice({
   name: 'auth',
   initialState: { id: null, token: null, role: null, email: null} as AuthState,
-  reducers: {},
+  reducers: {
+    resetState: (state: AuthState) => {
+      state.id = null;
+      state.token = null;
+      state.role = null;
+      state.email = null;
+   }
+  },
   extraReducers: (builder) => {
     builder.addMatcher(
       intermediarySearchServiceApi.endpoints.login.matchFulfilled,
@@ -28,4 +36,5 @@ const slice = createSlice({
 
 export default slice.reducer
 
-export const selectCurrentUser = (state: RootState) => state.auth
+export const selectCurrentUser = (state: RootState) => state.auth;
+export const clearCredentials = slice.actions.resetState;

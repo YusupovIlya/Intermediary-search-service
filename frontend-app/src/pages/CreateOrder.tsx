@@ -8,15 +8,15 @@ import { useScrapper } from 'react-tiny-link'
 import { useEffect, useState } from "react";
 import { useCreateOrderMutation, useGetUserAddressesQuery } from "../store/intermediarysearchservice.api";
 import { useTranslation } from 'react-i18next';
-import { useAuth, useAuthWithRedir } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
 import history from '../hooks/history';
+import { API_KEY_CORS, CORS_URL } from '../authConst';
 
 export default function CreateOrder() {
-  useAuthWithRedir();
   const auth = useAuth();
   const { t } = useTranslation(['validation_messages', 'buttons', 'order', 'toast_messages']);
   const [createOrder] = useCreateOrderMutation();
-  const {data: addresses} = useGetUserAddressesQuery({id: auth.user.id!}, {refetchOnMountOrArgChange: true});
+  const {data: response} = useGetUserAddressesQuery({id: auth.user.id!}, {refetchOnMountOrArgChange: true});
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [images, setImages] = useState<string[]>([]);
   const [itemLinks, setItemLinks] = useState<string[]>([""]);
@@ -24,10 +24,10 @@ export default function CreateOrder() {
 
   const [result, loading, error] = useScrapper({
     url: itemLinks[source],
+    proxyUrl: CORS_URL,
+    requestHeaders: {"x-cors-api-key":API_KEY_CORS},
     onSuccess: 
               (response:any) => {
-                console.log(response);
-
                 if(response != undefined){
                   let imgLink = "";
                   if(response.image[0] != undefined) imgLink = response.image[0];
@@ -45,8 +45,16 @@ export default function CreateOrder() {
   }, [images]);
 
   useEffect(() => {
-    addresses && setSelectedAddress(addresses[0].label);
-  }, [addresses]);
+    console.log(itemLinks);
+  }, [itemLinks]);
+
+  useEffect(() => {
+    if(response?.data == null){
+      history.push("/user/addresses");
+      toast.info(t("addAddr", {ns: 'order'})); 
+    }
+    response?.data && setSelectedAddress(response?.data[0].label);
+  }, [response]);
 
 
   const {register, control, handleSubmit, formState: { errors }, reset} = useForm<INewOrder>({
@@ -70,7 +78,7 @@ export default function CreateOrder() {
 
   const onSubmit = async (data: INewOrder) => {
     images.map((item, index) => data.orderItems[index] == undefined ? "": data.orderItems[index].imageLink = item);
-    data.address = addresses!.find(a => a.label == selectedAddress)!;
+    data.address = response?.data!.find(a => a.label == selectedAddress)!;
     const promise = createOrder(data).unwrap();
     reset();
     setItemLinks([]);
@@ -157,10 +165,14 @@ export default function CreateOrder() {
               <div className="flex flex-col md:w-1/3">
                 <label className="leading-loose">{t("orderForm.place", {ns: 'order'})}</label>
                 <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  {addresses?.map(addr => 
-                  <option onClick={() => 
-                    setSelectedAddress(addr.label)} value={addr.label}>{addr.label}
-                  </option>)}
+                {response && response?.data != null && 
+                  response?.data.map((addr) => (
+                    <option 
+                      onClick={() => setSelectedAddress(addr.label)} 
+                      value={addr.label}>
+                      {addr.label}
+                    </option>))
+                }
                 </select>              
               </div>
 
@@ -255,6 +267,8 @@ export default function CreateOrder() {
                   <div className="flex flex-row mt-4">
                     {(itemLinks[index] != "" && itemLinks[index] != undefined && checkValidUrl(itemLinks[index])) &&
                       <ReactTinyLink
+                      proxyUrl={CORS_URL}
+                      requestHeaders={{"x-cors-api-key": API_KEY_CORS}}
                       cardSize="small"
                       showGraphic={true}
                       maxLine={2}

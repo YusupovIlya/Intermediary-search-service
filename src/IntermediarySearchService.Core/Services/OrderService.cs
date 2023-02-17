@@ -172,6 +172,12 @@ public class OrderService : IOrderService
         order.CloseOrder();
         await _orderRepository.UpdateAsync(order);
     }
+
+    public async Task DeleteUserOrdersAsync(string userName)
+    {
+        var orders = await GetUserOrdersAsync(userName, new OrderState[0], new string[0], null);
+        await _orderRepository.DeleteRangeAsync(orders);
+    }
 }
 
 public enum FilterParam

@@ -2,6 +2,7 @@
 
 using IntermediarySearchService.Core.Entities.OrderAggregate;
 using IntermediarySearchService.Core.Exceptions;
+using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Infrastructure.Identity;
 using IntermediarySearchService.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -12,10 +13,12 @@ namespace IntermediarySearchService.Infrastructure.Services;
 public class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IOrderService _orderService;
 
-    public UserService(UserManager<ApplicationUser> userManager)
+    public UserService(UserManager<ApplicationUser> userManager, IOrderService orderService)
     {
         _userManager = userManager;
+        _orderService = orderService;
     }
 
     public async Task<int> CreateAddressAsync(string userId, string postalCode, string country, string city, string label)
@@ -50,10 +53,37 @@ public class UserService : IUserService
         await _userManager.UpdateAsync(user);
     }
 
+    public async Task DeleteUserAsync(string id)
+    {
+        var user = await GetUserByIdAsync(id);
+        await _orderService.DeleteUserOrdersAsync(user.UserName);
+        await _userManager.DeleteAsync(user);
+    }
+
     public async Task<IEnumerable<UserAddress>> GetAddressesAsync(string id)
     {
         var user = await GetUserByIdAsync(id);
         return user.Addresses;
+    }
+
+    public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
+    {
+        var users = await _userManager.GetUsersInRoleAsync("User");
+        return users.AsEnumerable();
+    }
+
+    public async Task LockUserAsync(string id)
+    {
+        var endDate = new DateTime(2025, 1, 1);
+        var user = await GetUserByIdAsync(id);
+        await _userManager.SetLockoutEnabledAsync(user, true);
+        await _userManager.SetLockoutEndDateAsync(user, endDate);
+    }
+
+    public async Task UnLockUserAsync(string id)
+    {
+        var user = await GetUserByIdAsync(id);
+        await _userManager.SetLockoutEndDateAsync(user, null);
     }
 
     public async Task<ApplicationUser> GetUserByEmailAsync(string email)

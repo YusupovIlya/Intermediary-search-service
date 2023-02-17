@@ -32,5 +32,8 @@ public class MappingProfile : Profile
                                       $"{s.Date.Value.ToShortDateString()} {s.Date.Value.ToShortTimeString()}"))));
         
         CreateMap<ApplicationUser, UserProfileModel>();
+        CreateMap<ApplicationUser, UserProfileForAdminModel>()
+            .ForMember(dest => dest.LockoutEnd,
+                       opt => opt.MapFrom(src => src.LockoutEnd.HasValue ? $"{src.LockoutEnd.Value.DateTime.ToString("MM/dd/yyyy HH:mm")}" : ""));
     }
 }

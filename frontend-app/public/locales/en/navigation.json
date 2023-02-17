@@ -3,7 +3,10 @@
     "unAuthRoutes": {
         "createOrder": "Create order",
         "findOrder": "Become an intermediary",
-        "login": "Sign In"
+        "login": "Sign In",
+        "logout": "Log out",
+        "allUsers": "Users",
+        "howtouse": "How to use?"
     },
     "authRoutes": ["My profile", "My addresses", "My orders", "My offers"]
 }

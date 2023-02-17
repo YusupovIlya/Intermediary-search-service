@@ -1,15 +1,14 @@
 import { toast, ToastContentProps } from 'react-toastify';
-
 import { useForm} from "react-hook-form";
-import { ILoginResponse, INewUser, IResponse } from "../models";
-import { useLoginMutation, useRegistrationMutation } from "../store/intermediarysearchservice.api";
-import { useSearchParams } from 'react-router-dom';
+import { INewUser } from "../models";
+import { useRegistrationMutation } from "../store/intermediarysearchservice.api";
 import { useTranslation } from 'react-i18next';
-import history from '../hooks/history';
+import { useState } from 'react';
 
 export default function Registration() {
   const { t } = useTranslation(['user', 'toast_messages', 'validation_messages']);
   const [registration] = useRegistrationMutation();
+  const [showForm, setShowForm] = useState(true);
   const {register, handleSubmit, formState: { errors }, reset} = useForm<INewUser>({
     mode: "onBlur"
   });
@@ -23,13 +22,19 @@ export default function Registration() {
           {
             pending: t("toastRegistration.pending", {ns: 'toast_messages'}),
             success: t("toastRegistration.success", {ns: 'toast_messages'})!,
-            error: t("toastRegistration.error", {ns: 'toast_messages'})!,
+            error: {
+              render(response: ToastContentProps<number>){
+                if(response.data == 409) return t("toastRegistration.errorEmail", {email: data.email, ns: 'toast_messages'})
+                else if(response.data == 503) return t("toastRegistration.sendingEmailError", {ns: 'toast_messages'})
+                else return t("toastRegistration.error", {ns: 'toast_messages'})
+              }
+            },
           }
-        );
-        if((await promise).status == 200){
-          history.push("/user/profile");
+        ); //4cfda5dc-a6af-482b-8ef7-e4e5001fbbbe
+        let code = (await promise).status;
+        if(code == 200){
+          setShowForm(false);
         }
-
       } catch (err) {
         console.log(err);
       }
@@ -38,8 +43,12 @@ export default function Registration() {
 
   return (
   <div className="min-h-screen flex flex-col items-center justify-start w-full">
+    {!showForm &&
+    <p className="mt-4 text-xl text-gray-900 dark:text-white">{t("afterReg")}</p>
+    }
 
-    <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-full max-w-md">
+    {showForm &&
+      <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-full max-w-md">
       <div className="font-medium self-center text-xl sm:text-2xl uppercase text-gray-800">{t("registrationTitile")}</div>
       <div className="mt-10">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -152,7 +161,8 @@ export default function Registration() {
           </div>
         </form>
       </div>
-    </div>
+      </div>    
+    }
   </div>
 )
 }

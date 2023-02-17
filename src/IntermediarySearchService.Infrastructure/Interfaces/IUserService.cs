@@ -12,6 +12,31 @@ public interface IUserService
     Task<ApplicationUser> GetUserByIdAsync(string id);
 
     /// <summary>
+    /// Deletes user by id
+    /// </summary>
+    /// <param name="id">user id</param>
+    /// <exception cref="UserNotFoundException"></exception>
+    Task DeleteUserAsync(string id);
+
+    /// <summary>
+    /// Gets all users
+    /// </summary>
+    Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
+
+    /// <summary>
+    /// Locks user by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <exception cref="UserNotFoundException"></exception>
+    Task LockUserAsync(string id);
+
+    /// <summary>
+    /// Unlocks user by id
+    /// </summary>
+    /// <exception cref="UserNotFoundException"></exception>
+    Task UnLockUserAsync(string id);
+
+    /// <summary>
     /// Gets user by email
     /// </summary>
     /// <exception cref="UserNotFoundException"></exception>

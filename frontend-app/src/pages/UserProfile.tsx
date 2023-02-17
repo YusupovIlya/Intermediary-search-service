@@ -3,9 +3,12 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Modal } from "../components/Modal";
+import history from "../hooks/history";
+import { useClearCredentials } from "../hooks/resetState";
 import { useAuth } from "../hooks/useAuth"
 import { IUserProfile } from "../models";
-import { useGetUserProfileQuery, useUpdateUserProfileMutation } from "../store/intermediarysearchservice.api"
+import { useGetUserProfileQuery, useRemoveUserProfileMutation, useUpdateUserProfileMutation } from "../store/intermediarysearchservice.api"
 
 interface UserProfileProps {
     isEditable: boolean
@@ -23,7 +26,10 @@ export default function UserProfile({isEditable}: UserProfileProps) {
 
     const {data: user, isLoading, refetch} = useGetUserProfileQuery({email: emailToQuery});
     const [updateUser] = useUpdateUserProfileMutation();
+    const [removeUser] = useRemoveUserProfileMutation();
+    const clearCredentials = useClearCredentials();
     const [isEditing, setIsEditing] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const { t } = useTranslation(['buttons', 'user', 'validation_messages', 'toast_messages', 'order']);
     const {register, handleSubmit, formState: { errors }, setValue} = useForm<IUserProfile>({
         mode: "onBlur"
@@ -47,33 +53,46 @@ export default function UserProfile({isEditable}: UserProfileProps) {
           }
         );
         refetch();
-    }    
+    }
+
+    const onDeleteHandler = async () => {
+        history.push("/auth/login");
+        const promise = removeUser({id: auth.user.id!}).unwrap();
+        await toast.promise(
+          promise,
+          {
+            pending: t("toastDeleteProfile.pending", {ns: 'toast_messages'}),
+            success: t("toastDeleteProfile.success", {ns: 'toast_messages'})!,
+            error: t("toastDeleteProfile.error", {ns: 'toast_messages'})
+          }
+        );
+        clearCredentials();
+    }
 
     return(
         <div className="p-2">
+          <Modal 
+            active={showDeleteModal} 
+            setActive={setShowDeleteModal}
+            content={
+                <div className="p-4">
+                  <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("removeConfirm", {ns: 'user'})}</p>
+                  <p className="mt-2 text-lg text-slate-600 not-italic font-medium font-sans">{t("warnMessg", {ns: 'user'})}</p>
+                  <button 
+                  className="mt-2 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    onDeleteHandler();
+                  }}
+                  >{t("confirm")}</button>
+                </div>
+              }/>            
             <div className="p-8 bg-white shadow mt-20">
                 <div className="grid grid-cols-1 md:grid-cols-3">
-                        <div className="grid grid-cols-3 text-center order-last md:order-first mt-20 md:mt-0">
-                            <div>
-                                <p className="font-bold text-gray-700 text-xl">22</p>
-                                <p className="text-gray-400">Заказов</p>
-                            </div>
-                            <div>
-                                <p className="font-bold text-gray-700 text-xl">10</p>
-                                <p className="text-gray-400">Заявок</p>
-                            </div>
-                        </div>
-                        <div className="relative">
-                            <div className="w-48 h-48 bg-indigo-100 mx-auto rounded-full shadow-2xl absolute inset-x-0 top-0 -mt-24 flex items-center justify-center text-indigo-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
                         {isEditable &&
                         <div className="ml-2 space-x-8 flex justify-between mt-32 md:mt-0 md:justify-center">
                             <button
-                                className="text-white py-2 px-4 uppercase rounded bg-blue-400 hover:bg-blue-500 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
+                                className="text-white py-2 px-4 uppercase rounded bg-blue-400 hover:bg-blue-500 shadow hover:shadow-lg font-medium"
                                 onClick={() => {
                                     setIsEditing(true);
                                     setValues();
@@ -82,7 +101,8 @@ export default function UserProfile({isEditable}: UserProfileProps) {
                                 {t("edit")}
                             </button>
                             <button
-                                className="text-white py-2 px-4 uppercase rounded bg-gray-700 hover:bg-gray-800 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
+                                className="text-white py-2 px-4 uppercase rounded bg-gray-700 hover:bg-gray-800 shadow hover:shadow-lg font-medium"
+                                onClick={() => setShowDeleteModal(true)}
                                 >
                                 {t("remove")}
                             </button>
@@ -110,7 +130,7 @@ export default function UserProfile({isEditable}: UserProfileProps) {
                 </div>                
                 }
                 {isEditing &&
-                <form className="text-sm mt-10" onSubmit={handleSubmit(onSubmit)}>
+                <form className="text-sm mt-14" onSubmit={handleSubmit(onSubmit)}>
                     <div className="flex flex-col mb-4">
                         <label className="text-gray-700">{t("firstName", {ns: 'user'})}</label>
                         <input

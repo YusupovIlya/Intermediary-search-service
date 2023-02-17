@@ -1,4 +1,5 @@
 ﻿using IntermediarySearchService.Api.DtoModels;
+using IntermediarySearchService.Api.Services;
 using IntermediarySearchService.Core.Exceptions;
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Infrastructure.Identity;
@@ -9,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IntermediarySearchService.Api.Controllers;
 
+[TypeFilter(typeof(EntityNotFoundExceptionFilter))]
+[AllowAnonymous]
 public class AuthController : BaseController
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -16,23 +19,33 @@ public class AuthController : BaseController
     private readonly ITokenService _tokenClaimsService;
     private readonly IEmailService _emailService;
     private readonly IUserService _userService;
+    private readonly IConfiguration _configuration;
 
     public AuthController(SignInManager<ApplicationUser> signInManager,
                           UserManager<ApplicationUser> userManager,
                           IUserService userService,
                           ITokenService tokenClaimsService,
-                          IEmailService emailService)
+                          IEmailService emailService,
+                          IConfiguration configuration)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _tokenClaimsService = tokenClaimsService;
         _emailService = emailService;
         _userService = userService;
+        _configuration = configuration;
     }
 
-    [AllowAnonymous]
-    [HttpPost]
-    [Route("login")]
+
+    /// <summary>
+    /// Generates access token for user and returns him credentials
+    /// </summary>
+    /// <param name="request">User credentials</param>
+    /// <response code="200">User credentials</response>
+    /// <response code="400">Wrong data</response>
+    [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResponseModel))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(LoginResponseModel))]
     public async Task<IActionResult> Login(LoginRequestModel request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
@@ -48,24 +61,38 @@ public class AuthController : BaseController
                 response.Email = user.Email;
                 response.Token = await _tokenClaimsService.GetTokenAsync(user.UserName);
                 response.Message = "You have been successfully logged in!";
+                return Ok(response);
             }
+            else if (result.IsNotAllowed)
+                response.Message = "Email isn't confirmed!";
+
+            else if(result.IsLockedOut)
+                response.Message = "Your account is blocked!";
             else
-            {
                 response.Message = "Wrong password!";
-                return BadRequest(response);
-            }
+            return BadRequest(response);
         }
         else
         {
             response.Message = "Wrong login!";
             return BadRequest(response);
         }
-        return Ok(response);
     }
 
 
-    [AllowAnonymous]
+    /// <summary>
+    /// Registrates new user
+    /// </summary>
+    /// <param name="model">User credentials</param>
+    /// <response code="200">User was registered</response>
+    /// <response code="400">Invalid model request</response>
+    /// <response code="409">User with this email already has registered</response>
+    /// <response code="503">Internal error with sending email confirmation</response>
     [HttpPost("registration")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResponseModel))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ResponseModel))]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable, Type = typeof(ResponseModel))]
     public async Task<IActionResult> Registration([FromBody] NewUserModel model)
     {
         try
@@ -74,9 +101,9 @@ public class AuthController : BaseController
                                                           model.AdditionalContact, model.Password);
             string confirmationEmailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-           // var mail = _emailService.PrepareConfirmationMail(user.FirstName, user.LastName, confirmationEmailToken, user.Email, user.Id);
-           // var res = await _emailService.SendAsync(mail);
-            if (false)
+            var mail = _emailService.PrepareConfirmationMail(user.FirstName, user.LastName, confirmationEmailToken, user.Email, user.Id);
+            var res = await _emailService.SendAsync(mail);
+            if (res)
             {
                 var response = new ResponseModel(model.Email, "User was registered!");
                 return Ok(response);
@@ -90,19 +117,32 @@ public class AuthController : BaseController
         catch(UserCreatingException ex)
         {
             var response = new ResponseModel(model.Email, ex.Message);
-            return BadRequest(response);
+            return Conflict(response);
         }
     }
 
-    [AllowAnonymous]
+
+    /// <summary>
+    /// Activtes user account
+    /// </summary>
+    /// <param name="userId">user id</param>
+    /// <param name="token">email confirmation token</param>
+    /// <response code="302">User acount was activated</response>
+    /// <response code="400">Invalid token</response>
+    /// <response code="404">User not found with this id</response>
     [HttpGet("{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status302Found, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(EmptyResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ResponseModel))]
     public async Task<IActionResult> Activate([FromRoute] string userId,
                                               [FromQuery] string token)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var clientURL = _configuration.GetSection("CLIENT_URL").Value;
+        var user = await _userService.GetUserByIdAsync(userId);
         var res = await _userManager.ConfirmEmailAsync(user, token);
         if (res.Succeeded)
-            return Redirect("http://localhost:3000/");
-        else return Ok();
+            return Redirect(clientURL);
+        else 
+            return BadRequest();
     }
 }

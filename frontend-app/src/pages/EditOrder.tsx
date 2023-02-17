@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom';
 import history from '../hooks/history';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { API_KEY_CORS, CORS_URL } from '../authConst';
 
 export default function EditOrder() {
   const auth = useAuth();
@@ -18,7 +19,7 @@ export default function EditOrder() {
   const { t } = useTranslation(['validation_messages', 'buttons', 'order', 'toast_messages']);
   const {data: order} = useGetOrderByIdQuery(id!);
   const [updateOrder] = useUpdateOrderMutation();
-  const {data: addresses} = useGetUserAddressesQuery({id: auth.user.id!});
+  const {data: response} = useGetUserAddressesQuery({id: auth.user.id!});
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [images, setImages] = useState<string[]>([]);
   const [itemLinks, setItemLinks] = useState<string[]>([""]);
@@ -26,6 +27,8 @@ export default function EditOrder() {
 
   const [result, loading, error] = useScrapper({
     url: itemLinks[source],
+    proxyUrl: CORS_URL,
+    requestHeaders: {"x-cors-api-key":API_KEY_CORS},
     onSuccess: 
               (response:any) => {
 
@@ -48,8 +51,8 @@ export default function EditOrder() {
   }, [order]);
 
   useEffect(() => {
-    addresses && setSelectedAddress(order?.address.label!);
-  }, [addresses]);
+    response?.data && setSelectedAddress(order?.address.label!);
+  }, [response]);
 
   const {register, control, handleSubmit, formState: { errors }} = useForm<INewOrder>({
     mode: "onBlur",
@@ -69,7 +72,7 @@ export default function EditOrder() {
 
   const onSubmit = async (data: INewOrder) => {
     images.map((item, index) => data.orderItems[index] == undefined ? "": data.orderItems[index].imageLink = item);
-    data.address = addresses?.find(a => a.label == selectedAddress)!;
+    data.address = response?.data!.find(a => a.label == selectedAddress)!;
     const promise = updateOrder({id: order?.id!, data: data}).unwrap();
     await toast.promise(
       promise,
@@ -149,13 +152,14 @@ export default function EditOrder() {
               <div className="flex flex-col md:w-1/3">
                 <label className="leading-loose">{t("orderForm.place", {ns: 'order'})}</label>
                 <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  {addresses?.map(addr => 
-                  <option                     
-                    onClick={() => setSelectedAddress(addr.label)} 
-                    value={addr.label}
-                    selected={addr.label == selectedAddress}
-                    >{addr.label}
-                  </option>)}
+                {response && response?.data != null && 
+                  response?.data.map((addr) => (
+                    <option 
+                      onClick={() => setSelectedAddress(addr.label)} 
+                      value={addr.label}>
+                      {addr.label}
+                    </option>))
+                }
                 </select>              
               </div>
 
@@ -250,6 +254,8 @@ export default function EditOrder() {
                   <div className="flex flex-row mt-4">
                     {(itemLinks[index] != "" && itemLinks[index] != undefined && checkValidUrl(itemLinks[index])) &&
                       <ReactTinyLink
+                      proxyUrl={CORS_URL}
+                      requestHeaders={{"x-cors-api-key": API_KEY_CORS}}
                       cardSize="small"
                       showGraphic={true}
                       maxLine={2}

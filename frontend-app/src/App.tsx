@@ -16,6 +16,10 @@ import EditOrder from "./pages/EditOrder";
 import UserOffers from "./pages/UserOffers";
 import Registration from "./pages/Registration";
 import PrivateRoute from "./components/PrivateRoute";
+import NotFound from "./pages/NotFound";
+import PublicRoute from "./components/PublicRoute";
+import AllUsers from "./pages/AllUsers";
+import Instruction from "./pages/Instruction";
 
 
 const App = () => {
@@ -24,23 +28,29 @@ const App = () => {
     <div className="p-2">     
       <Navbar/>
       <div className="flex items-center justify-center text-gray-300 m-2 sm:m-8">
-      <ToastContainer />
+      <ToastContainer autoClose={1200}/>
         <Routes>
+
+          <Route path="/" element={ <PublicRoute><Login /></PublicRoute>}/>
+          <Route path="/auth/login" element={ <PublicRoute><Login /></PublicRoute>}/>
+          <Route path="/auth/registration" element={ <PublicRoute><Registration /></PublicRoute>}/>
+          <Route path="/instruction/:lng" element={ <Instruction />}/>
+
           <Route path="/orders/create" element={ <PrivateRoute><CreateOrder /></PrivateRoute>}/>
           <Route path="/orders/all" element={ <AllOrders /> } />
           <Route path="/orders/:id" element={ <OrderSummary /> } />
-
-          <Route path="/auth/login" element={ <Login /> } />
-          <Route path="/auth/registration" element={ <Registration /> } />
 
           <Route path="/user/profile/:email" element={ <PrivateRoute><UserProfile isEditable={false}/></PrivateRoute>}/>
           <Route path="/user/profile" element={ <PrivateRoute><UserProfile isEditable={true}/></PrivateRoute>}/>
           <Route path="/user/addresses" element={ <PrivateRoute><MyAddresses /></PrivateRoute>}/>
           <Route path="/user/orders" element={ <PrivateRoute><UserOrders /></PrivateRoute>}/>
           <Route path="/user/offers" element={ <PrivateRoute><UserOffers /></PrivateRoute>}/>
+          <Route path="/admin/users" element={ <PrivateRoute><AllUsers /></PrivateRoute>}/>
 
           <Route path="/user/orders/:id" element={ <PrivateRoute><OrderSummaryForOwner /></PrivateRoute>}/>
           <Route path="/user/orders/:id/edit" element={ <PrivateRoute><EditOrder /></PrivateRoute>}/>
+
+          <Route path="*" element={ <NotFound /> } />
         </Routes>
       </div>
     </div>

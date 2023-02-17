@@ -14,4 +14,5 @@ public class OrderModel : NewOrderModel
     public bool HasConfirmedOffer { get; set; }
     public bool CanBeClosed { get; set; }
     public string? TrackCode { get; set; }
+    public string UserName { get; set; }
 }

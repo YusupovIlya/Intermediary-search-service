@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import Address from "../components/Address"
 import { Modal } from "../components/Modal"
@@ -13,8 +13,8 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function MyAddresses() {
     const auth = useAuth();
-    const { t } = useTranslation(['user', 'buttons', 'toast_messages']);
-    const {data: addresses,isLoading,refetch} = useGetUserAddressesQuery({id: auth.user.id!});
+    const { t } = useTranslation(['user', 'buttons', 'toast_messages', 'order']);
+    const {data: response ,isLoading, refetch} = useGetUserAddressesQuery({id: auth.user.id!});
     const [deleteAddress] = useRemoveAddressMutation();
     const [addAddress] = useAddAddressMutation();
 
@@ -103,14 +103,22 @@ export default function MyAddresses() {
                 </div>
             }/>
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-                {isLoading && <p>Loading...</p>}
-                {addresses?.map((item, index) => (
-                <Address 
-                    address={item} 
-                    key={index}
-                    setAddressInModal={setAddressInModal}
-                    setModalActive={setModalActive}
-                />
+                {isLoading && <p className="text-center font-medium text-gray-800">{t("load", {ns: "order"})}</p>}
+                {response?.status == 204 &&
+                <div className="flex justify-center items-center">
+                    <div className="mt-6 flex flex-col space-y-4 justify-center items-center">
+                        <p className="font-medium text-gray-800">{t("noAddresses", {ns: "order"})}</p>
+                    </div>                            
+                </div>
+                }
+                {response && response?.data != null && 
+                    response?.data.map((item, index) => (
+                        <Address 
+                        address={item} 
+                        key={index}
+                        setAddressInModal={setAddressInModal}
+                        setModalActive={setModalActive}
+                    />
                 ))}
             </div>
             {!showAddForm &&

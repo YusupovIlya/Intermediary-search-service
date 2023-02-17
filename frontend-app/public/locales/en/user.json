@@ -11,7 +11,7 @@
         "emailRequired": "Enter an email !",
         "emailRegex": "Invalid format!",
         "passwordRequired": "Please enter a password!",
-        "passwordValidation": "Password must contain at least one character a-z, A-z, and at least 1 digit",
+        "passwordValidation": "Password must contain at least one character a-z, A-z, at least 1 digit and nonalphanumeric smb.",
         "passwordLngth": "Password must be at least 5 characters long"
     },
     "addresses": {
@@ -37,5 +37,11 @@
     "firstName": "Name",
     "lastName": "Last name",
     "next": "Continue",
-    "registrationTitile": "Registration"
+    "registrationTitile": "Registration",
+    "afterReg": "To activate your account, follow the link sent to the email you provided during registration",
+    "removeConfirm": "Confirm profile removal",
+    "warnMessg": "This action cannot be undone!",
+    "notFoundMsg1": "Sorry, we couldn't find this page.",
+    "notFoundMsg2": "But don't worry, go back to the homepage.",
+    "blocked": "Blocked"
 }

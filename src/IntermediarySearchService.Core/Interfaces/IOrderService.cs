@@ -48,6 +48,12 @@ public interface IOrderService
     Task DeleteAsync(int id);
 
     /// <summary>
+    /// Deletes all user orders
+    /// </summary>
+    /// <param name="userName">user name</param>
+    Task DeleteUserOrdersAsync(string userName);
+
+    /// <summary>
     /// Updates order
     /// </summary>
     /// <exception cref="OrderNotFoundException"></exception>

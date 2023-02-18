@@ -9,7 +9,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntermediarySearchService.I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntermediarySearchService.Core", "src\IntermediarySearchService.Core\IntermediarySearchService.Core.csproj", "{A02C21D7-4ED2-4BFB-AB4C-978844434985}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntermediarySearchService.Api", "src\IntermediarySearchService.Api\IntermediarySearchService.Api.csproj", "{17EAEFDB-4A79-4AFB-AF4D-51FB27BB9B6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntermediarySearchService.Api", "src\IntermediarySearchService.Api\IntermediarySearchService.Api.csproj", "{17EAEFDB-4A79-4AFB-AF4D-51FB27BB9B6D}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{E0C49AD1-2A93-4879-A4FC-03A62ED5407D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{BBBEAF6B-618F-4118-BD70-ADD1B6B6B204}"
+	ProjectSection(SolutionItems) = preProject
+		.env = .env
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +36,10 @@ Global
 		{17EAEFDB-4A79-4AFB-AF4D-51FB27BB9B6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17EAEFDB-4A79-4AFB-AF4D-51FB27BB9B6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17EAEFDB-4A79-4AFB-AF4D-51FB27BB9B6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0C49AD1-2A93-4879-A4FC-03A62ED5407D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0C49AD1-2A93-4879-A4FC-03A62ED5407D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0C49AD1-2A93-4879-A4FC-03A62ED5407D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0C49AD1-2A93-4879-A4FC-03A62ED5407D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

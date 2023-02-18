@@ -41,14 +41,6 @@ export default function CreateOrder() {
   });
 
   useEffect(() => {
-    console.log(images);
-  }, [images]);
-
-  useEffect(() => {
-    console.log(itemLinks);
-  }, [itemLinks]);
-
-  useEffect(() => {
     if(response?.data == null){
       history.push("/user/addresses");
       toast.info(t("addAddr", {ns: 'order'})); 

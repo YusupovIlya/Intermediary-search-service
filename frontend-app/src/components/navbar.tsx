@@ -42,7 +42,10 @@ export default function Navbar() {
                         {auth.user.id != null
                          ? <button 
                             className="text-base font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                            onClick={() => clearCredentials()}
+                            onClick={() => {
+                                clearCredentials();
+                                history.push("/auth/login");
+                            }}
                             >{t("unAuthRoutes.logout")}
                             </button>
                          : <button 

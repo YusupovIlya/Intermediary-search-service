@@ -8,10 +8,15 @@ namespace IntermediarySearchService.Infrastructure.Services;
 
 public class IdentityDbContextSeed
 {
-    public static async Task SeedAsync(UserManager<ApplicationUser> userManager, 
+    public static async Task SeedAsync(IdentityDbContext identityDbContext,
+                                       UserManager<ApplicationUser> userManager, 
                                        RoleManager<IdentityRole> roleManager,
                                        IConfiguration configuration)
     {
+        if (identityDbContext.Database.IsNpgsql())
+        {
+            identityDbContext.Database.Migrate();
+        }
         var adminCredentials = configuration.GetSection("Admin");
 
         await roleManager.CreateAsync(new IdentityRole("User"));

@@ -30,8 +30,8 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
             .AllowCredentials();
     }));
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext")));
-builder.Services.AddDbContext<IdentityDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext")));
+builder.Services.AddDbContext<AppDbContext>(c => c.UseNpgsql(builder.Configuration.GetConnectionString("AppDbContext")));
+builder.Services.AddDbContext<IdentityDbContext>(c => c.UseNpgsql(builder.Configuration.GetConnectionString("IdentityDbContext")));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opts =>
                 {
@@ -101,7 +101,7 @@ builder.Services.AddSwaggerGen(opt =>
     opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
-
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
@@ -115,8 +115,14 @@ using (var scope = app.Services.CreateScope())
     {
         var userManager = scopedProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = scopedProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var identityContext = scopedProvider.GetRequiredService<IdentityDbContext>();
+        var dbContext = scopedProvider.GetRequiredService<AppDbContext>();
         var config = builder.Configuration;
-        await IdentityDbContextSeed.SeedAsync(userManager, roleManager, config);
+        await IdentityDbContextSeed.SeedAsync(identityContext, userManager, roleManager, config);
+        if (dbContext.Database.IsNpgsql())
+        {
+            dbContext.Database.Migrate();
+        }
     }
     catch (Exception ex)
     {

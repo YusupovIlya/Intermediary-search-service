@@ -31,14 +31,14 @@ export default function EditOrder() {
     requestHeaders: {"x-cors-api-key":API_KEY_CORS},
     onSuccess: 
               (response:any) => {
-
                 if(response != undefined){
-
+                  let imgLink = "";
+                  if(response.image[0] != undefined) imgLink = response.image[0];
                   setImages([
-                      ...images.slice(0, source),
-                      response.image,
-                      ...images.slice(source+1)
-                    ]);                  
+                    ...images.slice(0, source),
+                    imgLink,
+                    ...images.slice(source+1)
+                  ]);                
                 }
               },
   });

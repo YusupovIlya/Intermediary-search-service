@@ -1,0 +1,64 @@
+version: '3.4'
+
+services:
+  backend:
+    container_name: backend
+    image: ${DOCKER_REGISTRY-}intermediarysearchserviceapi
+    depends_on:
+        - db-data
+        - db-identity
+    build:
+      context: .
+      dockerfile: src/IntermediarySearchService.Api/Dockerfile
+
+  client:
+    container_name: client
+    image: client
+    build:
+      context: ./frontend-app
+      dockerfile: Dockerfile
+
+  db-data:
+    container_name: db-data
+    image: postgres
+    restart: always
+    environment:
+        - POSTGRES_USER=${DB_DATA_USER}
+        - POSTGRES_PASSWORD=${DB_DATA_PASSWORD}
+        - POSTGRES_DB=${DB_DATA_NAME}
+    ports:
+      - ${DB_DATA_PORT}:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  db-identity:
+    container_name: db-identity
+    image: postgres
+    restart: always
+    environment:
+        - POSTGRES_USER=${DB_IDENTITY_USER}
+        - POSTGRES_PASSWORD=${DB_IDENTITY_PASSWORD}
+        - POSTGRES_DB=${DB_IDENTITY_NAME}
+    ports:
+      - ${DB_IDENTITY_PORT}:5432
+    volumes:
+      - db-identity:/var/lib/postgresql/data
+      
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+        - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+        - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    depends_on:
+      - db-data
+      - db-identity
+    ports:
+      - ${PGADMIN_PORT}:80
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  db-data:
+  db-identity:
+  pgadmin-data:

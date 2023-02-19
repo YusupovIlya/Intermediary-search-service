@@ -15,6 +15,7 @@ using IntermediarySearchService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using IntermediarySearchService.Infrastructure.Interfaces;
 using IntermediarySearchService.Infrastructure.Models;
+using Microsoft.AspNetCore.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 

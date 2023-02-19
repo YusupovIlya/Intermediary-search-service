@@ -33,7 +33,7 @@ export function useGeoCoder(queryStr: string) {
   
     async function fetchPlaces() {
         const params = {
-            access_key: process.env.API_KEY_GEOCODER!,
+            access_key: process.env.REACT_APP_API_KEY_GEOCODER!,
             query: queryStr
         };
         const full_url = api_url + '?' + new URLSearchParams(params);

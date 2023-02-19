@@ -14,9 +14,9 @@ services:
 
   client:
     ports:
-      - "5010:3000"
+      - "5050:3000"
     environment:
-        - IP=${IP}
-        - API_KEY_GEOCODER=${API_KEY_GEOCODER}
-        - API_KEY_CORS=${API_KEY_CORS}
-        - CORS_URL=${CORS_URL}
+        - REACT_APP_IP=${IP}
+        - REACT_APP_API_KEY_GEOCODER=${API_KEY_GEOCODER}
+        - REACT_APP_API_KEY_CORS=${API_KEY_CORS}
+        - REACT_APP_CORS_URL=${CORS_URL}

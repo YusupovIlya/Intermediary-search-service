@@ -12,6 +12,13 @@ COPY ["src/IntermediarySearchService.Infrastructure/IntermediarySearchService.In
 COPY ["src/IntermediarySearchService.Core/IntermediarySearchService.Core.csproj", "IntermediarySearchService.Core/"]
 RUN dotnet restore "IntermediarySearchService.Api/IntermediarySearchService.Api.csproj"
 COPY ["src/", "./"]
+
+RUN dotnet dev-certs https --clean
+RUN dotnet dev-certs https --verbose
+RUN dotnet dev-certs https --trust
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=MyPassword
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+
 WORKDIR "IntermediarySearchService.Api"
 RUN dotnet build "IntermediarySearchService.Api.csproj" -c Release -o /app/build
 

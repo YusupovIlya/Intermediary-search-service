@@ -1,5 +1,18 @@
 FROM node:lts-alpine
 ENV NODE_ENV=production
+
+ARG REACT_APP_IP
+ENV REACT_APP_IP=$IP
+
+ARG REACT_APP_API_KEY_GEOCODER
+ENV REACT_APP_API_KEY_GEOCODER=$API_KEY_GEOCODER
+
+ARG REACT_APP_API_KEY_CORS
+ENV REACT_APP_API_KEY_CORS=$API_KEY_CORS
+
+ARG REACT_APP_CORS_URL
+ENV REACT_APP_CORS_URL=$CORS_URL
+
 WORKDIR /app
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
 RUN npm install --production

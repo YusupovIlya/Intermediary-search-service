@@ -10,7 +10,6 @@ import { useCreateOrderMutation, useGetUserAddressesQuery } from "../store/inter
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import history from '../hooks/history';
-import { API_KEY_CORS, CORS_URL } from '../authConst';
 
 export default function CreateOrder() {
   const auth = useAuth();
@@ -24,8 +23,8 @@ export default function CreateOrder() {
 
   const [result, loading, error] = useScrapper({
     url: itemLinks[source],
-    proxyUrl: CORS_URL,
-    requestHeaders: {"x-cors-api-key":API_KEY_CORS},
+    proxyUrl: process.env.CORS_URL,
+    requestHeaders: {"x-cors-api-key":process.env.API_KEY_CORS},
     onSuccess: 
               (response:any) => {
                 if(response != undefined){
@@ -259,8 +258,8 @@ export default function CreateOrder() {
                   <div className="flex flex-row mt-4">
                     {(itemLinks[index] != "" && itemLinks[index] != undefined && checkValidUrl(itemLinks[index])) &&
                       <ReactTinyLink
-                      proxyUrl={CORS_URL}
-                      requestHeaders={{"x-cors-api-key": API_KEY_CORS}}
+                      proxyUrl={process.env.CORS_URL}
+                      requestHeaders={{"x-cors-api-key":process.env.API_KEY_CORS}}
                       cardSize="small"
                       showGraphic={true}
                       maxLine={2}

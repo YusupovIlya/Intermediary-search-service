@@ -1,4 +1,3 @@
-import { API_KEY_GEOCODER } from "../authConst";
 import {useEffect, useState} from 'react';
 import axios from 'axios'
 
@@ -34,7 +33,7 @@ export function useGeoCoder(queryStr: string) {
   
     async function fetchPlaces() {
         const params = {
-            access_key: API_KEY_GEOCODER,
+            access_key: process.env.API_KEY_GEOCODER!,
             query: queryStr
         };
         const full_url = api_url + '?' + new URLSearchParams(params);

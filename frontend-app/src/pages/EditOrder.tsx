@@ -15,7 +15,8 @@ import { useAuth } from '../hooks/useAuth';
 export default function EditOrder() {
   const auth = useAuth();
   const { id } = useParams();
-  const { t } = useTranslation(['validation_messages', 'buttons', 'order', 'toast_messages']);
+  const { t } = useTranslation(['validation_messages', 'buttons', 'order', 'toast_messages', 'titles']);
+  document.title = t("editOrder", {ns: 'titles'});
   const {data: order} = useGetOrderByIdQuery(id!);
   const [updateOrder] = useUpdateOrderMutation();
   const {data: response} = useGetUserAddressesQuery({id: auth.user.id!});

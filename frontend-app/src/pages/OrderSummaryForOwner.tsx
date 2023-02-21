@@ -11,7 +11,8 @@ import { useTranslation } from "react-i18next";
 
 export default function OrderSummaryForOwner() {
     const { id } = useParams();
-    const { t, i18n } = useTranslation(['order', 'buttons', 'toast_messages']);
+    const { t, i18n } = useTranslation(['order', 'buttons', 'toast_messages', 'titles']);
+    document.title = t("orderSummary", {ns: 'titles', id: id});
     const {data: order, refetch} = useGetOrderByIdQuery(id!, {refetchOnMountOrArgChange: true});
     const [removeOrder] = useRemoveOrderMutation();
     const [closeOrder] = useCloseOrderMutation();
@@ -133,7 +134,7 @@ export default function OrderSummaryForOwner() {
               <div className="flex flex-col justify-start items-start dark:bg-gray-800 bg-gray-50 px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full">
 
                 <p className="text-lg md:text-xl dark:text-white font-semibold leading-6 xl:leading-5 text-gray-800">{t("orderSummary.details")}</p>
-                <a href={order?.siteLink} className="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("orderCard.shop", {shop: order?.siteName})}</a>
+                <a href={order?.siteLink} target="_blank" className="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("orderCard.shop", {shop: order?.siteName})}</a>
                 {order?.trackCode != null &&
                   <a href={`https://www.ordertracker.com/track/${order?.trackCode}`} target="_blank" className="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("orderCard.trackText", {track: order?.trackCode})}</a>
                 }

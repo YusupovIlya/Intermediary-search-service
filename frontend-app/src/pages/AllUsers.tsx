@@ -13,7 +13,8 @@ export default function AllUsers() {
     const [unlockUser] = useUnlockUserMutation();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userId, setUserId] = useState("");
-    const { t } = useTranslation(['user', 'buttons', 'toast_messages']);
+    const { t } = useTranslation(['user', 'buttons', 'toast_messages', 'titles']);
+    document.title = t("allUsers", {ns: 'titles'});
 
     const onDeleteHandler = async () => {
         const promise = removeUser({id: userId}).unwrap();

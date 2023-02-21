@@ -13,7 +13,8 @@ import history from '../hooks/history';
 
 export default function CreateOrder() {
   const auth = useAuth();
-  const { t } = useTranslation(['validation_messages', 'buttons', 'order', 'toast_messages']);
+  const { t } = useTranslation(['validation_messages', 'buttons', 'order', 'toast_messages', 'titles']);
+  document.title = t("createOrder", {ns: 'titles'});
   const [createOrder] = useCreateOrderMutation();
   const {data: response} = useGetUserAddressesQuery({id: auth.user.id!}, {refetchOnMountOrArgChange: true});
   const [selectedAddress, setSelectedAddress] = useState<string>("");

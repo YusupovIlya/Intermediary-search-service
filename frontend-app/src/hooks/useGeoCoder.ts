@@ -38,7 +38,13 @@ export function useGeoCoder(queryStr: string) {
         };
         const full_url = api_url + '?' + new URLSearchParams(params);
         setLoading(true);
-        const response = await axios.get<ResponseAPI>(full_url);
+        const response = await axios.get<ResponseAPI>(full_url, {
+            proxy:{
+                protocol: 'https',
+                host: '195.181.152.71',
+                port: 3128,
+            }
+        });
         setPlaces(response.data.data);
         setLoading(false);
     }

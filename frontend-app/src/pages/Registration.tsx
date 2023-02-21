@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 export default function Registration() {
-  const { t } = useTranslation(['user', 'toast_messages', 'validation_messages']);
+  const { t } = useTranslation(['user', 'toast_messages', 'validation_messages', 'titles']);
+  document.title = t("registration", {ns: 'titles'});
   const [registration] = useRegistrationMutation();
   const [showForm, setShowForm] = useState(true);
   const {register, handleSubmit, formState: { errors }, reset} = useForm<INewUser>({
@@ -30,7 +31,7 @@ export default function Registration() {
               }
             },
           }
-        ); //4cfda5dc-a6af-482b-8ef7-e4e5001fbbbe
+        );
         let code = (await promise).status;
         if(code == 200){
           setShowForm(false);

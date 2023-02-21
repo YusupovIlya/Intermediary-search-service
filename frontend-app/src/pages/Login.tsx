@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 import history from '../hooks/history';
 
 export default function Login() {
-  const { t } = useTranslation(['user', 'toast_messages']);
+  const { t } = useTranslation(['user', 'toast_messages', 'titles']);
+  document.title = t("login", {ns: 'titles'});
   const [loginRequest] = useLoginMutation();
   const [searchParams] = useSearchParams();
   const {register, handleSubmit, formState: { errors }, reset} = useForm<ILoginRequest>({
@@ -98,11 +99,6 @@ export default function Login() {
             <p className="text-red-600 inline text-base font-semibold mt-2">
                 {errors?.password && errors.password.message}
             </p>
-          </div>
-          <div className="flex items-center mb-6 -mt-4">
-            <div className="flex ml-auto">
-              <a href="#" className="inline-flex text-xs sm:text-sm text-blue-500 hover:text-blue-700">{t("login.forgotPass")}</a>
-            </div>
           </div>
           <div className="flex w-full">
             <button type="submit" className="flex items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-blue-600 hover:bg-blue-700 rounded py-2 w-full transition duration-150 ease-in">

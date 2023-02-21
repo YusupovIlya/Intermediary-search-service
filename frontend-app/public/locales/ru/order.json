@@ -6,7 +6,7 @@
         "editInfo": "Редактирование",
         "siteName": "Название сайта",
         "siteLink": "Ссылка на сайт",
-        "performerFee": "Вознограждение",
+        "performerFee": "Вознаграждение",
         "place": "Куда доставить?",
         "productName": "Название товара",
         "options": "Опции товара",
@@ -16,7 +16,7 @@
     },
     "orderCard": {
         "shop": "Магазин {{shop}}",
-        "performerFee": "Вознограждение {{performerFee}}$",
+        "performerFee": "Вознаграждение {{performerFee}}$",
         "from": "От {{from}}",
         "numItems": "и еще {{numItems}} ед. в этом заказе",
         "totalPrice": "Стоимость заказа: ${{totalPrice}}",

@@ -1,0 +1,14 @@
+{
+    "userProfile": "User Profile",
+    "userOrders": "My Orders",
+    "userOffers": "My Offers",
+    "registration": "Registration",
+    "orderSummary": "Order #{{id}}",
+    "addresses": "My addresses",
+    "login": "Login",
+    "guide": "Instruction",
+    "editOrder": "Edit Order",
+    "createOrder": "Create Order",
+    "allOrders": "Become a reseller",
+    "allUsers": "Users"
+}

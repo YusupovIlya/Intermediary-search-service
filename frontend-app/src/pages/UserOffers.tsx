@@ -19,7 +19,8 @@ export default function UserOffers() {
         offerStates: [],
         sortBy: "newest"
       });
-      const { t, i18n } = useTranslation(['order', 'buttons']);
+      const { t, i18n } = useTranslation(['order', 'buttons', 'titles']);
+      document.title = t("userOffers", {ns: 'titles'});
       const { data: response, isLoading, refetch } = useGetUserOffersQuery({id: auth.user.id!, param: filter}, {refetchOnMountOrArgChange: true});
       const [mobileFilter, setMobileFilter] = useState(false);
       const [sortActive, setSortActive] = useState(false);
@@ -158,7 +159,7 @@ export default function UserOffers() {
   
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900">{t("allOrders.titleUser")}</h1>
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900">{t("userOffers", {ns: 'titles'})}</h1>
         
                 <div className="flex items-center">
                   <div className="inline-block text-left">

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using IntermediarySearchService.Infrastructure.Interfaces;
 using IntermediarySearchService.Infrastructure.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -139,7 +140,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
+});
 
 app.UseCors("CorsPolicy");
 

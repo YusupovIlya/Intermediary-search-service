@@ -41,8 +41,8 @@ export function useGeoCoder(queryStr: string) {
         const response = await axios.get<ResponseAPI>(full_url, {
             proxy:{
                 protocol: 'https',
-                host: '195.181.152.71',
-                port: 3128,
+                host: process.env.REACT_APP_PROXY_IP!,
+                port: Number(process.env.REACT_APP_PROXY_PORT),
             }
         });
         setPlaces(response.data.data);

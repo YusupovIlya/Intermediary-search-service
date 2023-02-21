@@ -11,7 +11,7 @@ const myParamsSerializer = (params:any) => {
 };
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: `https://${process.env.REACT_APP_IP}:5001/api/v1`,
+    baseUrl: "api/v1",
     paramsSerializer: myParamsSerializer,
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).auth.token

@@ -66,7 +66,6 @@ export default function UserOffer({offer, setOfferInModal, setOfferModalActive, 
 
                     <div className="w-full flex flex-col justify-center items-center space-y-8">
                         <Link to={`/orders/${offer.orderId}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("offer.goToOrder", { ns: 'user' })}</Link>
-                        <Link to={"/orders/all"} className="font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("offer.goToUser", { ns: 'user' })}</Link>
                     </div>
 
                     {offer.isNeedTrackNumber &&

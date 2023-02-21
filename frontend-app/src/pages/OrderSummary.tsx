@@ -10,7 +10,8 @@ import history from '../hooks/history';
 
 export default function OrderSummary() {
     const { id } = useParams();
-    const { t } = useTranslation(['order', 'buttons', 'validation_messages', 'toast_messages', 'user']);
+    const { t } = useTranslation(['order', 'buttons', 'validation_messages', 'toast_messages', 'user', 'titles']);
+    document.title = t("orderSummary", {ns: 'titles', id: id});
     const [showForm, setShowForm] = useState(false);
     const [btnText, setbtnText] = useState(t("open", {ns: 'buttons'}));
     const [createOffer] = useCreateOfferMutation();
@@ -59,7 +60,7 @@ export default function OrderSummary() {
       <div className="flex flex-col justify-start items-start dark:bg-gray-800 bg-gray-50 px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full">
 
         <p className="text-lg md:text-xl dark:text-white font-semibold leading-6 xl:leading-5 text-gray-800">{t("orderSummary.details")}</p>
-        <a href={order?.siteLink} className="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("orderCard.shop", {shop: order?.siteName})}</a>
+        <a href={order?.siteLink} target="_blank" className="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline text-base">{t("orderCard.shop", {shop: order?.siteName})}</a>
         {order?.orderItems.map((val, index) => <OrderItemSummary orderItem={val} key={index} />)}
       </div>
       <div className="flex justify-center flex-col md:flex-row flex-col items-stretch w-full space-y-4 md:space-y-0 md:space-x-6 xl:space-x-8">

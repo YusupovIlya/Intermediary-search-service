@@ -13,7 +13,8 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function MyAddresses() {
     const auth = useAuth();
-    const { t } = useTranslation(['user', 'buttons', 'toast_messages', 'order']);
+    const { t } = useTranslation(['user', 'buttons', 'toast_messages', 'order', 'titles']);
+    document.title = t("addresses", {ns: 'titles'});
     const {data: response ,isLoading, refetch} = useGetUserAddressesQuery({id: auth.user.id!});
     const [deleteAddress] = useRemoveAddressMutation();
     const [addAddress] = useAddAddressMutation();

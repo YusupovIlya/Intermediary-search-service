@@ -1,0 +1,14 @@
+{
+    "userProfile": "Профиль пользователя",
+    "userOrders": "Мои заказы",
+    "userOffers": "Мои заявки",
+    "registration": "Регистрация",
+    "orderSummary": "Заказ №{{id}}",
+    "addresses": "Мои адреса",
+    "login": "Вход",
+    "guide": "Инструкция",
+    "editOrder": "Редактирование заказа",
+    "createOrder": "Создание заказа",
+    "allOrders": "Стать посредником",
+    "allUsers": "Пользователи"
+}

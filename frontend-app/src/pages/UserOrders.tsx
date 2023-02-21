@@ -18,7 +18,8 @@ export default function UserOrders() {
         shops: [],
         sortBy: "newest"
       });
-      const { t, i18n } = useTranslation(['order', 'buttons']);
+      const { t, i18n } = useTranslation(['order', 'buttons', 'titles']);
+      document.title = t("userOrders", {ns: 'titles'});
       const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(2);
       const { data: response, isLoading, refetch } = useGetUserOrdersQuery({id: auth.user.id!, param: filter}, {refetchOnMountOrArgChange: true});
       const [mobileFilter, setMobileFilter] = useState(false);

@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 export default function AllOrders() {
     const [filter, setFilter] = useState<IOrdersFilter>({
       page: 1,
-      pageSize: 5,
+      pageSize: 6,
       shops: [],
       countries: [],
       numOrderItems: -1,
@@ -18,7 +18,8 @@ export default function AllOrders() {
       minOrderPrice: -1,
       sortBy: "newest"
     });
-    const { t } = useTranslation(['order', 'buttons']);
+    const { t } = useTranslation(['order', 'buttons', 'titles']);
+    document.title = t("allOrders", {ns: 'titles'});
     const { data: countries, isLoading: isLoadingCountries } = useGetParamsForFilterQuery(1);
     const { data: shops, isLoading: isLoadingShops } = useGetParamsForFilterQuery(0);
     const { data: allOrdersResponse, isLoading } = useFilteredOrdersQuery(filter, {refetchOnMountOrArgChange: 10});
@@ -582,7 +583,7 @@ export default function AllOrders() {
                             <div className="flex-col justify-center">
                             <MultiRangeSlider
                               min={1}
-                              max={1000}
+                              max={4000}
                               step={5}
                               minValue={minPrice}
                               maxValue={maxPrice}

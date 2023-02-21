@@ -30,10 +30,12 @@ export default function UserProfile({isEditable}: UserProfileProps) {
     const clearCredentials = useClearCredentials();
     const [isEditing, setIsEditing] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const { t } = useTranslation(['buttons', 'user', 'validation_messages', 'toast_messages', 'order']);
+    const { t } = useTranslation(['buttons', 'user', 'validation_messages', 'toast_messages', 'order', 'titles']);
     const {register, handleSubmit, formState: { errors }, setValue} = useForm<IUserProfile>({
         mode: "onBlur"
     });
+    document.title = t("userProfile", {ns: 'titles'});
+
 
     const setValues = () => {
         setValue("firstName", user?.firstName!);

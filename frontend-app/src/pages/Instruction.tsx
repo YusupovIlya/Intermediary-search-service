@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom"
 
 export default function Instruction(){
     const {lng} = useParams();
+    const { t } = useTranslation('titles');
+    document.title = t("guide");
     return(
         <div>
             {lng == "ru" &&

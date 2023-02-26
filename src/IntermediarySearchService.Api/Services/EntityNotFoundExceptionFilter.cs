@@ -17,15 +17,9 @@ public class EntityNotFoundExceptionFilter : IAsyncExceptionFilter
         if(context.Exception is EntityNotFoundException)
         {
             _logger.LogError(context.Exception.Message);
-            string idFromRoute = "0";
-            try
-            {
-                idFromRoute = context.HttpContext.Request.RouteValues["id"].ToString();
-            }
-            catch (NullReferenceException) { }
             context.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            var errorResponse = new ResponseModel(idFromRoute, context.Exception.Message);
-            await context.HttpContext.Response.WriteAsJsonAsync(errorResponse);
+            context.HttpContext.Response.ContentType = "application/problem+json";
+            await context.HttpContext.Response.WriteAsync(context.Exception.Message);
         }
     }
 }

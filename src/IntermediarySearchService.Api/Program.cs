@@ -132,6 +132,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+if (app.Environment.EnvironmentName == "Testing")
+{
+    app.UseMiddleware<AuthenticatedTestRequestMiddleware>();
+}
+
 app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");
@@ -142,3 +147,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

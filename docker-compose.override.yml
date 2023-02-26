@@ -4,19 +4,23 @@ services:
   backend:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_HTTPS_PORT=5001
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev_cert.pfx
     ports:
       - "5000:80"
+      - "5001:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ./conf.d/https/:/https/
 
   client:
     ports:
       - "5050:3000"
     environment:
+        - REACT_APP_IP=${IP}
         - REACT_APP_API_KEY_GEOCODER=${API_KEY_GEOCODER}
         - REACT_APP_API_KEY_CORS=${API_KEY_CORS}
         - REACT_APP_CORS_URL=${CORS_URL}
-        - REACT_APP_PROXY_IP=${PROXY_IP}
-        - REACT_APP_PROXY_PORT=${PROXY_PORT}

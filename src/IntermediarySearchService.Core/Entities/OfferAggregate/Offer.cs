@@ -32,6 +32,13 @@ public class Offer: BaseEntity, IAggregateRoot
 
     private Offer() { }
 
+    public Offer(int id, int orderId, string userName, decimal itemsTotalCost,
+                 decimal deliveryCost, decimal? expenses = 0m, string? comment = null) :
+        this(orderId, userName, itemsTotalCost, deliveryCost, expenses, comment)
+    {
+        Id = id;
+    }
+
     public Offer(int orderId, string userName, decimal itemsTotalCost,
                  decimal deliveryCost, decimal? expenses = 0m, string? comment = null)
     {
@@ -42,6 +49,30 @@ public class Offer: BaseEntity, IAggregateRoot
         Expenses = expenses;
         Comment = comment;
         AddStateOffer();
+    }
+
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || !(obj is Offer))
+            return false;
+
+        if (this.GetType() != obj.GetType())
+            return false;
+
+        Offer offer = (Offer)obj;
+
+        if (offer.ItemsTotalCost == this.ItemsTotalCost &&
+            offer.DeliveryCost == this.DeliveryCost &&
+            offer.UserName == this.UserName &&
+            offer.OrderId == this.OrderId &&
+            offer.Comment == this.Comment &&
+            offer.Expenses == this.Expenses &&
+            offer.Deleted == this.Deleted &&
+            offer.isSelected == this.isSelected)
+            return true;
+        else
+            return false;
     }
 
     public void ChangeSelectStatus(bool state)

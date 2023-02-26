@@ -34,6 +34,14 @@ public class Order: BaseEntity, IAggregateRoot
 
     private Order() { }
 
+    public Order(int id, string userName, string siteName, string siteLink, decimal performerFee,
+             List<OrderItem> orderItems, Address address, bool isBuyingByMyself):
+
+        this(userName, siteName, siteLink, performerFee, orderItems, address, isBuyingByMyself)
+    {
+        Id = id;
+    }
+
     public Order(string userName, string siteName, string siteLink, decimal performerFee, 
                  List<OrderItem> orderItems, Address address, bool isBuyingByMyself)
     {
@@ -70,7 +78,7 @@ public class Order: BaseEntity, IAggregateRoot
     /// <exception cref="CloseOrderException"></exception>
     public void CloseOrder()
     {
-        if (_statesOrder.Last().State == OrderState.Shipped)
+        if (CanBeClosed)
         {
             GetActiveOffer().AddStateOffer(OfferState.Completed);
             AddStateOrder(OrderState.Received);
@@ -164,5 +172,7 @@ public class Order: BaseEntity, IAggregateRoot
     public decimal TotalOrderPrice() => _orderItems.Sum(i => i.Units * i.UnitPrice);
 
     public Offer? GetActiveOffer() => _offers.FirstOrDefault(of => of.isSelected);
+
+    public void AddOffers(List<Offer> offers) => _offers.AddRange(offers);
 
 }

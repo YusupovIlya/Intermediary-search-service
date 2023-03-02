@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+  backend:
+    container_name: backend
+    image: ${DOCKER_REGISTRY-}intermediarysearchserviceapi
+    depends_on:
+        - db-data
+        - db-identity
+    build:
+      context: .
+      dockerfile: src/IntermediarySearchService.Api/Dockerfile
+
+  client:
+    container_name: client
+    image: client
+    build:
+      context: ./frontend-app
+      dockerfile: Dockerfile
+
+  db-data:
+    container_name: db-data
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+        - SA_PASSWORD=${DB_DATA_PASSWORD}
+        - ACCEPT_EULA=Y
+        - MSSQL_PID=Developer
+    ports:
+      - ${DB_DATA_PORT}:1433
+    volumes:
+      - dbdata:/var/opt/mssql
+
+  db-identity:
+    container_name: db-identity
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+        - SA_PASSWORD=${DB_IDENTITY_PASSWORD}
+        - ACCEPT_EULA=Y
+        - MSSQL_PID=Developer
+    ports:
+      - ${DB_IDENTITY_PORT}:1433
+    volumes:
+      - dbdata:/var/opt/mssql
+
+volumes:
+  db-data:
+  db-identity:

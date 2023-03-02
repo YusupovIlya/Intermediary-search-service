@@ -7,10 +7,13 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/IntermediarySearchService.Api/IntermediarySearchService.Api.csproj", "src/IntermediarySearchService.Api/"]
-RUN dotnet restore "src/IntermediarySearchService.Api/IntermediarySearchService.Api.csproj"
-COPY . .
-WORKDIR "/src/src/IntermediarySearchService.Api"
+COPY ["src/IntermediarySearchService.Api/IntermediarySearchService.Api.csproj", "IntermediarySearchService.Api/"]
+COPY ["src/IntermediarySearchService.Infrastructure/IntermediarySearchService.Infrastructure.csproj", "IntermediarySearchService.Infrastructure/"]
+COPY ["src/IntermediarySearchService.Core/IntermediarySearchService.Core.csproj", "IntermediarySearchService.Core/"]
+RUN dotnet restore "IntermediarySearchService.Api/IntermediarySearchService.Api.csproj"
+COPY ["src/", "./"]
+
+WORKDIR "IntermediarySearchService.Api"
 RUN dotnet build "IntermediarySearchService.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish

@@ -34,18 +34,12 @@ export function useGeoCoder(queryStr: string) {
   
     async function fetchPlaces() {
         const params = {
-            access_key: API_KEY_GEOCODER,
+            access_key: process.env.REACT_APP_API_KEY_GEOCODER!,
             query: queryStr
         };
         const full_url = api_url + '?' + new URLSearchParams(params);
         setLoading(true);
-        const response = await axios.get<ResponseAPI>(full_url, {
-            proxy:{
-                protocol: 'https',
-                host: '195.181.152.71',
-                port: 3128,
-            }
-        });
+        const response = await axios.get<ResponseAPI>(full_url);
         setPlaces(response.data.data);
         setLoading(false);
     }

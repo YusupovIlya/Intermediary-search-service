@@ -25,8 +25,8 @@ export default function CreateOrder() {
 
   const [result, loading, error] = useScrapper({
     url: itemLinks[source],
-    proxyUrl: CORS_URL,
-    requestHeaders: {"x-cors-api-key":API_KEY_CORS},
+    proxyUrl: process.env.REACT_APP_CORS_URL,
+    requestHeaders: {"x-cors-api-key":process.env.REACT_APP_API_KEY_CORS},
     onSuccess: 
               (response:any) => {
                 if(response != undefined){
@@ -268,8 +268,8 @@ export default function CreateOrder() {
                   <div className="flex flex-row mt-4">
                     {(itemLinks[index] != "" && itemLinks[index] != undefined && checkValidUrl(itemLinks[index])) &&
                       <ReactTinyLink
-                      proxyUrl={CORS_URL}
-                      requestHeaders={{"x-cors-api-key": API_KEY_CORS}}
+                      proxyUrl={process.env.REACT_APP_CORS_URL}
+                      requestHeaders={{"x-cors-api-key":process.env.REACT_APP_API_KEY_CORS}}
                       cardSize="small"
                       showGraphic={true}
                       maxLine={2}

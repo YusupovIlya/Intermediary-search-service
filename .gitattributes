@@ -1,0 +1,5 @@
+*.cs linguist-language=CSharp
+*.ts linguist-language=TypeScript
+
+CSharp 60.0
+TypeScript 40.0

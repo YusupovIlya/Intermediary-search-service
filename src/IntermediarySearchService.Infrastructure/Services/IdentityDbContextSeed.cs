@@ -12,23 +12,23 @@ public class IdentityDbContextSeed
                                        RoleManager<IdentityRole> roleManager,
                                        IConfiguration configuration)
     {
-        var adminCredentials = configuration.GetSection("Admin");
+        //var adminCredentials = configuration.GetSection("Admin");
 
         await roleManager.CreateAsync(new IdentityRole("User"));
-        await roleManager.CreateAsync(new IdentityRole("Admin"));
+        //await roleManager.CreateAsync(new IdentityRole("Admin"));
 
         var defaultUser = new ApplicationUser(AuthConstants.FIRST_NAME, AuthConstants.LAST_NAME, AuthConstants.EMAIL, AuthConstants.DEFAULT_CONTACT);
-        var admin = new ApplicationUser(adminCredentials["FirstName"], adminCredentials["LastName"], adminCredentials["Email"], adminCredentials["Contact"]);
+        //var admin = new ApplicationUser(adminCredentials["FirstName"], adminCredentials["LastName"], adminCredentials["Email"], adminCredentials["Contact"]);
 
         await userManager.CreateAsync(defaultUser, AuthConstants.DEFAULT_PASSWORD);
-        await userManager.CreateAsync(admin, adminCredentials["Password"]);
+        //await userManager.CreateAsync(admin, adminCredentials["Password"]);
 
         defaultUser = await userManager.FindByEmailAsync(AuthConstants.EMAIL);
         defaultUser.EmailConfirmed = true;
         await userManager.AddToRoleAsync(defaultUser, "User");
 
-        admin = await userManager.FindByEmailAsync(adminCredentials["Email"]);
-        admin.EmailConfirmed = true;
-        await userManager.AddToRoleAsync(admin, "Admin");
+        //admin = await userManager.FindByEmailAsync(adminCredentials["Email"]);
+        //admin.EmailConfirmed = true;
+        //await userManager.AddToRoleAsync(admin, "Admin");
     }
 }

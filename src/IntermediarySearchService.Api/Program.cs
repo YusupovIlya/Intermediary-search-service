@@ -30,8 +30,8 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
             .AllowCredentials();
     }));
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext")));
-builder.Services.AddDbContext<IdentityDbContext>(c => c.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext")));
+builder.Services.AddDbContext<AppDbContext>(c => c.UseNpgsql(builder.Configuration.GetConnectionString("AppDbContext")));
+builder.Services.AddDbContext<IdentityDbContext>(c => c.UseNpgsql(builder.Configuration.GetConnectionString("IdentityDbContext")));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opts =>
                 {
@@ -113,6 +113,13 @@ using (var scope = app.Services.CreateScope())
     var scopedProvider = scope.ServiceProvider;
     try
     {
+        // Automigrations
+        var dataDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var identityDbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        dataDbContext.Database.Migrate();
+        identityDbContext.Database.Migrate();
+
+        // Seed default users
         var userManager = scopedProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = scopedProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var config = builder.Configuration;

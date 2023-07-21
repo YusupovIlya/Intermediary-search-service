@@ -5,43 +5,29 @@ services:
     container_name: backend
     image: ${DOCKER_REGISTRY-}intermediarysearchserviceapi
     depends_on:
-        - db-data
-        - db-identity
+        - postgres
     build:
       context: .
       dockerfile: src/IntermediarySearchService.Api/Dockerfile
 
-  client:
-    container_name: client
-    image: client
-    build:
-      context: ./frontend-app
-      dockerfile: Dockerfile
+  #client:
+  #  container_name: client
+  #  image: client
+  #  build:
+  #    context: ./frontend-app
+  #    dockerfile: Dockerfile
 
-  db-data:
-    container_name: db-data
-    image: mcr.microsoft.com/mssql/server:latest
+  postgres:
+    container_name: postgres
+    image: postgres:latest
     environment:
-        - SA_PASSWORD=${DB_DATA_PASSWORD}
-        - ACCEPT_EULA=Y
-        - MSSQL_PID=Developer
+      POSTGRES_USER: "root_user"
+      POSTGRES_PASSWORD: "pass12345"
+      PGDATA: "/data/pgdata"
     ports:
-      - ${DB_DATA_PORT}:1433
+      - "5432:5432"
     volumes:
-      - dbdata:/var/opt/mssql
-
-  db-identity:
-    container_name: db-identity
-    image: mcr.microsoft.com/mssql/server:latest
-    environment:
-        - SA_PASSWORD=${DB_IDENTITY_PASSWORD}
-        - ACCEPT_EULA=Y
-        - MSSQL_PID=Developer
-    ports:
-      - ${DB_IDENTITY_PORT}:1433
-    volumes:
-      - dbdata:/var/opt/mssql
+       - postgres:/data/postgres
 
 volumes:
-  db-data:
-  db-identity:
+  postgres:

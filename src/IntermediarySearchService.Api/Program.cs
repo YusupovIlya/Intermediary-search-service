@@ -1,6 +1,5 @@
 using IntermediarySearchService.Core.Interfaces;
 using IntermediarySearchService.Core.Services;
-using IntermediarySearchService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using IntermediarySearchService.Api;
@@ -15,6 +14,7 @@ using IntermediarySearchService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using IntermediarySearchService.Infrastructure.Interfaces;
 using IntermediarySearchService.Infrastructure.Models;
+using IntermediarySearchService.Infrastructure.Data.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 

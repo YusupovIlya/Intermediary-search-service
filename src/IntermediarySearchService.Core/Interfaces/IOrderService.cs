@@ -113,3 +113,10 @@ public interface IOrderService
                                                       int? numOrderItems, int? minOrderPrice, 
                                                       int? maxOrderPrice, string? sortBy);
 }
+
+public enum FilterParam
+{
+    AllShops,
+    AllCountries,
+    UserShops,
+}

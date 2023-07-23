@@ -1,21 +1,34 @@
 ﻿using IntermediarySearchService.Core.Entities.OrderAggregate;
-using IntermediarySearchService.Core.Interfaces;
-using IntermediarySearchService.Core.Specifications;
 using IntermediarySearchService.Core.Exceptions;
+using IntermediarySearchService.Core.Interfaces;
+using IntermediarySearchService.Core.Services;
+using IntermediarySearchService.Infrastructure.Data.DataAccess;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
-namespace IntermediarySearchService.Core.Services;
+namespace IntermediarySearchService.Infrastructure.Data.Services;
 
 public class OrderService : IOrderService
 {
+    private readonly AppDbContext _dbContext;
     private readonly IRepository<Order> _orderRepository;
     private const string maxMin = "maxmin";
     private const string minMax = "minmax";
     private const string newest = "newest";
     private const string oldest = "oldest";
-    public OrderService(IRepository<Order> orderRepository)
+
+    public OrderService(IRepository<Order> orderRepository,
+                        AppDbContext dbContext)
     {
         _orderRepository = orderRepository;
+        _dbContext = dbContext;
     }
+
+    public IQueryable<Order> GetWithRelated(Expression<Func<Order, bool>> predicate) =>
+                                    _dbContext.Orders
+                                                    .Where(predicate)
+                                                    .Include(o => o.Offers)
+                                                    .Include(o => o.OrderItems);
 
     public async Task<int> CreateAsync(string userName, string siteName, string siteLink, decimal performerFee,
                                        List<OrderItem> orderItems, Address address, bool isBuyingByMyself)
@@ -27,8 +40,10 @@ public class OrderService : IOrderService
 
     public async Task<Order> GetByIdAsync(int orderId)
     {
-        var orderSpec = new OrderWithItemsSpecification(orderId);
-        var order = await _orderRepository.FirstOrDefaultAsync(orderSpec);
+        var order = await GetWithRelated(o => o.Id == orderId)
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync();
+
         if (order != null)
             return order;
         else
@@ -38,16 +53,24 @@ public class OrderService : IOrderService
     public async Task<IEnumerable<Order>> GetUserOrdersAsync(string userName, OrderState[] orderStates,
                                                              string[] shops, string? sortBy)
     {
-        var orderSpec = new OrdersWithItemsSpecification(userName);
-        var orders = await _orderRepository.ListAsync(orderSpec);
-        if (shops.Length > 0) orders = orders.Where(o => shops.Contains(o.SiteName)).ToList();
-        if(orderStates.Length > 0) orders = orders.Where(o => orderStates.Contains((OrderState)o.StatesOrder.Last()?.State)).ToList();
+        var orders = await GetWithRelated(o => o.UserName == userName)
+                            .AsNoTracking()
+                            .ToListAsync();
+
+        if (shops.Length > 0) 
+            orders = orders.Where(o => shops.Contains(o.SiteName))
+                .ToList();
+
+        if (orderStates.Length > 0) 
+            orders = orders.Where(o => orderStates.Contains((OrderState)o.StatesOrder.Last()?.State))
+                .ToList();
+
         return SortByParam(sortBy, orders);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var order = await _orderRepository.GetByIdAsync(id);
+        var order = await _orderRepository.SearchOneAsync(o => o.Id == id);
         if (order != null)
         {
             if (order.isDeletable)
@@ -59,7 +82,7 @@ public class OrderService : IOrderService
             throw new OrderNotFoundException(id);
     }
 
-    public async Task UpdateAsync(int id, string siteName, string siteLink, 
+    public async Task UpdateAsync(int id, string siteName, string siteLink,
                                   decimal performerFee, List<OrderItem> orderItems)
     {
         var order = await GetByIdAsync(id);
@@ -75,12 +98,13 @@ public class OrderService : IOrderService
     public async Task<string[]> GetShopsForFilter(string userName = null)
     {
         List<Order> orders;
-        if(userName == null)
-            orders = await _orderRepository.ListAsync();
+        if (userName == null)
+            orders = await _orderRepository.GetAllAsync();
         else
         {
-            var orderSpec = new OrdersWithItemsSpecification(userName);
-            orders = await _orderRepository.ListAsync(orderSpec);
+            orders = await GetWithRelated(o => o.UserName == userName)
+                            .AsNoTracking()
+                            .ToListAsync();
         }
         return orders.DistinctBy(order => order.SiteName)
                      .Select(i => i.SiteName)
@@ -90,7 +114,7 @@ public class OrderService : IOrderService
     public async Task<string?[]> GetCountriesForFilter()
     {
         return await _orderRepository
-                                    .ListAsync()
+                                    .GetAllAsync()
                                     .ContinueWith(o => o.Result
                                                             .DistinctBy(order => order.Address.Country)
                                                             .Where(order => order.Address.Country != null)
@@ -103,29 +127,33 @@ public class OrderService : IOrderService
                                                                    int? numOrderItems, int? minOrderPrice,
                                                                    int? maxOrderPrice, string? sortBy)
     {
-        var orderSpec = new OrdersWithItemsSpecification();
-        var orders = await _orderRepository.ListAsync(orderSpec);
+        var orders = await _dbContext.Orders.Include(o => o.OrderItems)
+            .Where(o => o.StatesOrder
+                                .OrderBy(s => s.Date)
+                                .Last().State == OrderState.InSearchPerformer)
+            .AsNoTracking()
+            .ToListAsync();
 
         Func<Order, bool> checkIntParams = (order) => {
             bool res = true;
             if (numOrderItems != null) res = res && order.OrderItems.Count <= numOrderItems;
-            if (minOrderPrice != null && maxOrderPrice != null) 
+            if (minOrderPrice != null && maxOrderPrice != null)
                 res = res && order.TotalOrderPrice() >= minOrderPrice && order.TotalOrderPrice() <= maxOrderPrice;
             return res;
         };
 
         var filtered = (shops.Length == 0, countries.Length == 0) switch
-            {
-                (false, true) => orders.Where(o => shops.Contains(o.SiteName) && checkIntParams(o)),
+        {
+            (false, true) => orders.Where(o => shops.Contains(o.SiteName) && checkIntParams(o)),
 
-                (true, false) => orders.Where(o => countries.Contains(o.Address.Country) && checkIntParams(o)),
+            (true, false) => orders.Where(o => countries.Contains(o.Address.Country) && checkIntParams(o)),
 
-                (false, false) => orders.Where(o => shops.Contains(o.SiteName) &&
-                                                    countries.Contains(o.Address.Country) &&
-                                                    checkIntParams(o)),
+            (false, false) => orders.Where(o => shops.Contains(o.SiteName) &&
+                                                countries.Contains(o.Address.Country) &&
+                                                checkIntParams(o)),
 
-                (true, true) => orders.Where(o => checkIntParams(o)),
-            };
+            (true, true) => orders.Where(o => checkIntParams(o)),
+        };
 
         filtered = SortByParam(sortBy, filtered);
         var paginatedOrders = PagedList<Order>.ToPagedList(filtered, pageNumber, pageSize);
@@ -178,11 +206,4 @@ public class OrderService : IOrderService
         var orders = await GetUserOrdersAsync(userName, new OrderState[0], new string[0], null);
         await _orderRepository.DeleteRangeAsync(orders);
     }
-}
-
-public enum FilterParam
-{
-    AllShops,
-    AllCountries,
-    UserShops,
 }

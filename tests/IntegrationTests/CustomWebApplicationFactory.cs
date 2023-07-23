@@ -1,6 +1,6 @@
 ﻿using IntermediarySearchService.Core.Entities.OrderAggregate;
 using IntermediarySearchService.Core.Interfaces;
-using IntermediarySearchService.Infrastructure.Data;
+using IntermediarySearchService.Infrastructure.Data.DataAccess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

@@ -1,10 +1,9 @@
 ﻿using IntermediarySearchService.Core.Entities.OfferAggregate;
-using IntermediarySearchService.Core.Interfaces;
-using IntermediarySearchService.Core.Exceptions;
 using IntermediarySearchService.Core.Entities.OrderAggregate;
-using IntermediarySearchService.Core.Specifications;
+using IntermediarySearchService.Core.Exceptions;
+using IntermediarySearchService.Core.Interfaces;
 
-namespace IntermediarySearchService.Core.Services;
+namespace IntermediarySearchService.Infrastructure.Data.Services;
 
 public class OfferService : IOfferService
 {
@@ -15,7 +14,8 @@ public class OfferService : IOfferService
     private const string minMax = "minmax";
     private const string newest = "newest";
     private const string oldest = "oldest";
-    public OfferService(IRepository<Offer> offerRepository, IRepository<Order> orderRepository, 
+    public OfferService(IRepository<Offer> offerRepository, 
+                        IRepository<Order> orderRepository,
                         IOrderService orderService)
     {
         _offerRepository = offerRepository;
@@ -32,12 +32,15 @@ public class OfferService : IOfferService
             await _offerRepository.AddAsync(offer);
             return offer.Id;
         }
-        else throw new OfferCreatingException(order.Id);
+        else
+        {
+            throw new OfferCreatingException(order.Id);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        var offer = await _offerRepository.GetByIdAsync(id);
+        var offer = await _offerRepository.SearchOneAsync(o => o.Id == id);
         if (offer != null)
         {
             offer.Remove();
@@ -71,10 +74,9 @@ public class OfferService : IOfferService
 
     public async Task<IEnumerable<Offer>> GetUserOffersAsync(string userName, OfferState[] offerStates, string? sortBy)
     {
-        var offerSpec = new OffersSpecification(userName);
-        var offers = await _offerRepository.ListAsync(offerSpec);
+        var offers = await _offerRepository.SearchManyAsync(of => of.UserName == userName && of.Deleted == null);
 
-        if (offerStates.Length > 0) 
+        if (offerStates.Length > 0)
             offers = offers.Where(o => offerStates.Contains((OfferState)o.StatesOffer.Last()?.State)).ToList();
 
         return SortByParam(sortBy, offers);
@@ -92,15 +94,15 @@ public class OfferService : IOfferService
 
     public async Task<Offer> GetByIdAsync(int id)
     {
-        var offerSpec = new OfferSpecification(id);
-        var offer = await _offerRepository.FirstOrDefaultAsync(offerSpec);
+        var offer = await _offerRepository.SearchOneAsync(of => of.Id == id && of.Deleted == null);
+
         if (offer != null)
             return offer;
         else
             throw new OfferNotFoundException(id);
     }
 
-    public async Task UpdateAsync(int id, decimal itemsTotalCost, decimal deliveryCost, 
+    public async Task UpdateAsync(int id, decimal itemsTotalCost, decimal deliveryCost,
                                         decimal? expenses, string? comment)
     {
         var offer = await GetByIdAsync(id);
@@ -110,6 +112,8 @@ public class OfferService : IOfferService
             await _offerRepository.UpdateAsync(offer);
         }
         else
+        {
             throw new OfferNotFoundException(id);
+        }
     }
 }

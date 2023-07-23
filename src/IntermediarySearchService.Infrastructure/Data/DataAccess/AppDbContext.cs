@@ -1,10 +1,9 @@
-﻿
-using IntermediarySearchService.Core.Entities.OfferAggregate;
+﻿using IntermediarySearchService.Core.Entities.OfferAggregate;
 using IntermediarySearchService.Core.Entities.OrderAggregate;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
-namespace IntermediarySearchService.Infrastructure.Data;
+namespace IntermediarySearchService.Infrastructure.Data.DataAccess;
 
 public class AppDbContext : DbContext
 {
